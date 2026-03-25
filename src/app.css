@@ -1,0 +1,53 @@
+@import 'tailwindcss';
+@import 'maplibre-gl/dist/maplibre-gl.css';
+
+:root {
+	--color-amber: #f59e0b;
+	--color-amber-dark: #d97706;
+	--color-amber-light: #fef3c7;
+	--color-ink: #1a1a1a;
+	--color-ink-light: #404040;
+	--color-muted: #737373;
+	--color-border: #e5e5e5;
+	--color-surface: #fafafa;
+	--color-white: #ffffff;
+	--color-lost: #ef4444;
+	--color-lost-light: #fef2f2;
+	--color-found: #22c55e;
+	--color-found-light: #f0fdf4;
+}
+
+html {
+	font-family: 'Inter', system-ui, -apple-system, sans-serif;
+	-webkit-font-smoothing: antialiased;
+}
+
+body {
+	background-color: var(--color-white);
+	color: var(--color-ink);
+}
+
+/* Map popup overrides */
+.maplibregl-popup-content {
+	border-radius: 12px !important;
+	padding: 0 !important;
+	box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12) !important;
+	border: 1px solid var(--color-border) !important;
+}
+
+.maplibregl-popup-close-button {
+	font-size: 18px;
+	padding: 4px 8px;
+	color: var(--color-muted);
+}
+
+/* Hide scrollbar on category filter */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Print styles */
+@media print {
+	header, footer, .no-print { display: none !important; }
+	main { padding: 0 !important; }
+	.flyer { border: none !important; box-shadow: none !important; }
+}

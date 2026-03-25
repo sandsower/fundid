@@ -1,0 +1,90 @@
+{
+	"common": {
+		"appName": "Fundið",
+		"tagline": "Lost and found in Iceland",
+		"lost": "Lost",
+		"found": "Found",
+		"search": "Search",
+		"submit": "Submit",
+		"cancel": "Cancel",
+		"back": "Back",
+		"loading": "Loading...",
+		"noResults": "No results found",
+		"resolved": "Resolved",
+		"active": "Active",
+		"close": "Close",
+		"share": "Share",
+		"contact": "Contact",
+		"all": "All"
+	},
+	"nav": {
+		"home": "Home",
+		"report": "Report",
+		"about": "About"
+	},
+	"home": {
+		"heroTitle": "Lost something?",
+		"heroSubtitle": "Or found something? Help items find their way home.",
+		"iLostSomething": "I lost something",
+		"iFoundSomething": "I found something",
+		"recentItems": "Recent listings",
+		"viewAll": "View all",
+		"stats": {
+			"itemsPosted": "Posted",
+			"itemsReturned": "Returned",
+			"activeListings": "Active listings"
+		}
+	},
+	"item": {
+		"reportLost": "Report a lost item",
+		"reportFound": "Report a found item",
+		"category": "Category",
+		"title": "Title",
+		"titlePlaceholder": "Brief description of the item",
+		"description": "Description",
+		"descriptionPlaceholder": "Color, brand, distinguishing features...",
+		"location": "Location",
+		"locationPlaceholder": "Where was it lost/found?",
+		"date": "Date",
+		"photo": "Photo",
+		"uploadPhoto": "Upload photo",
+		"contactMethod": "Contact method",
+		"email": "Email",
+		"anonymous": "Anonymous via Fundið",
+		"email_placeholder": "your@email.com",
+		"posted": "Posted",
+		"generateFlyer": "Generate flyer",
+		"tapMap": "Tap the map to drop a pin",
+		"markResolved": "Mark as resolved",
+		"contactFinder": "Contact finder",
+		"contactOwner": "Contact owner"
+	},
+	"categories": {
+		"phone": "Phone",
+		"wallet": "Wallet",
+		"keys": "Keys",
+		"bag": "Bag",
+		"glasses": "Glasses",
+		"clothing": "Clothing",
+		"jewelry": "Jewelry",
+		"documents": "Documents",
+		"electronics": "Electronics",
+		"pet": "Pet",
+		"bicycle": "Bicycle",
+		"other": "Other"
+	},
+	"flyer": {
+		"title": "LOST",
+		"foundTitle": "FOUND",
+		"scanToHelp": "Scan the QR code to help",
+		"printFlyer": "Print flyer"
+	},
+	"about": {
+		"title": "About Fundið",
+		"description": "Fundið is a community project to help people in Iceland find lost items.",
+		"howItWorks": "How does it work?",
+		"step1": "Report a lost or found item",
+		"step2": "We notify you if something matches",
+		"step3": "Get in touch and get your item back"
+	}
+}

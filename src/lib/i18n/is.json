@@ -1,0 +1,89 @@
+{
+	"common": {
+		"appName": "Fundið",
+		"tagline": "Týnt og fundið á Íslandi",
+		"lost": "Týnt",
+		"found": "Fundið",
+		"search": "Leita",
+		"submit": "Senda inn",
+		"cancel": "Hætta við",
+		"back": "Til baka",
+		"loading": "Hleð...",
+		"noResults": "Ekkert fannst",
+		"resolved": "Leyst",
+		"active": "Virkt",
+		"close": "Loka",
+		"share": "Deila",
+		"contact": "Hafa samband",
+		"all": "Allt"
+	},
+	"nav": {
+		"home": "Heim",
+		"report": "Tilkynna",
+		"about": "Um"
+	},
+	"home": {
+		"heroTitle": "Týndir þú einhverju?",
+		"heroSubtitle": "Eða fannst þú eitthvað? Hjálpaðu að koma hlutum heim.",
+		"iLostSomething": "Ég týndi einhverju",
+		"iFoundSomething": "Ég fann eitthvað",
+		"recentItems": "Nýlegar skráningar",
+		"viewAll": "Sjá allt",
+		"stats": {
+			"itemsPosted": "Skráð",
+			"itemsReturned": "Skilað",
+			"activeListings": "Virkar skráningar"
+		}
+	},
+	"item": {
+		"reportLost": "Tilkynna týndan hlut",
+		"reportFound": "Tilkynna fundinn hlut",
+		"category": "Flokkur",
+		"title": "Titill",
+		"titlePlaceholder": "Stutt lýsing á hlutnum",
+		"description": "Lýsing",
+		"descriptionPlaceholder": "Litur, gerð, sérkenni...",
+		"location": "Staðsetning",
+		"locationPlaceholder": "Hvar týndist/fannst hluturinn?",
+		"date": "Dagsetning",
+		"photo": "Mynd",
+		"uploadPhoto": "Hlaða upp mynd",
+		"contactMethod": "Samskiptaleið",
+		"email": "Netfang",
+		"anonymous": "Nafnlaust í gegnum Fundið",
+		"posted": "Skráð",
+		"generateFlyer": "Búa til veggspjald",
+		"tapMap": "Smelltu á kortið til að setja nál",
+		"markResolved": "Merkja sem leyst",
+		"contactFinder": "Hafa samband við finnanda",
+		"contactOwner": "Hafa samband við eiganda"
+	},
+	"categories": {
+		"phone": "Sími",
+		"wallet": "Veski",
+		"keys": "Lyklar",
+		"bag": "Taska",
+		"glasses": "Gleraugu",
+		"clothing": "Fatnaður",
+		"jewelry": "Skartgripir",
+		"documents": "Skjöl",
+		"electronics": "Raftæki",
+		"pet": "Gæludýr",
+		"bicycle": "Reiðhjól",
+		"other": "Annað"
+	},
+	"flyer": {
+		"title": "TÝNT",
+		"foundTitle": "FUNDIÐ",
+		"scanToHelp": "Skannaðu QR kóðann til að hjálpa",
+		"printFlyer": "Prenta veggspjald"
+	},
+	"about": {
+		"title": "Um Fundið",
+		"description": "Fundið er samfélagsverkefni til að hjálpa fólki á Íslandi að finna týnda hluti.",
+		"howItWorks": "Hvernig virkar þetta?",
+		"step1": "Skráðu týndan eða fundinn hlut",
+		"step2": "Við sendum tilkynningu ef eitthvað passar",
+		"step3": "Hafðu samband og fáðu hlutinn til baka"
+	}
+}
