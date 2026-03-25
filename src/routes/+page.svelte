@@ -17,7 +17,7 @@
 	import type { MapBounds } from '$components/Map.svelte';
 
 	let view: 'map' | 'list' = $state('map');
-	let showFoundModal = $state(false);
+	let showReportModal: 'lost' | 'found' | null = $state(null);
 	let previewItem: import('$types/item').Item | null = $state(null);
 	let mapBounds: MapBounds | null = $state(null);
 	let boundsTimer: ReturnType<typeof setTimeout>;
@@ -87,8 +87,8 @@
 		filters.update((f) => ({ ...f, category }));
 	}
 
-	function handleFoundSuccess(id: string) {
-		showFoundModal = false;
+	function handleReportSuccess(id: string) {
+		showReportModal = null;
 		goto(`/item/${id}`);
 	}
 </script>
@@ -101,14 +101,14 @@
 
 	<!-- Floating action buttons over the map -->
 	<div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
-		<a
-			href="/new?type=lost"
+		<button
+			onclick={() => (showReportModal = 'lost')}
 			class="bg-[var(--color-lost)] text-white font-medium text-sm px-5 py-2.5 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all inline-flex items-center gap-1.5"
 		>
 			<SearchX size={16} /> {$_('home.iLostSomething')}
-		</a>
+		</button>
 		<button
-			onclick={() => (showFoundModal = true)}
+			onclick={() => (showReportModal = 'found')}
 			class="bg-[var(--color-found)] text-white font-medium text-sm px-5 py-2.5 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all inline-flex items-center gap-1.5"
 		>
 			<HandHelping size={16} /> {$_('home.iFoundSomething')}
@@ -181,36 +181,38 @@
 	{/if}
 </section>
 
-<!-- Found item modal -->
-{#if showFoundModal}
+<!-- Report modal (lost or found) -->
+{#if showReportModal}
 	<div
 		class="fixed inset-0 z-50 flex items-start justify-center"
 		role="dialog"
 		aria-modal="true"
 	>
-		<!-- Backdrop -->
 		<button
 			class="absolute inset-0 bg-black/40 backdrop-blur-sm"
-			onclick={() => (showFoundModal = false)}
+			onclick={() => (showReportModal = null)}
 			aria-label="Close"
 		></button>
 
-		<!-- Modal panel -->
 		<div class="relative bg-white w-full max-w-lg mx-4 mt-16 mb-8 rounded-2xl shadow-2xl border border-[var(--color-border)] max-h-[calc(100vh-6rem)] overflow-y-auto">
 			<div class="sticky top-0 bg-white border-b border-[var(--color-border)] px-6 py-4 rounded-t-2xl flex items-center justify-between">
 				<div>
-					<h2 class="text-lg font-bold text-[var(--color-ink)]">{$_('item.reportFound')}</h2>
-					<p class="text-xs text-[var(--color-muted)]">{$_('item.reportFoundSub')}</p>
+					<h2 class="text-lg font-bold text-[var(--color-ink)]">
+						{showReportModal === 'lost' ? $_('item.reportLost') : $_('item.reportFound')}
+					</h2>
+					<p class="text-xs text-[var(--color-muted)]">
+						{showReportModal === 'lost' ? $_('item.reportLostSub') : $_('item.reportFoundSub')}
+					</p>
 				</div>
 				<button
-					onclick={() => (showFoundModal = false)}
+					onclick={() => (showReportModal = null)}
 					class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[var(--color-surface)] text-[var(--color-muted)] hover:text-[var(--color-ink)] transition-colors"
 				>
 					<X size={18} />
 				</button>
 			</div>
 			<div class="p-6">
-				<ReportForm type="found" onSuccess={handleFoundSuccess} onCancel={() => (showFoundModal = false)} />
+				<ReportForm type={showReportModal} onSuccess={handleReportSuccess} onCancel={() => (showReportModal = null)} />
 			</div>
 		</div>
 	</div>
