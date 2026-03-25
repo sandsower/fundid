@@ -18,7 +18,7 @@
 		{itemType === 'lost' ? $_('item.reportLost') : $_('item.reportFound')}
 	</h1>
 	<p class="text-sm text-[var(--color-muted)] mb-6">
-		{itemType === 'lost' ? 'Describe what you lost and where.' : 'Help someone get their item back.'}
+		{itemType === 'lost' ? $_('item.reportLostSub') : $_('item.reportFoundSub')}
 	</p>
 
 	<!-- Type toggle -->

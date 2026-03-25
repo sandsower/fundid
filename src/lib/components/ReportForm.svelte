@@ -26,7 +26,7 @@
 	let longitude = $state(ICELAND_CENTER.lng);
 	let dateOccurred = $state(new Date().toISOString().split('T')[0]);
 	let contactValue = $state('');
-	let locationPicker: LocationPicker;
+	let flyToMap: ((lat: number, lng: number) => void) | null = null;
 	let imageFile: File | null = $state(null);
 	let imagePreview: string | null = $state(null);
 	let submitting = $state(false);
@@ -45,15 +45,23 @@
 		}
 	}
 
+	let locating = $state(false);
+
 	function useMyLocation() {
 		if (!navigator.geolocation) return;
+		locating = true;
 		navigator.geolocation.getCurrentPosition(
 			(pos) => {
 				latitude = pos.coords.latitude;
 				longitude = pos.coords.longitude;
-				locationPicker?.flyTo(pos.coords.latitude, pos.coords.longitude);
+				flyToMap?.(pos.coords.latitude, pos.coords.longitude);
+				locating = false;
 			},
-			() => {}
+			() => {
+				locating = false;
+				error = $_('item.locationError');
+			},
+			{ enableHighAccuracy: true, timeout: 10000 }
 		);
 	}
 
@@ -61,7 +69,7 @@
 		latitude = result.lat;
 		longitude = result.lng;
 		locationName = result.name;
-		locationPicker?.flyTo(result.lat, result.lng);
+		flyToMap?.(result.lat, result.lng);
 	}
 
 	function handleLocationResolved(name: string) {
@@ -201,13 +209,13 @@
 				<AddressSearch bind:value={locationName} onSelect={handleAddressSelect} />
 			</div>
 			<button
-				type="button" onclick={useMyLocation}
-				class="shrink-0 px-3 py-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl hover:border-[var(--color-amber)] transition-colors text-lg"
+				type="button" onclick={useMyLocation} disabled={locating}
+				class="shrink-0 px-3 py-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl hover:border-[var(--color-amber)] transition-colors disabled:opacity-50"
 				title="Use my location"
-			><MapPin size={18} /></button>
+			>{#if locating}<span class="w-[18px] h-[18px] border-2 border-[var(--color-amber)] border-t-transparent rounded-full animate-spin inline-block"></span>{:else}<MapPin size={18} />{/if}</button>
 		</div>
 		<div>
-			<LocationPicker bind:this={locationPicker} bind:latitude bind:longitude height="200px" onLocationResolved={handleLocationResolved} />
+			<LocationPicker bind:latitude bind:longitude height="200px" onLocationResolved={handleLocationResolved} onReady={(api) => (flyToMap = api.flyTo)} />
 		</div>
 	</div>
 

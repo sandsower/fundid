@@ -7,12 +7,14 @@
 		latitude = $bindable(ICELAND_CENTER.lat),
 		longitude = $bindable(ICELAND_CENTER.lng),
 		height = '200px',
-		onLocationResolved
+		onLocationResolved,
+		onReady
 	}: {
 		latitude: number;
 		longitude: number;
 		height?: string;
 		onLocationResolved?: (name: string) => void;
+		onReady?: (api: { flyTo: (lat: number, lng: number) => void }) => void;
 	} = $props();
 
 	let container: HTMLDivElement;
@@ -80,6 +82,8 @@
 				resolveAddress(e.coords.latitude, e.coords.longitude);
 			}
 		});
+
+		if (onReady) onReady({ flyTo });
 	}
 
 	function placeMarker(maplibregl: any, lng: number, lat: number) {
@@ -220,14 +224,18 @@
 		});
 	}
 
-	async function resolveAddress(lat: number, lng: number) {
+	let resolveTimer: ReturnType<typeof setTimeout>;
+
+	function resolveAddress(lat: number, lng: number) {
 		if (!onLocationResolved) return;
-		const name = await reverseGeocode(lat, lng);
-		if (name) onLocationResolved(name);
+		clearTimeout(resolveTimer);
+		resolveTimer = setTimeout(async () => {
+			const name = await reverseGeocode(lat, lng);
+			if (name) onLocationResolved(name);
+		}, 1500);
 	}
 
-	/** Called externally to fly to a specific location */
-	export function flyTo(lat: number, lng: number) {
+	function flyTo(lat: number, lng: number) {
 		if (!map) return;
 		latitude = lat;
 		longitude = lng;

@@ -5,17 +5,41 @@
 	import CategoryFilter from '$components/CategoryFilter.svelte';
 	import Map from '$components/Map.svelte';
 	import ReportForm from '$components/ReportForm.svelte';
+	import ItemPreview from '$components/ItemPreview.svelte';
 	import { items, filters, loading } from '$stores/items';
 	import { SearchX, HandHelping, Map as MapIcon, LayoutList, Search, X } from 'lucide-svelte';
 	import type { ItemType, ItemCategory } from '$types/item';
 	import { supabase } from '$lib/supabase';
+	import { generateMockItems } from '$utils/mock-data';
+	import { dev } from '$app/environment';
 	import { onMount } from 'svelte';
+
+	import type { MapBounds } from '$components/Map.svelte';
 
 	let view: 'map' | 'list' = $state('map');
 	let showFoundModal = $state(false);
+	let previewItem: import('$types/item').Item | null = $state(null);
+	let mapBounds: MapBounds | null = $state(null);
+	let boundsTimer: ReturnType<typeof setTimeout>;
+
+	function handleBoundsChange(bounds: MapBounds) {
+		clearTimeout(boundsTimer);
+		boundsTimer = setTimeout(() => {
+			mapBounds = bounds;
+		}, 300);
+	}
+
+	const USE_MOCK = dev;
 
 	onMount(async () => {
 		loading.set(true);
+
+		if (USE_MOCK) {
+			items.set(generateMockItems(300));
+			loading.set(false);
+			return;
+		}
+
 		const { data, error } = await supabase
 			.from('items')
 			.select('id, type, category, title, description, image_url, latitude, longitude, location_name, date_occurred, status, contact_method, created_at, updated_at')
@@ -27,7 +51,8 @@
 		loading.set(false);
 	});
 
-	let filteredItems = $derived.by(() => {
+	// Items filtered by type/category/query — fed to the map
+	let searchFiltered = $derived.by(() => {
 		let result = $items;
 		if ($filters.type !== 'all') result = result.filter((i) => i.type === $filters.type);
 		if ($filters.category !== 'all') result = result.filter((i) => i.category === $filters.category);
@@ -41,6 +66,17 @@
 			);
 		}
 		return result;
+	});
+
+	// Items visible on the current map viewport — fed to the card grid
+	let filteredItems = $derived.by(() => {
+		if (!mapBounds) return searchFiltered;
+		return searchFiltered.filter((i) =>
+			i.latitude >= mapBounds.south &&
+			i.latitude <= mapBounds.north &&
+			i.longitude >= mapBounds.west &&
+			i.longitude <= mapBounds.east
+		);
 	});
 
 	function setType(type: ItemType | 'all') {
@@ -60,7 +96,7 @@
 <!-- Map section — full width, the hero IS the map -->
 <section class="relative">
 	<div class="h-[55vh] md:h-[60vh] w-full">
-		<Map items={filteredItems} />
+		<Map items={searchFiltered} onBoundsChange={handleBoundsChange} />
 	</div>
 
 	<!-- Floating action buttons over the map -->
@@ -139,7 +175,7 @@
 	{:else}
 		<div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
 			{#each filteredItems as item (item.id)}
-				<ItemCard {item} />
+				<ItemCard {item} onSelect={(i) => (previewItem = i)} />
 			{/each}
 		</div>
 	{/if}
@@ -164,7 +200,7 @@
 			<div class="sticky top-0 bg-white border-b border-[var(--color-border)] px-6 py-4 rounded-t-2xl flex items-center justify-between">
 				<div>
 					<h2 class="text-lg font-bold text-[var(--color-ink)]">{$_('item.reportFound')}</h2>
-					<p class="text-xs text-[var(--color-muted)]">Help someone get their item back.</p>
+					<p class="text-xs text-[var(--color-muted)]">{$_('item.reportFoundSub')}</p>
 				</div>
 				<button
 					onclick={() => (showFoundModal = false)}
@@ -178,5 +214,9 @@
 			</div>
 		</div>
 	</div>
+{/if}
+
+{#if previewItem}
+	<ItemPreview item={previewItem} onClose={() => (previewItem = null)} />
 {/if}
 

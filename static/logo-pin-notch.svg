@@ -1,0 +1,6 @@
+<svg viewBox="0 0 32 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M16 42C16 42 30 26 30 16C30 8.268 23.732 2 16 2C8.268 2 2 8.268 2 16C2 26 16 42 16 42Z" fill="#f59e0b"/>
+  <g transform="translate(0,2)">
+    <path d="M11 8 H22 V11.5 H15.5 L15.5 13 H21 L18 16.5 H15.5 V25 H11 Z" fill="white"/>
+  </g>
+</svg>

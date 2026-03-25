@@ -29,6 +29,7 @@
 		"iFoundSomething": "I found something",
 		"recentItems": "Recent listings",
 		"viewAll": "View all",
+		"viewDetails": "View full details",
 		"stats": {
 			"itemsPosted": "Posted",
 			"itemsReturned": "Returned",
@@ -38,6 +39,8 @@
 	"item": {
 		"reportLost": "Report a lost item",
 		"reportFound": "Report a found item",
+		"reportLostSub": "Describe what you lost and where.",
+		"reportFoundSub": "Help someone get their item back.",
 		"category": "Category",
 		"title": "Title",
 		"titlePlaceholder": "Brief description of the item",
@@ -54,6 +57,7 @@
 		"posted": "Posted",
 		"generateFlyer": "Generate flyer",
 		"tapMap": "Tap the map to drop a pin",
+		"locationError": "Could not get your location. Try searching for the address or dropping a pin on the map.",
 		"markResolved": "Mark as resolved",
 		"contactFinder": "Contact finder",
 		"contactOwner": "Contact owner"

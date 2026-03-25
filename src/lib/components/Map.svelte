@@ -3,7 +3,18 @@
 	import { ICELAND_CENTER, DEFAULT_ZOOM } from '$utils/geo';
 	import type { Item } from '$types/item';
 
-	let { items = [], onMarkerClick }: { items?: Item[]; onMarkerClick?: (item: Item) => void } = $props();
+	export interface MapBounds {
+		north: number;
+		south: number;
+		east: number;
+		west: number;
+	}
+
+	let { items = [], onMarkerClick, onBoundsChange }: {
+		items?: Item[];
+		onMarkerClick?: (item: Item) => void;
+		onBoundsChange?: (bounds: MapBounds) => void;
+	} = $props();
 
 	let container: HTMLDivElement;
 	let map: any;
@@ -39,6 +50,20 @@
 		});
 
 		map.addControl(new maplibregl.NavigationControl(), 'top-right');
+
+		function emitBounds() {
+			if (!onBoundsChange || !map) return;
+			const b = map.getBounds();
+			onBoundsChange({
+				north: b.getNorth(),
+				south: b.getSouth(),
+				east: b.getEast(),
+				west: b.getWest()
+			});
+		}
+
+		map.on('moveend', emitBounds);
+		map.on('load', emitBounds);
 		map.addControl(
 			new maplibregl.GeolocateControl({ positionOptions: { enableHighAccuracy: true }, trackUserLocation: false }),
 			'top-right'
@@ -118,13 +143,6 @@
 				markers.push(marker);
 			}
 
-			if (itemList.length > 0 && map) {
-				const bounds = new maplibregl.LngLatBounds();
-				for (const item of itemList) {
-					if (item.latitude && item.longitude) bounds.extend([item.longitude, item.latitude]);
-				}
-				if (!bounds.isEmpty()) map.fitBounds(bounds, { padding: 60, maxZoom: 14 });
-			}
 		});
 	}
 

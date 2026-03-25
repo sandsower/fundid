@@ -26,12 +26,12 @@
 			return;
 		}
 
-		searching = true;
 		debounceTimer = setTimeout(async () => {
+			searching = true;
 			results = await searchAddress(query);
 			showResults = results.length > 0;
 			searching = false;
-		}, 300);
+		}, 800);
 	}
 
 	function selectResult(result: GeoResult) {

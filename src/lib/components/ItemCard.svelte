@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { _ } from 'svelte-i18n';
+	import { goto } from '$app/navigation';
 	import type { Item } from '$types/item';
 	import { categoryIcons } from '$utils/categories';
 	import { MapPin } from 'lucide-svelte';
 
-	let { item }: { item: Item } = $props();
+	let { item, onSelect }: { item: Item; onSelect?: (item: Item) => void } = $props();
 
 	function timeAgo(dateStr: string): string {
 		const diff = Date.now() - new Date(dateStr).getTime();
@@ -18,11 +19,19 @@
 	}
 
 	const Icon = $derived(categoryIcons[item.category] || categoryIcons.other);
+
+	function handleClick() {
+		if (onSelect) {
+			onSelect(item);
+		} else {
+			goto(`/item/${item.id}`);
+		}
+	}
 </script>
 
-<a
-	href="/item/{item.id}"
-	class="group block bg-white rounded-2xl border border-[var(--color-border)] overflow-hidden hover:border-[var(--color-amber)] hover:shadow-sm transition-all"
+<button
+	onclick={handleClick}
+	class="group block w-full text-left bg-white rounded-2xl border border-[var(--color-border)] overflow-hidden hover:border-[var(--color-amber)] hover:shadow-sm transition-all cursor-pointer"
 >
 	{#if item.image_url}
 		<div class="h-44 bg-[var(--color-surface)] overflow-hidden">
@@ -57,4 +66,4 @@
 			<span class="line-clamp-1">{item.location_name}</span>
 		</p>
 	</div>
-</a>
+</button>

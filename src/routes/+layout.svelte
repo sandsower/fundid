@@ -19,7 +19,7 @@
 	<header class="border-b border-[var(--color-border)] bg-white sticky top-0 z-50">
 		<nav class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
 			<a href="/" class="flex items-center gap-2">
-				<span class="w-8 h-8 bg-[var(--color-amber)] rounded-lg flex items-center justify-center text-white font-bold text-sm">F</span>
+				<img src="/logo-pin-geo.svg" alt="Fundið" class="h-8" />
 				<span class="text-lg font-semibold tracking-tight text-[var(--color-ink)]">Fundið</span>
 			</a>
 			<div class="flex items-center gap-1">

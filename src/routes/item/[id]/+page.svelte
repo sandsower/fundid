@@ -4,11 +4,14 @@
 	import { onMount } from 'svelte';
 	import { supabase } from '$lib/supabase';
 	import { categoryIcons } from '$utils/categories';
+	import { items as itemsStore } from '$stores/items';
+	import { dev } from '$app/environment';
 	import Map from '$components/Map.svelte';
 	import ResolveModal from '$components/ResolveModal.svelte';
 	import ContactModal from '$components/ContactModal.svelte';
 	import { MapPin, Calendar, Clock, Share2, Printer, ArrowLeft, CheckCircle, MessageCircle } from 'lucide-svelte';
 	import type { Item } from '$types/item';
+	import { get } from 'svelte/store';
 
 	let item: Item | null = $state(null);
 	let loading = $state(true);
@@ -17,7 +20,17 @@
 	let CatIcon = $derived(item ? (categoryIcons[item.category] || categoryIcons.other) : categoryIcons.other);
 
 	onMount(async () => {
-		const { data, error } = await supabase.from('items').select('id, type, category, title, description, image_url, latitude, longitude, location_name, date_occurred, status, contact_method, created_at, updated_at').eq('id', $page.params.id).single();
+		const id = $page.params.id;
+
+		// Check the in-memory store first (has mock data in dev)
+		const cached = get(itemsStore).find((i) => i.id === id);
+		if (cached) {
+			item = cached;
+			loading = false;
+			return;
+		}
+
+		const { data, error } = await supabase.from('items').select('id, type, category, title, description, image_url, latitude, longitude, location_name, date_occurred, status, contact_method, created_at, updated_at').eq('id', id).single();
 		if (data && !error) item = data;
 		loading = false;
 	});
@@ -50,7 +63,7 @@
 
 		<div class="bg-white rounded-2xl border border-[var(--color-border)] overflow-hidden">
 			{#if item.image_url}
-				<img src={item.image_url} alt={item.title} class="w-full h-72 object-cover" />
+				<img src={item.image_url} alt={item.title} class="w-full max-h-[60vh] object-contain bg-[var(--color-surface)]" />
 			{:else}
 				<div class="w-full h-48 bg-[var(--color-surface)] flex items-center justify-center">
 					<CatIcon size={64} strokeWidth={1} class="text-[var(--color-muted)]" />

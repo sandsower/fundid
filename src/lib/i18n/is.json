@@ -29,6 +29,7 @@
 		"iFoundSomething": "Ég fann eitthvað",
 		"recentItems": "Nýlegar skráningar",
 		"viewAll": "Sjá allt",
+		"viewDetails": "Sjá allar upplýsingar",
 		"stats": {
 			"itemsPosted": "Skráð",
 			"itemsReturned": "Skilað",
@@ -38,6 +39,8 @@
 	"item": {
 		"reportLost": "Tilkynna týndan hlut",
 		"reportFound": "Tilkynna fundinn hlut",
+		"reportLostSub": "Lýstu því sem þú týndir og hvar.",
+		"reportFoundSub": "Hjálpaðu einhverjum að fá hlutinn sinn til baka.",
 		"category": "Flokkur",
 		"title": "Titill",
 		"titlePlaceholder": "Stutt lýsing á hlutnum",
@@ -54,6 +57,7 @@
 		"posted": "Skráð",
 		"generateFlyer": "Búa til veggspjald",
 		"tapMap": "Smelltu á kortið til að setja nál",
+		"locationError": "Ekki tókst að finna staðsetningu þína. Reyndu að leita að heimilisfangi eða settu nál á kortið.",
 		"markResolved": "Merkja sem leyst",
 		"contactFinder": "Hafa samband við finnanda",
 		"contactOwner": "Hafa samband við eiganda"
