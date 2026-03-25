@@ -30,6 +30,7 @@ export interface Item {
 	status: ItemStatus;
 	contact_method: 'email' | 'anonymous';
 	contact_value: string | null;
+	claim_code_hash: string | null;
 	created_at: string;
 	updated_at: string;
 }

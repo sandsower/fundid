@@ -72,7 +72,7 @@
 			</div>
 
 			<div class="border-t-2 border-[var(--color-border)] pt-6">
-				<p class="text-sm text-[var(--color-muted)] mb-3">{$_('flyer.scanToHelp')}</p>
+				<p class="text-sm text-[var(--color-muted)] mb-3">{item.type === 'lost' ? $_('flyer.scanLost') : $_('flyer.scanFound')}</p>
 				<img
 					src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={encodeURIComponent(`https://fundid.is/item/${item.id}`)}"
 					alt="QR Code"

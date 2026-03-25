@@ -18,7 +18,7 @@
 		loading.set(true);
 		const { data, error } = await supabase
 			.from('items')
-			.select('*')
+			.select('id, type, category, title, description, image_url, latitude, longitude, location_name, date_occurred, status, contact_method, created_at, updated_at')
 			.eq('status', 'active')
 			.order('created_at', { ascending: false })
 			.limit(50);
@@ -179,3 +179,4 @@
 		</div>
 	</div>
 {/if}
+

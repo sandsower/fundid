@@ -19,6 +19,7 @@ create table public.items (
   status text not null default 'active' check (status in ('active', 'resolved', 'expired')),
   contact_method text not null default 'anonymous' check (contact_method in ('email', 'anonymous')),
   contact_value text,
+  claim_code_hash text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   -- PostGIS geometry column for spatial queries
@@ -88,6 +89,33 @@ begin
     limit 50;
 end;
 $$ language plpgsql;
+
+-- Function: verify claim code and mark item as resolved
+create or replace function resolve_item(
+  item_id uuid,
+  code_hash text
+)
+returns boolean as $$
+declare
+  matched boolean;
+begin
+  update public.items
+  set status = 'resolved'
+  where id = item_id
+    and claim_code_hash = code_hash
+    and status = 'active';
+
+  get diagnostics matched = row_count;
+  return matched > 0;
+end;
+$$ language plpgsql security definer;
+
+-- RLS policy: allow updates only through the resolve_item function
+-- (no direct updates from anon clients)
+create policy "No direct updates"
+  on public.items for update
+  to anon, authenticated, public
+  using (false);
 
 -- Storage bucket for item images
 -- Run via Supabase dashboard: create bucket 'item-images' with public access

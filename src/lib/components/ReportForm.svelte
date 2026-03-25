@@ -8,6 +8,7 @@
 	import LocationPicker from '$components/LocationPicker.svelte';
 	import AddressSearch from '$components/AddressSearch.svelte';
 	import { Camera, MapPin, X } from 'lucide-svelte';
+	import { generateClaimCode, hashClaimCode } from '$utils/claim';
 	import type { GeoResult } from '$utils/geocode';
 	import type { ItemType, ItemCategory } from '$types/item';
 
@@ -24,7 +25,6 @@
 	let latitude = $state(ICELAND_CENTER.lat);
 	let longitude = $state(ICELAND_CENTER.lng);
 	let dateOccurred = $state(new Date().toISOString().split('T')[0]);
-	let contactMethod: 'email' | 'anonymous' = $state('anonymous');
 	let contactValue = $state('');
 	let locationPicker: LocationPicker;
 	let imageFile: File | null = $state(null);
@@ -69,8 +69,8 @@
 	}
 
 	async function handleSubmit() {
-		if (!title.trim() || !locationName.trim()) {
-			error = 'Please fill in title and location';
+		if (!title.trim() || !locationName.trim() || !contactValue.trim()) {
+			error = 'Please fill in title, location, and email';
 			return;
 		}
 		submitting = true;
@@ -87,6 +87,9 @@
 				const { data: urlData } = supabase.storage.from('item-images').getPublicUrl(uploadData.path);
 				imageUrl = urlData.publicUrl;
 			}
+			const claimCode = generateClaimCode();
+			const claimCodeHash = await hashClaimCode(claimCode);
+
 			const { data, error: insertError } = await supabase
 				.from('items')
 				.insert({
@@ -99,14 +102,26 @@
 					longitude,
 					location_name: locationName.trim(),
 					date_occurred: dateOccurred,
-					contact_method: contactMethod,
-					contact_value: contactMethod === 'email' ? contactValue : null,
+					contact_method: 'email',
+					contact_value: contactValue.trim(),
+					claim_code_hash: claimCodeHash,
 					status: 'active'
 				})
 				.select()
 				.single();
 			if (insertError) throw insertError;
 			if (data) {
+				// Send claim code to poster's email (fire and forget)
+				supabase.functions.invoke('send-email', {
+					body: {
+						type: 'claim_code',
+						to: contactValue.trim(),
+						claimCode,
+						itemTitle: title.trim(),
+						itemId: data.id
+					}
+				});
+
 				if (onSuccess) onSuccess(data.id);
 				else goto(`/item/${data.id}`);
 			}
@@ -205,26 +220,15 @@
 		/>
 	</div>
 
-	<!-- Contact -->
-	<fieldset>
-		<legend class="text-sm font-semibold text-[var(--color-ink)] mb-3">{$_('item.contactMethod')}</legend>
-		<div class="space-y-2">
-			<label class="flex items-center gap-3 p-3 border border-[var(--color-border)] rounded-xl cursor-pointer hover:border-[var(--color-amber)] transition-colors {contactMethod === 'anonymous' ? 'border-[var(--color-amber)] bg-[var(--color-amber-light)]' : ''}">
-				<input type="radio" bind:group={contactMethod} value="anonymous" class="accent-[var(--color-amber)]" />
-				<span class="text-sm">{$_('item.anonymous')}</span>
-			</label>
-			<label class="flex items-center gap-3 p-3 border border-[var(--color-border)] rounded-xl cursor-pointer hover:border-[var(--color-amber)] transition-colors {contactMethod === 'email' ? 'border-[var(--color-amber)] bg-[var(--color-amber-light)]' : ''}">
-				<input type="radio" bind:group={contactMethod} value="email" class="accent-[var(--color-amber)]" />
-				<span class="text-sm">{$_('item.email')}</span>
-			</label>
-		</div>
-		{#if contactMethod === 'email'}
-			<input
-				type="email" bind:value={contactValue} placeholder="your@email.com"
-				class="mt-2 w-full px-4 py-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-amber)] focus:border-transparent placeholder:text-[var(--color-muted)]"
-			/>
-		{/if}
-	</fieldset>
+	<!-- Contact email -->
+	<div>
+		<label for="modal-email" class="text-sm font-semibold text-[var(--color-ink)] mb-1 block">{$_('item.email')}</label>
+		<input
+			id="modal-email" type="email" bind:value={contactValue} placeholder="your@email.com" required
+			class="w-full px-4 py-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-amber)] focus:border-transparent placeholder:text-[var(--color-muted)]"
+		/>
+		<p class="text-xs text-[var(--color-muted)] mt-1.5">{$_('item.emailPrivacy')}</p>
+	</div>
 
 	{#if error}
 		<p class="text-[var(--color-lost)] text-sm">{error}</p>

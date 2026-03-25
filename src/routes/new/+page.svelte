@@ -2,6 +2,7 @@
 	import { _ } from 'svelte-i18n';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
+	import { ArrowLeft } from 'lucide-svelte';
 	import ReportForm from '$components/ReportForm.svelte';
 	import type { ItemType } from '$types/item';
 
@@ -9,8 +10,8 @@
 </script>
 
 <section class="max-w-xl mx-auto px-4 py-8">
-	<a href="/" class="text-sm text-[var(--color-muted)] hover:text-[var(--color-ink)] transition-colors mb-6 inline-block">
-		← {$_('common.back')}
+	<a href="/" class="text-sm text-[var(--color-muted)] hover:text-[var(--color-ink)] transition-colors mb-6 inline-flex items-center gap-1.5">
+		<ArrowLeft size={14} /> {$_('common.back')}
 	</a>
 
 	<h1 class="text-2xl font-bold mb-1 text-[var(--color-ink)]">

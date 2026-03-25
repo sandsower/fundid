@@ -1,5 +1,5 @@
 const NOMINATIM = 'https://nominatim.openstreetmap.org';
-const HEADERS = { 'Accept-Language': 'is,en', 'User-Agent': 'Fundid/1.0 (fundid.is)' };
+const HEADERS = { 'Accept-Language': 'is,en', 'User-Agent': 'Fundið/1.0 (fundid.is)' };
 
 export interface GeoResult {
 	lat: number;

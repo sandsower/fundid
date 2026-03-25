@@ -5,16 +5,19 @@
 	import { supabase } from '$lib/supabase';
 	import { categoryIcons } from '$utils/categories';
 	import Map from '$components/Map.svelte';
-	import { MapPin, Calendar, Clock, Share2, Printer, ArrowLeft, Mail } from 'lucide-svelte';
+	import ResolveModal from '$components/ResolveModal.svelte';
+	import ContactModal from '$components/ContactModal.svelte';
+	import { MapPin, Calendar, Clock, Share2, Printer, ArrowLeft, CheckCircle, MessageCircle } from 'lucide-svelte';
 	import type { Item } from '$types/item';
 
 	let item: Item | null = $state(null);
 	let loading = $state(true);
 	let showContact = $state(false);
+	let showResolve = $state(false);
 	let CatIcon = $derived(item ? (categoryIcons[item.category] || categoryIcons.other) : categoryIcons.other);
 
 	onMount(async () => {
-		const { data, error } = await supabase.from('items').select('*').eq('id', $page.params.id).single();
+		const { data, error } = await supabase.from('items').select('id, type, category, title, description, image_url, latitude, longitude, location_name, date_occurred, status, contact_method, created_at, updated_at').eq('id', $page.params.id).single();
 		if (data && !error) item = data;
 		loading = false;
 	});
@@ -100,13 +103,18 @@
 				<div class="flex gap-2 flex-wrap">
 					{#if item.status === 'active'}
 						<button
-							onclick={() => (showContact = !showContact)}
-							class="px-5 py-2.5 rounded-full font-medium text-sm text-white transition-colors
-								{item.type === 'lost'
-									? 'bg-[var(--color-found)] hover:bg-green-600'
-									: 'bg-[var(--color-ink)] hover:bg-[var(--color-ink-light)]'}"
+							onclick={() => (showContact = true)}
+							class="px-5 py-2.5 rounded-full font-medium text-sm text-white transition-colors bg-[var(--color-amber)] hover:bg-[var(--color-amber-dark)] inline-flex items-center gap-1.5"
 						>
+							<MessageCircle size={14} />
 							{item.type === 'lost' ? $_('item.contactOwner') : $_('item.contactFinder')}
+						</button>
+
+						<button
+							onclick={() => (showResolve = true)}
+							class="px-5 py-2.5 border border-[var(--color-border)] rounded-full font-medium text-sm text-[var(--color-found)] hover:bg-[var(--color-found-light)] transition-colors inline-flex items-center gap-1.5"
+						>
+							<CheckCircle size={14} /> {$_('item.markResolved')}
 						</button>
 					{/if}
 
@@ -124,21 +132,19 @@
 						<Printer size={14} /> {$_('item.generateFlyer')}
 					</a>
 				</div>
-
-				{#if showContact}
-					<div class="mt-4 p-4 bg-[var(--color-surface)] rounded-xl border border-[var(--color-border)]">
-						{#if item.contact_method === 'email' && item.contact_value}
-							<p class="text-sm flex items-center gap-2">
-								<Mail size={14} class="text-[var(--color-amber)] shrink-0" /> <a href="mailto:{item.contact_value}" class="text-[var(--color-amber-dark)] hover:underline font-medium">{item.contact_value}</a>
-							</p>
-						{:else}
-							<p class="text-sm text-[var(--color-muted)]">
-								Anonymous contact — messaging feature coming soon.
-							</p>
-						{/if}
-					</div>
-				{/if}
 			</div>
 		</div>
 	{/if}
 </section>
+
+{#if showResolve && item}
+	<ResolveModal
+		itemId={item.id}
+		onResolved={() => { showResolve = false; if (item) item.status = 'resolved'; }}
+		onClose={() => (showResolve = false)}
+	/>
+{/if}
+
+{#if showContact && item}
+	<ContactModal itemId={item.id} itemType={item.type} onClose={() => (showContact = false)} />
+{/if}
