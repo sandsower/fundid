@@ -38,6 +38,7 @@
 			<img
 				src={item.image_url}
 				alt={item.title}
+				loading="lazy"
 				class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
 			/>
 		</div>

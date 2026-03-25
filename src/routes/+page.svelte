@@ -19,6 +19,7 @@
 	let view: 'map' | 'list' = $state('map');
 	let showReportModal: 'lost' | 'found' | null = $state(null);
 	let previewItem: import('$types/item').Item | null = $state(null);
+	let visibleCount = $state(18);
 	let mapBounds: MapBounds | null = $state(null);
 	let boundsTimer: ReturnType<typeof setTimeout>;
 
@@ -26,6 +27,7 @@
 		clearTimeout(boundsTimer);
 		boundsTimer = setTimeout(() => {
 			mapBounds = bounds;
+			visibleCount = 18;
 		}, 300);
 	}
 
@@ -81,10 +83,12 @@
 
 	function setType(type: ItemType | 'all') {
 		filters.update((f) => ({ ...f, type }));
+		visibleCount = 18;
 	}
 
 	function setCategory(category: ItemCategory | 'all') {
 		filters.update((f) => ({ ...f, category }));
+		visibleCount = 18;
 	}
 
 	function handleReportSuccess(id: string) {
@@ -174,10 +178,20 @@
 		</div>
 	{:else}
 		<div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-			{#each filteredItems as item (item.id)}
+			{#each filteredItems.slice(0, visibleCount) as item (item.id)}
 				<ItemCard {item} onSelect={(i) => (previewItem = i)} />
 			{/each}
 		</div>
+		{#if filteredItems.length > visibleCount}
+			<div class="text-center mt-6">
+				<button
+					onclick={() => (visibleCount += 18)}
+					class="text-sm font-medium text-[var(--color-amber-dark)] hover:text-[var(--color-amber)] transition-colors px-5 py-2.5 border border-[var(--color-border)] rounded-full hover:border-[var(--color-amber)] inline-flex items-center gap-1.5"
+				>
+					{$_('home.showMore')} ({filteredItems.length - visibleCount})
+				</button>
+			</div>
+		{/if}
 	{/if}
 </section>
 
