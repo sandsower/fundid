@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { _ } from 'svelte-i18n';
-	import { goto } from '$app/navigation';
+	import { goto, replaceState } from '$app/navigation';
+	import { page } from '$app/stores';
 	import ItemCard from '$components/ItemCard.svelte';
 	import CategoryFilter from '$components/CategoryFilter.svelte';
 	import Map from '$components/Map.svelte';
@@ -16,12 +17,61 @@
 
 	import type { MapBounds } from '$components/Map.svelte';
 
-	let view: 'map' | 'list' = $state('map');
+	// Initialize state from URL
+	const params = $page.url.searchParams;
+	const initialType = params.get('type');
+	const initialCategory = params.get('category');
+	const initialQuery = params.get('q') || '';
+	const initialView = params.get('view');
+
+	let view: 'map' | 'list' = $state(initialView === 'list' ? 'list' : 'map');
 	let showReportModal: 'lost' | 'found' | null = $state(null);
 	let previewItem: import('$types/item').Item | null = $state(null);
 	let visibleCount = $state(18);
 	let mapBounds: MapBounds | null = $state(null);
 	let boundsTimer: ReturnType<typeof setTimeout>;
+	let searchSyncTimer: ReturnType<typeof setTimeout>;
+
+	// Set initial filters from URL
+	if (initialType === 'lost' || initialType === 'found') {
+		filters.update((f) => ({ ...f, type: initialType }));
+	}
+	if (initialCategory && initialCategory !== 'all') {
+		filters.update((f) => ({ ...f, category: initialCategory as ItemCategory }));
+	}
+	if (initialQuery) {
+		filters.update((f) => ({ ...f, query: initialQuery }));
+	}
+
+	function syncUrl() {
+		const url = new URL($page.url);
+
+		// View
+		if (view === 'list') url.searchParams.set('view', 'list');
+		else url.searchParams.delete('view');
+
+		// Type
+		const f = $filters;
+		if (f.type !== 'all') url.searchParams.set('type', f.type);
+		else url.searchParams.delete('type');
+
+		// Category
+		if (f.category !== 'all') url.searchParams.set('category', f.category);
+		else url.searchParams.delete('category');
+
+		// Query
+		if (f.query) url.searchParams.set('q', f.query);
+		else url.searchParams.delete('q');
+
+		replaceState(url, {});
+	}
+
+	function setView(v: 'map' | 'list') {
+		view = v;
+		visibleCount = 18;
+		if (v === 'list') mapBounds = null;
+		syncUrl();
+	}
 
 	function handleBoundsChange(bounds: MapBounds) {
 		clearTimeout(boundsTimer);
@@ -84,11 +134,13 @@
 	function setType(type: ItemType | 'all') {
 		filters.update((f) => ({ ...f, type }));
 		visibleCount = 18;
+		syncUrl();
 	}
 
 	function setCategory(category: ItemCategory | 'all') {
 		filters.update((f) => ({ ...f, category }));
 		visibleCount = 18;
+		syncUrl();
 	}
 
 	function handleReportSuccess(id: string) {
@@ -97,28 +149,48 @@
 	}
 </script>
 
-<!-- Map section — full width, the hero IS the map -->
-<section class="relative">
-	<div class="h-[55vh] md:h-[60vh] w-full">
+<!-- Map section — animates between full height and collapsed -->
+<section class="relative overflow-hidden transition-all duration-500 ease-in-out" style="height: {view === 'map' ? '60vh' : '0px'};">
+	<div class="h-[60vh] w-full">
 		<Map items={searchFiltered} onBoundsChange={handleBoundsChange} />
 	</div>
 
 	<!-- Floating action buttons over the map -->
-	<div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
+	{#if view === 'map'}
+		<div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
+			<button
+				onclick={() => (showReportModal = 'lost')}
+				class="bg-[var(--color-lost)] text-white font-medium text-sm px-5 py-2.5 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all inline-flex items-center gap-1.5"
+			>
+				<SearchX size={16} /> {$_('home.iLostSomething')}
+			</button>
+			<button
+				onclick={() => (showReportModal = 'found')}
+				class="bg-[var(--color-found)] text-white font-medium text-sm px-5 py-2.5 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all inline-flex items-center gap-1.5"
+			>
+				<HandHelping size={16} /> {$_('home.iFoundSomething')}
+			</button>
+		</div>
+	{/if}
+</section>
+
+<!-- Floating buttons when map is hidden -->
+{#if view === 'list'}
+	<div class="flex justify-center gap-2 py-4 border-b border-[var(--color-border)]">
 		<button
 			onclick={() => (showReportModal = 'lost')}
-			class="bg-[var(--color-lost)] text-white font-medium text-sm px-5 py-2.5 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all inline-flex items-center gap-1.5"
+			class="bg-[var(--color-lost)] text-white font-medium text-sm px-5 py-2.5 rounded-full hover:scale-105 transition-all inline-flex items-center gap-1.5"
 		>
 			<SearchX size={16} /> {$_('home.iLostSomething')}
 		</button>
 		<button
 			onclick={() => (showReportModal = 'found')}
-			class="bg-[var(--color-found)] text-white font-medium text-sm px-5 py-2.5 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all inline-flex items-center gap-1.5"
+			class="bg-[var(--color-found)] text-white font-medium text-sm px-5 py-2.5 rounded-full hover:scale-105 transition-all inline-flex items-center gap-1.5"
 		>
 			<HandHelping size={16} /> {$_('home.iFoundSomething')}
 		</button>
 	</div>
-</section>
+{/if}
 
 <!-- Filters + listings -->
 <section class="max-w-6xl mx-auto px-4 py-6">
@@ -143,13 +215,13 @@
 		<!-- View toggle -->
 		<div class="flex border border-[var(--color-border)] rounded-lg overflow-hidden">
 			<button
-				onclick={() => (view = 'map')}
+				onclick={() => setView('map')}
 				class="px-3 py-1.5 transition-colors flex items-center {view === 'map' ? 'bg-[var(--color-ink)] text-white' : 'text-[var(--color-muted)] hover:bg-[var(--color-surface)]'}"
 			>
 				<MapIcon size={16} />
 			</button>
 			<button
-				onclick={() => (view = 'list')}
+				onclick={() => setView('list')}
 				class="px-3 py-1.5 transition-colors flex items-center {view === 'list' ? 'bg-[var(--color-ink)] text-white' : 'text-[var(--color-muted)] hover:bg-[var(--color-surface)]'}"
 			>
 				<LayoutList size={16} />
@@ -165,7 +237,13 @@
 			type="text"
 			placeholder="{$_('common.search')}..."
 			class="w-full px-4 py-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-amber)] focus:border-transparent placeholder:text-[var(--color-muted)]"
-			oninput={(e) => filters.update((f) => ({ ...f, query: (e.target as HTMLInputElement).value }))}
+			value={$filters.query}
+			oninput={(e) => {
+				filters.update((f) => ({ ...f, query: (e.target as HTMLInputElement).value }));
+				visibleCount = 18;
+				clearTimeout(searchSyncTimer);
+				searchSyncTimer = setTimeout(syncUrl, 500);
+			}}
 		/>
 	</div>
 
