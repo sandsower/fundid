@@ -124,7 +124,8 @@
 		"notFound": "Skilaboð finnast ekki",
 		"notFoundDescription": "Þessi svartengill gæti verið útrunninn eða ógildur.",
 		"alreadyReplied": "Þegar svarað",
-		"alreadyRepliedDescription": "Þú hefur þegar svarað þessum skilaboðum."
+		"alreadyRepliedDescription": "Þú hefur þegar svarað þessum skilaboðum.",
+		"itemResolved": "Þessum hlut hefur verið skilað. Samtalinu er lokað."
 	},
 	"resolve": {
 		"successTitle": "Hlutur merktur sem leystur!",

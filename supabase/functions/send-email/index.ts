@@ -143,12 +143,14 @@ async function sendContactNotification(body: {
 }
 
 async function sendReplyNotification(body: {
-  sender_email: string;
+  recipient_email: string;
   sender_name: string;
   item_id: string;
   item_title: string;
   reply_text: string;
+  replyToken: string;
 }) {
+  const replyUrl = `${SITE_URL}/reply/${body.replyToken}`;
   const itemUrl = `${SITE_URL}/item/${body.item_id}`;
 
   const html = `
@@ -157,30 +159,34 @@ async function sendReplyNotification(body: {
         <span style="display: inline-block; width: 40px; height: 40px; background: #f59e0b; border-radius: 8px; color: white; font-weight: bold; font-size: 18px; line-height: 40px;">F</span>
       </div>
 
-      <h1 style="font-size: 20px; color: #1a1a1a; margin: 0 0 8px;">Reply about "${escapeHtml(body.item_title)}"</h1>
+      <h1 style="font-size: 20px; color: #1a1a1a; margin: 0 0 8px;">New reply about "${escapeHtml(body.item_title)}"</h1>
       <p style="font-size: 14px; color: #737373; margin: 0 0 24px;">
-        The poster replied to your message through Fundið.
+        <strong>${escapeHtml(body.sender_name)}</strong> replied through Fundið.
       </p>
 
       <div style="background: #fafafa; border: 1px solid #e5e5e5; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
         <p style="font-size: 14px; color: #1a1a1a; margin: 0; white-space: pre-wrap;">${escapeHtml(body.reply_text)}</p>
       </div>
 
-      <div style="text-align: center; margin-bottom: 32px;">
-        <a href="${itemUrl}" style="display: inline-block; background: #1a1a1a; color: white; font-weight: 600; font-size: 14px; padding: 12px 24px; border-radius: 12px; text-decoration: none;">
-          View listing
+      <div style="text-align: center; margin-bottom: 16px;">
+        <a href="${replyUrl}" style="display: inline-block; background: #f59e0b; color: white; font-weight: 600; font-size: 14px; padding: 12px 24px; border-radius: 12px; text-decoration: none;">
+          Reply on Fundið
         </a>
+      </div>
+
+      <div style="text-align: center; margin-bottom: 32px;">
+        <a href="${itemUrl}" style="font-size: 13px; color: #d97706; text-decoration: none;">View listing</a>
       </div>
 
       <hr style="border: none; border-top: 1px solid #e5e5e5; margin: 24px 0;" />
       <p style="font-size: 12px; color: #a3a3a3; margin: 0;">
-        You received this because you contacted a listing on fundid.is. We'll never send you anything else.
+        You received this because of a conversation on fundid.is. We'll never send you anything else.
       </p>
     </div>
   `;
 
   return await sendEmail(
-    body.sender_email,
+    body.recipient_email,
     sanitizeSubject(`Reply about: ${body.item_title}`),
     html
   );

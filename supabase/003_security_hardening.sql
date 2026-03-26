@@ -263,7 +263,7 @@ create or replace function resolve_item(
 returns boolean as $$
 declare
   v_recent_attempts integer;
-  matched boolean;
+  v_matched integer;
 begin
   -- Rate limit: max 5 attempts per item per hour
   select count(*) into v_recent_attempts
@@ -284,8 +284,8 @@ begin
     and claim_code_hash = code_hash
     and status = 'active';
 
-  get diagnostics matched = row_count;
-  return matched > 0;
+  get diagnostics v_matched = row_count;
+  return v_matched > 0;
 end;
 $$ language plpgsql security definer;
 

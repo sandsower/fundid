@@ -124,7 +124,8 @@
 		"notFound": "Message not found",
 		"notFoundDescription": "This reply link may have expired or is invalid.",
 		"alreadyReplied": "Already replied",
-		"alreadyRepliedDescription": "You've already replied to this message."
+		"alreadyRepliedDescription": "You've already replied to this message.",
+		"itemResolved": "This item has been returned. The conversation is now closed."
 	},
 	"resolve": {
 		"successTitle": "Item marked as resolved!",

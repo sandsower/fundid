@@ -121,8 +121,8 @@
 				.single();
 			if (insertError) throw insertError;
 			if (data) {
-				// Dispatch claim code email server-side (fire and forget)
-				supabase.rpc('send_claim_code_email', {
+				// Dispatch claim code email server-side
+				await supabase.rpc('send_claim_code_email', {
 					p_item_id: data.id,
 					p_to_email: contactValue.trim(),
 					p_claim_code: claimCode,
