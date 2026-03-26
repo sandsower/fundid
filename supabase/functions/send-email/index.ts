@@ -1,10 +1,28 @@
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') || '';
+const EDGE_FUNCTION_SECRET = Deno.env.get('EDGE_FUNCTION_SECRET') || '';
 const FROM_EMAIL = 'Fundið <noreply@fundid.is>';
 const SITE_URL = Deno.env.get('SITE_URL') || 'https://fundid.is';
+const ALLOWED_ORIGINS = (Deno.env.get('ALLOWED_ORIGINS') || 'https://fundid.is').split(',');
 
 Deno.serve(async (req) => {
+  // CORS preflight
+  if (req.method === 'OPTIONS') {
+    return new Response(null, {
+      headers: corsHeaders(req),
+    });
+  }
+
   if (req.method !== 'POST') {
     return new Response('Method not allowed', { status: 405 });
+  }
+
+  // Require shared secret — only server-side callers (pg_net) should know this
+  const secret = req.headers.get('x-edge-secret');
+  if (!EDGE_FUNCTION_SECRET || secret !== EDGE_FUNCTION_SECRET) {
+    return new Response(JSON.stringify({ error: 'unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 
   try {
@@ -66,7 +84,7 @@ async function sendClaimCodeEmail(body: {
     </div>
   `;
 
-  return await sendEmail(body.to, `Your Fundið claim code: ${body.claimCode}`, html);
+  return await sendEmail(body.to, sanitizeSubject(`Your Fundið claim code: ${body.claimCode}`), html);
 }
 
 async function sendContactNotification(body: {
@@ -119,7 +137,7 @@ async function sendContactNotification(body: {
 
   return await sendEmail(
     body.posterEmail,
-    `New message about your ${body.itemType} item: ${escapeHtml(body.itemTitle)}`,
+    sanitizeSubject(`New message about your ${body.itemType} item: ${body.itemTitle}`),
     html
   );
 }
@@ -163,9 +181,19 @@ async function sendReplyNotification(body: {
 
   return await sendEmail(
     body.sender_email,
-    `Reply about: ${escapeHtml(body.item_title)}`,
+    sanitizeSubject(`Reply about: ${body.item_title}`),
     html
   );
+}
+
+function corsHeaders(req: Request): Record<string, string> {
+  const origin = req.headers.get('origin') || '';
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, x-edge-secret',
+  };
 }
 
 function escapeHtml(str: string): string {
@@ -173,7 +201,13 @@ function escapeHtml(str: string): string {
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function sanitizeSubject(str: string): string {
+  // Strip newlines/carriage returns to prevent email header injection
+  return str.replace(/[\r\n]+/g, ' ').slice(0, 200);
 }
 
 async function sendEmail(to: string, subject: string, html: string) {

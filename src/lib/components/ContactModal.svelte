@@ -32,19 +32,7 @@
 			if (rpcError) throw rpcError;
 
 			if (data?.success) {
-				// Send notification email to poster (fire and forget)
-				supabase.functions.invoke('send-email', {
-					body: {
-						type: 'contact_notification',
-						posterEmail: data.poster_email,
-						senderName: data.sender_name,
-						message: data.message,
-						itemTitle: data.item_title,
-						itemType: data.item_type,
-						itemId: itemId,
-						replyToken: data.reply_token
-					}
-				});
+				// Email dispatched server-side by the RPC
 				sent = true;
 			} else if (data?.error === 'rate_limited') {
 				error = $_('contact.rateLimited');

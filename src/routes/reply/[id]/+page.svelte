@@ -40,13 +40,7 @@
 			if (rpcError) throw rpcError;
 
 			if (data?.success) {
-				// Send reply notification to the original sender
-				await supabase.functions.invoke('send-email', {
-					body: {
-						type: 'reply_notification',
-						...data
-					}
-				});
+				// Email dispatched server-side by the RPC
 				sent = true;
 			} else {
 				error = data?.error || 'Something went wrong';

@@ -119,15 +119,12 @@
 				.single();
 			if (insertError) throw insertError;
 			if (data) {
-				// Send claim code to poster's email (fire and forget)
-				supabase.functions.invoke('send-email', {
-					body: {
-						type: 'claim_code',
-						to: contactValue.trim(),
-						claimCode,
-						itemTitle: title.trim(),
-						itemId: data.id
-					}
+				// Dispatch claim code email server-side (fire and forget)
+				supabase.rpc('send_claim_code_email', {
+					p_item_id: data.id,
+					p_to_email: contactValue.trim(),
+					p_claim_code: claimCode,
+					p_item_title: title.trim()
 				});
 
 				if (onSuccess) onSuccess(data.id);
