@@ -1,6 +1,8 @@
 <script lang="ts">
-	import { _ } from 'svelte-i18n';
+	import { getTranslate } from '@tolgee/svelte';
 	import type { Item } from '$types/item';
+
+	const { t } = getTranslate();
 	import { categoryIcons } from '$utils/categories';
 	import { MapPin, Calendar, X, ArrowRight } from 'lucide-svelte';
 
@@ -51,10 +53,10 @@
 							? 'bg-[var(--color-lost-light)] text-[var(--color-lost)]'
 							: 'bg-[var(--color-found-light)] text-[var(--color-found)]'}"
 				>
-					{item.type === 'lost' ? $_('common.lost') : $_('common.found')}
+					{item.type === 'lost' ? $t('common.lost') : $t('common.found')}
 				</span>
 				<span class="text-xs text-[var(--color-muted)] flex items-center gap-1">
-					<CatIcon size={12} strokeWidth={2} /> {$_(`categories.${item.category}`)}
+					<CatIcon size={12} strokeWidth={2} /> {$t(`categories.${item.category}`)}
 				</span>
 			</div>
 
@@ -77,7 +79,7 @@
 				href="/item/{item.id}"
 				class="w-full py-2.5 rounded-xl font-medium text-sm bg-[var(--color-ink)] text-white hover:bg-[var(--color-ink-light)] transition-colors inline-flex items-center justify-center gap-1.5"
 			>
-				{$_('home.viewDetails')} <ArrowRight size={14} />
+				{$t('home.viewDetails')} <ArrowRight size={14} />
 			</a>
 		</div>
 	</div>

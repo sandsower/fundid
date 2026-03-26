@@ -1,6 +1,8 @@
 <script lang="ts">
-	import { _ } from 'svelte-i18n';
+	import { getTranslate } from '@tolgee/svelte';
 	import { page } from '$app/stores';
+
+	const { t } = getTranslate();
 	import { onMount } from 'svelte';
 	import { supabase } from '$lib/supabase';
 	import { categoryIcons } from '$utils/categories';
@@ -53,12 +55,12 @@
 
 <section class="max-w-3xl mx-auto px-4 py-8">
 	{#if loading}
-		<p class="text-center text-[var(--color-muted)] py-16 text-sm">{$_('common.loading')}</p>
+		<p class="text-center text-[var(--color-muted)] py-16 text-sm">{$t('common.loading')}</p>
 	{:else if !item}
-		<p class="text-center text-[var(--color-muted)] py-16 text-sm">{$_('common.noResults')}</p>
+		<p class="text-center text-[var(--color-muted)] py-16 text-sm">{$t('common.noResults')}</p>
 	{:else}
 		<a href="/" class="text-sm text-[var(--color-muted)] hover:text-[var(--color-ink)] transition-colors mb-6 inline-flex items-center gap-1.5">
-			<ArrowLeft size={14} /> {$_('common.back')}
+			<ArrowLeft size={14} /> {$t('common.back')}
 		</a>
 
 		<div class="bg-white rounded-2xl border border-[var(--color-border)] overflow-hidden">
@@ -76,14 +78,14 @@
 						{item.type === 'lost'
 							? 'bg-[var(--color-lost-light)] text-[var(--color-lost)]'
 							: 'bg-[var(--color-found-light)] text-[var(--color-found)]'}">
-						{item.type === 'lost' ? $_('common.lost') : $_('common.found')}
+						{item.type === 'lost' ? $t('common.lost') : $t('common.found')}
 					</span>
 					<span class="text-xs text-[var(--color-muted)] flex items-center gap-1">
-						<CatIcon size={12} strokeWidth={2} /> {$_(`categories.${item.category}`)}
+						<CatIcon size={12} strokeWidth={2} /> {$t(`categories.${item.category}`)}
 					</span>
 					{#if item.status === 'resolved'}
 						<span class="text-[11px] font-semibold uppercase tracking-wide px-2.5 py-1 rounded-full bg-blue-50 text-blue-600">
-							{$_('common.resolved')}
+							{$t('common.resolved')}
 						</span>
 					{/if}
 				</div>
@@ -103,7 +105,7 @@
 					</p>
 					<p class="flex items-center gap-2">
 						<Clock size={14} class="text-[var(--color-muted)] shrink-0" />
-						{$_('item.posted')} {formatDate(item.created_at)}
+						{$t('item.posted')} {formatDate(item.created_at)}
 					</p>
 				</div>
 
@@ -120,14 +122,14 @@
 							class="px-5 py-2.5 rounded-full font-medium text-sm text-white transition-colors bg-[var(--color-amber)] hover:bg-[var(--color-amber-dark)] inline-flex items-center gap-1.5"
 						>
 							<MessageCircle size={14} />
-							{item.type === 'lost' ? $_('item.contactOwner') : $_('item.contactFinder')}
+							{item.type === 'lost' ? $t('item.contactOwner') : $t('item.contactFinder')}
 						</button>
 
 						<button
 							onclick={() => (showResolve = true)}
 							class="px-5 py-2.5 border border-[var(--color-border)] rounded-full font-medium text-sm text-[var(--color-found)] hover:bg-[var(--color-found-light)] transition-colors inline-flex items-center gap-1.5"
 						>
-							<CheckCircle size={14} /> {$_('item.markResolved')}
+							<CheckCircle size={14} /> {$t('item.markResolved')}
 						</button>
 					{/if}
 
@@ -135,14 +137,14 @@
 						onclick={shareItem}
 						class="px-5 py-2.5 border border-[var(--color-border)] rounded-full font-medium text-sm text-[var(--color-ink)] hover:border-[var(--color-ink)] transition-colors inline-flex items-center gap-1.5"
 					>
-						<Share2 size={14} /> {$_('common.share')}
+						<Share2 size={14} /> {$t('common.share')}
 					</button>
 
 					<a
 						href="/item/{item.id}/flyer"
 						class="px-5 py-2.5 border border-[var(--color-border)] rounded-full font-medium text-sm text-[var(--color-ink)] hover:border-[var(--color-amber)] hover:text-[var(--color-amber-dark)] transition-colors inline-flex items-center gap-1.5"
 					>
-						<Printer size={14} /> {$_('item.generateFlyer')}
+						<Printer size={14} /> {$t('item.generateFlyer')}
 					</a>
 				</div>
 			</div>

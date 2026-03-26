@@ -1,6 +1,8 @@
 <script lang="ts">
-	import { _ } from 'svelte-i18n';
+	import { getTranslate } from '@tolgee/svelte';
 	import { page } from '$app/stores';
+
+	const { t } = getTranslate();
 	import { onMount } from 'svelte';
 	import { supabase } from '$lib/supabase';
 	import { Send, CheckCircle, XCircle, Loader, ArrowLeft } from 'lucide-svelte';
@@ -57,56 +59,56 @@
 	{#if loading}
 		<div class="text-center py-16">
 			<Loader size={32} class="text-[var(--color-amber)] animate-spin mx-auto mb-4" />
-			<p class="text-sm text-[var(--color-muted)]">{$_('common.loading')}</p>
+			<p class="text-sm text-[var(--color-muted)]">{$t('common.loading')}</p>
 		</div>
 	{:else if !msgData}
 		<div class="text-center py-16">
 			<div class="w-16 h-16 bg-[var(--color-lost-light)] rounded-full flex items-center justify-center mx-auto mb-4">
 				<XCircle size={32} class="text-[var(--color-lost)]" />
 			</div>
-			<h1 class="text-xl font-bold text-[var(--color-ink)] mb-2">{$_('reply.notFound')}</h1>
-			<p class="text-sm text-[var(--color-muted)]">{$_('reply.notFoundDescription')}</p>
+			<h1 class="text-xl font-bold text-[var(--color-ink)] mb-2">{$t('reply.notFound')}</h1>
+			<p class="text-sm text-[var(--color-muted)]">{$t('reply.notFoundDescription')}</p>
 		</div>
 	{:else if sent}
 		<div class="text-center py-8">
 			<div class="w-16 h-16 bg-[var(--color-found-light)] rounded-full flex items-center justify-center mx-auto mb-4">
 				<CheckCircle size={32} class="text-[var(--color-found)]" />
 			</div>
-			<h1 class="text-xl font-bold text-[var(--color-ink)] mb-2">{$_('reply.sent')}</h1>
-			<p class="text-sm text-[var(--color-muted)] mb-6">{$_('reply.sentDescription')}</p>
+			<h1 class="text-xl font-bold text-[var(--color-ink)] mb-2">{$t('reply.sent')}</h1>
+			<p class="text-sm text-[var(--color-muted)] mb-6">{$t('reply.sentDescription')}</p>
 			<a
 				href="/item/{msgData.item_id}"
 				class="px-5 py-2.5 bg-[var(--color-ink)] text-white rounded-xl font-medium text-sm hover:bg-[var(--color-ink-light)] transition-colors inline-flex items-center gap-1.5"
 			>
-				<ArrowLeft size={14} /> {$_('reply.viewItem')}
+				<ArrowLeft size={14} /> {$t('reply.viewItem')}
 			</a>
 		</div>
 	{:else if msgData.replied_at}
 		<div class="text-center py-8">
-			<h1 class="text-xl font-bold text-[var(--color-ink)] mb-2">{$_('reply.alreadyReplied')}</h1>
-			<p class="text-sm text-[var(--color-muted)]">{$_('reply.alreadyRepliedDescription')}</p>
+			<h1 class="text-xl font-bold text-[var(--color-ink)] mb-2">{$t('reply.alreadyReplied')}</h1>
+			<p class="text-sm text-[var(--color-muted)]">{$t('reply.alreadyRepliedDescription')}</p>
 		</div>
 	{:else}
 		<a href="/item/{msgData.item_id}" class="text-sm text-[var(--color-muted)] hover:text-[var(--color-ink)] transition-colors mb-6 inline-flex items-center gap-1.5">
 			<ArrowLeft size={14} /> {msgData.item_title}
 		</a>
 
-		<h1 class="text-xl font-bold text-[var(--color-ink)] mb-1">{$_('reply.title')}</h1>
-		<p class="text-sm text-[var(--color-muted)] mb-6">{$_('reply.description')}</p>
+		<h1 class="text-xl font-bold text-[var(--color-ink)] mb-1">{$t('reply.title')}</h1>
+		<p class="text-sm text-[var(--color-muted)] mb-6">{$t('reply.description')}</p>
 
 		<!-- Original message -->
 		<div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4 mb-6">
-			<p class="text-xs font-medium text-[var(--color-muted)] mb-2">{$_('reply.from')} {msgData.sender_name}</p>
+			<p class="text-xs font-medium text-[var(--color-muted)] mb-2">{$t('reply.from')} {msgData.sender_name}</p>
 			<p class="text-sm text-[var(--color-ink)] whitespace-pre-wrap">{msgData.message}</p>
 		</div>
 
 		<form onsubmit={(e) => { e.preventDefault(); handleReply(); }} class="space-y-4">
 			<textarea
-				bind:value={reply} placeholder={$_('reply.placeholder')} rows="4" required maxlength="500"
+				bind:value={reply} placeholder={$t('reply.placeholder')} rows="4" required maxlength="500"
 				class="w-full px-4 py-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-amber)] focus:border-transparent resize-none placeholder:text-[var(--color-muted)]"
 			></textarea>
 
-			<p class="text-xs text-[var(--color-muted)]">{$_('reply.privacy')}</p>
+			<p class="text-xs text-[var(--color-muted)]">{$t('reply.privacy')}</p>
 
 			{#if error}
 				<p class="text-[var(--color-lost)] text-xs">{error}</p>
@@ -117,7 +119,7 @@
 				class="w-full py-2.5 rounded-xl font-semibold text-sm bg-[var(--color-amber)] text-white hover:bg-[var(--color-amber-dark)] transition-colors disabled:opacity-50 inline-flex items-center justify-center gap-2"
 			>
 				<Send size={14} />
-				{sending ? $_('common.loading') : $_('reply.send')}
+				{sending ? $t('common.loading') : $t('reply.send')}
 			</button>
 		</form>
 	{/if}

@@ -1,6 +1,8 @@
 <script lang="ts">
-	import { _ } from 'svelte-i18n';
+	import { getTranslate } from '@tolgee/svelte';
 	import { goto } from '$app/navigation';
+
+	const { t } = getTranslate();
 	import type { Item } from '$types/item';
 	import { categoryIcons } from '$utils/categories';
 	import { MapPin } from 'lucide-svelte';
@@ -55,7 +57,7 @@
 						? 'bg-[var(--color-lost-light)] text-[var(--color-lost)]'
 						: 'bg-[var(--color-found-light)] text-[var(--color-found)]'}"
 			>
-				{item.type === 'lost' ? $_('common.lost') : $_('common.found')}
+				{item.type === 'lost' ? $t('common.lost') : $t('common.found')}
 			</span>
 			<span class="text-[11px] text-[var(--color-muted)]">{timeAgo(item.created_at)}</span>
 		</div>

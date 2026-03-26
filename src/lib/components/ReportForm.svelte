@@ -1,6 +1,8 @@
 <script lang="ts">
-	import { _ } from 'svelte-i18n';
+	import { getTranslate } from '@tolgee/svelte';
 	import { goto } from '$app/navigation';
+
+	const { t } = getTranslate();
 	import { supabase } from '$lib/supabase';
 	import { categoryIcons, allCategories } from '$utils/categories';
 	import { extractGps, compressImage } from '$utils/image';
@@ -59,7 +61,7 @@
 			},
 			() => {
 				locating = false;
-				error = $_('item.locationError');
+				error = $t('item.locationError');
 			},
 			{ enableHighAccuracy: true, timeout: 10000 }
 		);
@@ -141,7 +143,7 @@
 <form onsubmit={(e) => { e.preventDefault(); handleSubmit(); }} class="space-y-5">
 	<!-- Category -->
 	<fieldset>
-		<legend class="text-sm font-semibold text-[var(--color-ink)] mb-3">{$_('item.category')}</legend>
+		<legend class="text-sm font-semibold text-[var(--color-ink)] mb-3">{$t('item.category')}</legend>
 		<div class="grid grid-cols-4 gap-2">
 			{#each allCategories as cat}
 				{@const Icon = categoryIcons[cat]}
@@ -154,7 +156,7 @@
 							: 'border-[var(--color-border)] text-[var(--color-muted)] hover:border-[var(--color-amber)]'}"
 				>
 					<Icon size={20} strokeWidth={1.5} class="mb-1" />
-					{$_(`categories.${cat}`)}
+					{$t(`categories.${cat}`)}
 				</button>
 			{/each}
 		</div>
@@ -162,7 +164,7 @@
 
 	<!-- Photo -->
 	<div>
-		<label class="text-sm font-semibold text-[var(--color-ink)] mb-2 block">{$_('item.photo')}</label>
+		<label class="text-sm font-semibold text-[var(--color-ink)] mb-2 block">{$t('item.photo')}</label>
 		{#if imagePreview}
 			<div class="relative mb-2">
 				<img src={imagePreview} alt="Preview" class="w-full h-40 object-cover rounded-xl" />
@@ -175,32 +177,32 @@
 		{/if}
 		<label class="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-[var(--color-border)] rounded-xl cursor-pointer hover:border-[var(--color-amber)] transition-colors bg-[var(--color-surface)]">
 			<Camera size={18} class="text-[var(--color-muted)]" />
-			<span class="text-sm text-[var(--color-muted)]">{$_('item.uploadPhoto')}</span>
+			<span class="text-sm text-[var(--color-muted)]">{$t('item.uploadPhoto')}</span>
 			<input type="file" accept="image/*" capture="environment" class="hidden" onchange={handleImageSelect} />
 		</label>
 	</div>
 
 	<!-- Title -->
 	<div>
-		<label for="modal-title" class="text-sm font-semibold text-[var(--color-ink)] mb-1 block">{$_('item.title')}</label>
+		<label for="modal-title" class="text-sm font-semibold text-[var(--color-ink)] mb-1 block">{$t('item.title')}</label>
 		<input
-			id="modal-title" type="text" bind:value={title} placeholder={$_('item.titlePlaceholder')} required
+			id="modal-title" type="text" bind:value={title} placeholder={$t('item.titlePlaceholder')} required
 			class="w-full px-4 py-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-amber)] focus:border-transparent placeholder:text-[var(--color-muted)]"
 		/>
 	</div>
 
 	<!-- Description -->
 	<div>
-		<label for="modal-desc" class="text-sm font-semibold text-[var(--color-ink)] mb-1 block">{$_('item.description')}</label>
+		<label for="modal-desc" class="text-sm font-semibold text-[var(--color-ink)] mb-1 block">{$t('item.description')}</label>
 		<textarea
-			id="modal-desc" bind:value={description} placeholder={$_('item.descriptionPlaceholder')} rows="2"
+			id="modal-desc" bind:value={description} placeholder={$t('item.descriptionPlaceholder')} rows="2"
 			class="w-full px-4 py-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-amber)] focus:border-transparent resize-none placeholder:text-[var(--color-muted)]"
 		></textarea>
 	</div>
 
 	<!-- Location -->
 	<div>
-		<label class="text-sm font-semibold text-[var(--color-ink)] mb-2 block">{$_('item.location')}</label>
+		<label class="text-sm font-semibold text-[var(--color-ink)] mb-2 block">{$t('item.location')}</label>
 		<div class="flex gap-2 mb-2">
 			<div class="flex-1 min-w-0">
 				<AddressSearch bind:value={locationName} onSelect={handleAddressSelect} />
@@ -218,7 +220,7 @@
 
 	<!-- Date -->
 	<div>
-		<label for="modal-date" class="text-sm font-semibold text-[var(--color-ink)] mb-1 block">{$_('item.date')}</label>
+		<label for="modal-date" class="text-sm font-semibold text-[var(--color-ink)] mb-1 block">{$t('item.date')}</label>
 		<input
 			id="modal-date" type="date" bind:value={dateOccurred} max={new Date().toISOString().split('T')[0]}
 			class="w-full px-4 py-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-amber)] focus:border-transparent"
@@ -227,12 +229,12 @@
 
 	<!-- Contact email -->
 	<div>
-		<label for="modal-email" class="text-sm font-semibold text-[var(--color-ink)] mb-1 block">{$_('item.email')}</label>
+		<label for="modal-email" class="text-sm font-semibold text-[var(--color-ink)] mb-1 block">{$t('item.email')}</label>
 		<input
 			id="modal-email" type="email" bind:value={contactValue} placeholder="your@email.com" required
 			class="w-full px-4 py-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-amber)] focus:border-transparent placeholder:text-[var(--color-muted)]"
 		/>
-		<p class="text-xs text-[var(--color-muted)] mt-1.5">{$_('item.emailPrivacy')}</p>
+		<p class="text-xs text-[var(--color-muted)] mt-1.5">{$t('item.emailPrivacy')}</p>
 	</div>
 
 	{#if error}
@@ -245,7 +247,7 @@
 				type="button" onclick={onCancel}
 				class="flex-1 py-2.5 rounded-xl font-semibold text-sm border border-[var(--color-border)] text-[var(--color-muted)] hover:text-[var(--color-ink)] hover:border-[var(--color-ink)] transition-colors"
 			>
-				{$_('common.cancel')}
+				{$t('common.cancel')}
 			</button>
 		{/if}
 		<button
@@ -253,7 +255,7 @@
 			class="flex-1 py-2.5 rounded-xl font-semibold text-sm text-white transition-all disabled:opacity-50
 				{type === 'lost' ? 'bg-[var(--color-lost)] hover:bg-red-500' : 'bg-[var(--color-found)] hover:bg-green-600'}"
 		>
-			{submitting ? $_('common.loading') : $_('common.submit')}
+			{submitting ? $t('common.loading') : $t('common.submit')}
 		</button>
 	</div>
 </form>

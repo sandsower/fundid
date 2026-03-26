@@ -1,6 +1,8 @@
 <script lang="ts">
-	import { _ } from 'svelte-i18n';
+	import { getTranslate } from '@tolgee/svelte';
 	import { goto, replaceState } from '$app/navigation';
+
+	const { t } = getTranslate();
 	import { page } from '$app/stores';
 	import ItemCard from '$components/ItemCard.svelte';
 	import CategoryFilter from '$components/CategoryFilter.svelte';
@@ -162,13 +164,13 @@
 				onclick={() => (showReportModal = 'lost')}
 				class="bg-[var(--color-lost)] text-white font-medium text-sm px-5 py-2.5 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all inline-flex items-center gap-1.5"
 			>
-				<SearchX size={16} /> {$_('home.iLostSomething')}
+				<SearchX size={16} /> {$t('home.iLostSomething')}
 			</button>
 			<button
 				onclick={() => (showReportModal = 'found')}
 				class="bg-[var(--color-found)] text-white font-medium text-sm px-5 py-2.5 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all inline-flex items-center gap-1.5"
 			>
-				<HandHelping size={16} /> {$_('home.iFoundSomething')}
+				<HandHelping size={16} /> {$t('home.iFoundSomething')}
 			</button>
 		</div>
 	{/if}
@@ -181,13 +183,13 @@
 			onclick={() => (showReportModal = 'lost')}
 			class="bg-[var(--color-lost)] text-white font-medium text-sm px-5 py-2.5 rounded-full hover:scale-105 transition-all inline-flex items-center gap-1.5"
 		>
-			<SearchX size={16} /> {$_('home.iLostSomething')}
+			<SearchX size={16} /> {$t('home.iLostSomething')}
 		</button>
 		<button
 			onclick={() => (showReportModal = 'found')}
 			class="bg-[var(--color-found)] text-white font-medium text-sm px-5 py-2.5 rounded-full hover:scale-105 transition-all inline-flex items-center gap-1.5"
 		>
-			<HandHelping size={16} /> {$_('home.iFoundSomething')}
+			<HandHelping size={16} /> {$t('home.iFoundSomething')}
 		</button>
 	</div>
 {/if}
@@ -207,7 +209,7 @@
 							: 'bg-[var(--color-ink)] text-white'
 						: 'text-[var(--color-muted)] hover:text-[var(--color-ink)] hover:bg-[var(--color-surface)]'}"
 				>
-					{type === 'all' ? $_('common.all') : type === 'lost' ? $_('common.lost') : $_('common.found')}
+					{type === 'all' ? $t('common.all') : type === 'lost' ? $t('common.lost') : $t('common.found')}
 				</button>
 			{/each}
 		</div>
@@ -235,7 +237,7 @@
 	<div class="mt-3 mb-5">
 		<input
 			type="text"
-			placeholder="{$_('common.search')}..."
+			placeholder="{$t('common.search')}..."
 			class="w-full px-4 py-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-amber)] focus:border-transparent placeholder:text-[var(--color-muted)]"
 			value={$filters.query}
 			oninput={(e) => {
@@ -248,11 +250,11 @@
 	</div>
 
 	{#if $loading}
-		<p class="text-center text-[var(--color-muted)] py-12 text-sm">{$_('common.loading')}</p>
+		<p class="text-center text-[var(--color-muted)] py-12 text-sm">{$t('common.loading')}</p>
 	{:else if filteredItems.length === 0}
 		<div class="text-center py-16">
 			<div class="flex justify-center mb-3"><Search size={40} strokeWidth={1} class="text-[var(--color-muted)]" /></div>
-			<p class="text-[var(--color-muted)] text-sm">{$_('common.noResults')}</p>
+			<p class="text-[var(--color-muted)] text-sm">{$t('common.noResults')}</p>
 		</div>
 	{:else}
 		<div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -266,7 +268,7 @@
 					onclick={() => (visibleCount += 18)}
 					class="text-sm font-medium text-[var(--color-amber-dark)] hover:text-[var(--color-amber)] transition-colors px-5 py-2.5 border border-[var(--color-border)] rounded-full hover:border-[var(--color-amber)] inline-flex items-center gap-1.5"
 				>
-					{$_('home.showMore')} ({filteredItems.length - visibleCount})
+					{$t('home.showMore')} ({filteredItems.length - visibleCount})
 				</button>
 			</div>
 		{/if}
@@ -290,10 +292,10 @@
 			<div class="sticky top-0 bg-white border-b border-[var(--color-border)] px-6 py-4 rounded-t-2xl flex items-center justify-between">
 				<div>
 					<h2 class="text-lg font-bold text-[var(--color-ink)]">
-						{showReportModal === 'lost' ? $_('item.reportLost') : $_('item.reportFound')}
+						{showReportModal === 'lost' ? $t('item.reportLost') : $t('item.reportFound')}
 					</h2>
 					<p class="text-xs text-[var(--color-muted)]">
-						{showReportModal === 'lost' ? $_('item.reportLostSub') : $_('item.reportFoundSub')}
+						{showReportModal === 'lost' ? $t('item.reportLostSub') : $t('item.reportFoundSub')}
 					</p>
 				</div>
 				<button

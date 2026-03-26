@@ -1,6 +1,8 @@
 <script lang="ts">
-	import { _ } from 'svelte-i18n';
+	import { getTranslate } from '@tolgee/svelte';
 	import { X, CheckCircle } from 'lucide-svelte';
+
+	const { t } = getTranslate();
 	import { supabase } from '$lib/supabase';
 	import { hashClaimCode } from '$utils/claim';
 
@@ -30,7 +32,7 @@
 			if (data) {
 				onResolved();
 			} else {
-				error = $_('claim.invalid');
+				error = $t('claim.invalid');
 			}
 		} catch (e: any) {
 			error = e.message || 'Something went wrong';
@@ -55,8 +57,8 @@
 			<CheckCircle size={24} class="text-[var(--color-found)]" />
 		</div>
 
-		<h2 class="text-lg font-bold text-[var(--color-ink)] text-center mb-1">{$_('claim.resolveTitle')}</h2>
-		<p class="text-sm text-[var(--color-muted)] text-center mb-4">{$_('claim.resolveDescription')}</p>
+		<h2 class="text-lg font-bold text-[var(--color-ink)] text-center mb-1">{$t('claim.resolveTitle')}</h2>
+		<p class="text-sm text-[var(--color-muted)] text-center mb-4">{$t('claim.resolveDescription')}</p>
 
 		<form onsubmit={(e) => { e.preventDefault(); verify(); }}>
 			<input
@@ -75,7 +77,7 @@
 				disabled={verifying || !code.trim()}
 				class="w-full py-2.5 rounded-xl font-semibold text-sm bg-[var(--color-found)] text-white hover:bg-green-600 transition-colors disabled:opacity-50"
 			>
-				{verifying ? $_('common.loading') : $_('claim.verify')}
+				{verifying ? $t('common.loading') : $t('claim.verify')}
 			</button>
 		</form>
 	</div>

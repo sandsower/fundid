@@ -1,6 +1,8 @@
 <script lang="ts">
-	import { _ } from 'svelte-i18n';
+	import { getTranslate } from '@tolgee/svelte';
 	import { page } from '$app/stores';
+
+	const { t } = getTranslate();
 	import { onMount } from 'svelte';
 	import { supabase } from '$lib/supabase';
 	import { categoryIcons } from '$utils/categories';
@@ -27,30 +29,30 @@
 </script>
 
 {#if loading}
-	<p class="text-center text-[var(--color-muted)] py-16 text-sm">{$_('common.loading')}</p>
+	<p class="text-center text-[var(--color-muted)] py-16 text-sm">{$t('common.loading')}</p>
 {:else if !item}
-	<p class="text-center text-[var(--color-muted)] py-16 text-sm">{$_('common.noResults')}</p>
+	<p class="text-center text-[var(--color-muted)] py-16 text-sm">{$t('common.noResults')}</p>
 {:else}
 	<div class="max-w-2xl mx-auto px-4 py-8">
 		<div class="no-print mb-4 flex items-center">
 			<a href="/item/{item.id}" class="text-sm text-[var(--color-muted)] hover:text-[var(--color-ink)] transition-colors inline-flex items-center gap-1.5">
-				<ArrowLeft size={14} /> {$_('common.back')}
+				<ArrowLeft size={14} /> {$t('common.back')}
 			</a>
 			<button
 				onclick={printFlyer}
 				class="ml-auto px-5 py-2 bg-[var(--color-ink)] text-white rounded-full text-sm font-medium hover:bg-[var(--color-ink-light)] transition-colors inline-flex items-center gap-1.5"
 			>
-				<Printer size={14} /> {$_('flyer.printFlyer')}
+				<Printer size={14} /> {$t('flyer.printFlyer')}
 			</button>
 		</div>
 
 		<div class="flyer bg-white border-4 rounded-2xl p-10 text-center {item.type === 'lost' ? 'border-[var(--color-lost)]' : 'border-[var(--color-found)]'}">
 			<h1 class="text-6xl font-black tracking-tight mb-1 {item.type === 'lost' ? 'text-[var(--color-lost)]' : 'text-[var(--color-found)]'}">
-				{item.type === 'lost' ? $_('flyer.title') : $_('flyer.foundTitle')}
+				{item.type === 'lost' ? $t('flyer.title') : $t('flyer.foundTitle')}
 			</h1>
 
 			<p class="text-xl text-[var(--color-muted)] mb-6 flex items-center justify-center gap-2">
-				<CatIcon size={24} strokeWidth={1.5} /> {$_(`categories.${item.category}`)}
+				<CatIcon size={24} strokeWidth={1.5} /> {$t(`categories.${item.category}`)}
 			</p>
 
 			{#if item.image_url}
@@ -72,7 +74,7 @@
 			</div>
 
 			<div class="border-t-2 border-[var(--color-border)] pt-6">
-				<p class="text-sm text-[var(--color-muted)] mb-3">{item.type === 'lost' ? $_('flyer.scanLost') : $_('flyer.scanFound')}</p>
+				<p class="text-sm text-[var(--color-muted)] mb-3">{item.type === 'lost' ? $t('flyer.scanLost') : $t('flyer.scanFound')}</p>
 				<img
 					src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={encodeURIComponent(`https://fundid.is/item/${item.id}`)}"
 					alt="QR Code"
@@ -82,7 +84,7 @@
 			</div>
 
 			<p class="mt-8 text-sm font-semibold text-[var(--color-amber-dark)]">
-				Fundið — {$_('common.tagline')}
+				Fundið — {$t('common.tagline')}
 			</p>
 		</div>
 	</div>

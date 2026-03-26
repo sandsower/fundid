@@ -1,0 +1,14 @@
+{
+  "projectId": 29837,
+  "format": "JSON_ICU",
+  "push": {
+    "files": [
+      {
+        "path": "src/lib/i18n/{languageTag}.json"
+      }
+    ]
+  },
+  "pull": {
+    "path": "src/lib/i18n/{languageTag}.json"
+  }
+}

@@ -1,6 +1,8 @@
 <script lang="ts">
-	import { _ } from 'svelte-i18n';
+	import { getTranslate } from '@tolgee/svelte';
 	import { searchAddress, type GeoResult } from '$utils/geocode';
+
+	const { t } = getTranslate();
 
 	let {
 		value = $bindable(''),
@@ -58,7 +60,7 @@
 		oninput={handleInput}
 		onblur={handleBlur}
 		onfocus={handleFocus}
-		placeholder={$_('item.locationPlaceholder')}
+		placeholder={$t('item.locationPlaceholder')}
 		required
 		class="w-full px-4 py-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-amber)] focus:border-transparent placeholder:text-[var(--color-muted)]"
 	/>

@@ -1,6 +1,8 @@
 <script lang="ts">
-	import { _ } from 'svelte-i18n';
+	import { getTranslate } from '@tolgee/svelte';
 	import type { ItemCategory } from '$types/item';
+
+	const { t } = getTranslate();
 	import { categoryIcons, allCategories } from '$utils/categories';
 
 	let { selected, onSelect }: { selected: ItemCategory | 'all'; onSelect: (c: ItemCategory | 'all') => void } = $props();
@@ -14,7 +16,7 @@
 				? 'bg-[var(--color-ink)] text-white border-[var(--color-ink)]'
 				: 'border-[var(--color-border)] text-[var(--color-muted)] hover:border-[var(--color-ink)] hover:text-[var(--color-ink)]'}"
 	>
-		{$_('common.all')}
+		{$t('common.all')}
 	</button>
 	{#each allCategories as cat}
 		{@const Icon = categoryIcons[cat]}
@@ -26,7 +28,7 @@
 					: 'border-[var(--color-border)] text-[var(--color-muted)] hover:border-[var(--color-ink)] hover:text-[var(--color-ink)]'}"
 		>
 			<Icon size={14} strokeWidth={2} />
-			{$_(`categories.${cat}`)}
+			{$t(`categories.${cat}`)}
 		</button>
 	{/each}
 </div>

@@ -1,6 +1,8 @@
 <script lang="ts">
-	import { _ } from 'svelte-i18n';
+	import { getTranslate } from '@tolgee/svelte';
 	import { Copy, Check, ShieldAlert } from 'lucide-svelte';
+
+	const { t } = getTranslate();
 
 	let { code, onDismiss }: { code: string; onDismiss: () => void } = $props();
 
@@ -21,8 +23,8 @@
 			<ShieldAlert size={24} class="text-[var(--color-amber-dark)]" />
 		</div>
 
-		<h2 class="text-lg font-bold text-[var(--color-ink)] mb-1">{$_('claim.title')}</h2>
-		<p class="text-sm text-[var(--color-muted)] mb-4">{$_('claim.description')}</p>
+		<h2 class="text-lg font-bold text-[var(--color-ink)] mb-1">{$t('claim.title')}</h2>
+		<p class="text-sm text-[var(--color-muted)] mb-4">{$t('claim.description')}</p>
 
 		<div class="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-4 mb-4">
 			<p class="font-mono text-lg font-bold tracking-widest text-[var(--color-ink)]">{code}</p>
@@ -33,19 +35,19 @@
 			class="w-full py-2.5 rounded-xl font-medium text-sm border border-[var(--color-border)] hover:border-[var(--color-ink)] transition-colors inline-flex items-center justify-center gap-2 mb-3"
 		>
 			{#if copied}
-				<Check size={16} class="text-[var(--color-found)]" /> {$_('claim.copied')}
+				<Check size={16} class="text-[var(--color-found)]" /> {$t('claim.copied')}
 			{:else}
-				<Copy size={16} /> {$_('claim.copy')}
+				<Copy size={16} /> {$t('claim.copy')}
 			{/if}
 		</button>
 
-		<p class="text-xs text-[var(--color-lost)] mb-4">{$_('claim.warning')}</p>
+		<p class="text-xs text-[var(--color-lost)] mb-4">{$t('claim.warning')}</p>
 
 		<button
 			onclick={onDismiss}
 			class="w-full py-2.5 rounded-xl font-semibold text-sm bg-[var(--color-ink)] text-white hover:bg-[var(--color-ink-light)] transition-colors"
 		>
-			{$_('claim.saved')}
+			{$t('claim.saved')}
 		</button>
 	</div>
 </div>

@@ -1,6 +1,8 @@
 <script lang="ts">
-	import { _ } from 'svelte-i18n';
+	import { getTranslate } from '@tolgee/svelte';
 	import { X, Send, CheckCircle } from 'lucide-svelte';
+
+	const { t } = getTranslate();
 	import { supabase } from '$lib/supabase';
 
 	let { itemId, itemType, onClose }: {
@@ -35,9 +37,9 @@
 				// Email dispatched server-side by the RPC
 				sent = true;
 			} else if (data?.error === 'rate_limited') {
-				error = $_('contact.rateLimited');
+				error = $t('contact.rateLimited');
 			} else {
-				error = $_('contact.failed');
+				error = $t('contact.failed');
 			}
 		} catch (e: any) {
 			error = e.message || 'Something went wrong';
@@ -63,44 +65,44 @@
 				<div class="w-12 h-12 bg-[var(--color-found-light)] rounded-full flex items-center justify-center mx-auto mb-4">
 					<CheckCircle size={24} class="text-[var(--color-found)]" />
 				</div>
-				<h2 class="text-lg font-bold text-[var(--color-ink)] mb-1">{$_('contact.sent')}</h2>
-				<p class="text-sm text-[var(--color-muted)] mb-4">{$_('contact.sentDescription')}</p>
+				<h2 class="text-lg font-bold text-[var(--color-ink)] mb-1">{$t('contact.sent')}</h2>
+				<p class="text-sm text-[var(--color-muted)] mb-4">{$t('contact.sentDescription')}</p>
 				<button
 					onclick={onClose}
 					class="px-5 py-2.5 bg-[var(--color-ink)] text-white rounded-xl font-medium text-sm hover:bg-[var(--color-ink-light)] transition-colors"
 				>
-					{$_('common.close')}
+					{$t('common.close')}
 				</button>
 			</div>
 		{:else}
 			<h2 class="text-lg font-bold text-[var(--color-ink)] mb-1 pr-8">
-				{itemType === 'lost' ? $_('contact.titleLost') : $_('contact.titleFound')}
+				{itemType === 'lost' ? $t('contact.titleLost') : $t('contact.titleFound')}
 			</h2>
-			<p class="text-sm text-[var(--color-muted)] mb-4">{$_('contact.description')}</p>
+			<p class="text-sm text-[var(--color-muted)] mb-4">{$t('contact.description')}</p>
 
 			<form onsubmit={(e) => { e.preventDefault(); handleSend(); }} class="space-y-3">
 				<div>
 					<input
-						type="text" bind:value={senderName} placeholder={$_('contact.namePlaceholder')} required
+						type="text" bind:value={senderName} placeholder={$t('contact.namePlaceholder')} required
 						class="w-full px-4 py-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-amber)] focus:border-transparent placeholder:text-[var(--color-muted)]"
 					/>
 				</div>
 				<div>
 					<input
-						type="email" bind:value={senderEmail} placeholder={$_('contact.emailPlaceholder')} required
+						type="email" bind:value={senderEmail} placeholder={$t('contact.emailPlaceholder')} required
 						class="w-full px-4 py-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-amber)] focus:border-transparent placeholder:text-[var(--color-muted)]"
 					/>
-					<p class="text-xs text-[var(--color-muted)] mt-1">{$_('contact.emailPrivacy')}</p>
+					<p class="text-xs text-[var(--color-muted)] mt-1">{$t('contact.emailPrivacy')}</p>
 				</div>
 				<div>
 					<textarea
-						bind:value={message} placeholder={$_('contact.messagePlaceholder')} rows="3" required maxlength="500"
+						bind:value={message} placeholder={$t('contact.messagePlaceholder')} rows="3" required maxlength="500"
 						class="w-full px-4 py-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-amber)] focus:border-transparent resize-none placeholder:text-[var(--color-muted)]"
 					></textarea>
 					<p class="text-xs text-[var(--color-muted)] mt-1 text-right">{message.length}/500</p>
 				</div>
 
-				<p class="text-xs text-[var(--color-muted)]">{$_('contact.privacy')}</p>
+				<p class="text-xs text-[var(--color-muted)]">{$t('contact.privacy')}</p>
 
 				{#if error}
 					<p class="text-[var(--color-lost)] text-xs">{error}</p>
@@ -111,7 +113,7 @@
 					class="w-full py-2.5 rounded-xl font-semibold text-sm bg-[var(--color-amber)] text-white hover:bg-[var(--color-amber-dark)] transition-colors disabled:opacity-50 inline-flex items-center justify-center gap-2"
 				>
 					<Send size={14} />
-					{sending ? $_('common.loading') : $_('contact.send')}
+					{sending ? $t('common.loading') : $t('contact.send')}
 				</button>
 			</form>
 		{/if}
