@@ -134,10 +134,43 @@
 	},
 	"about": {
 		"title": "About Fundið",
-		"description": "Fundið is a community project to help people in Iceland find lost items.",
-		"howItWorks": "How does it work?",
-		"step1": "Report a lost or found item",
-		"step2": "We notify you if something matches",
-		"step3": "Get in touch and get your item back"
+		"what": {
+			"heading": "What is Fundið?",
+			"body": "Fundið is a free, independent platform for lost and found items in Iceland. Anyone can report something they lost or found, and the community helps items find their way home. No accounts, no fees, no catch."
+		},
+		"how": {
+			"heading": "How does it work?",
+			"step1": "Report a lost or found item — add a photo, description, and drop a pin on the map.",
+			"step2": "Your listing appears on the map and in the item list for others to browse.",
+			"step3": "Someone recognizes the item and sends you a message through Fundið.",
+			"step4": "All communication goes through our email relay — no personal info is shared directly.",
+			"step5": "For found items, a claim code verifies that the right person gets their item back."
+		},
+		"privacy": {
+			"heading": "Privacy",
+			"intro": "Fundið is built on a simple promise: your personal information stays private.",
+			"collected": "We collect your email address (to relay messages), item descriptions, photos, and approximate location. That's it.",
+			"email": "Your email is never shown publicly, sold, or shared with third parties. No spam, no newsletters, no tracking.",
+			"relay": "All communication between users goes through Fundið's email relay. Neither party sees the other's email address unless they choose to share it.",
+			"processors": "Your data is stored on Supabase (database) and emails are sent through Resend. Both operate under standard contractual clauses for data protection.",
+			"retention": "Reports and associated data are kept for 90 days after an item is resolved, and up to 6 months for unresolved items. After that, they are automatically deleted.",
+			"rights": "You have the right to access, correct, or delete your data at any time. Contact us at privacy@fundid.is.",
+			"complaint": "You also have the right to file a complaint with Persónuvernd, Iceland's Data Protection Authority."
+		},
+		"faq": {
+			"heading": "FAQ",
+			"q1": "Is Fundið free?",
+			"a1": "Yes, completely free. No hidden fees, no premium tiers.",
+			"q2": "Who can see my email?",
+			"a2": "Nobody. Your email is only used to forward messages through our relay system. It's never displayed on the site.",
+			"q3": "How do claim codes work?",
+			"a3": "When you report a found item, you receive a unique claim code. This code is needed to mark the item as resolved later, ensuring only the original reporter can close the listing.",
+			"q4": "Can I delete my report?",
+			"a4": "Yes. Use the claim code you received when you posted the item to mark it as resolved. If you've lost your claim code or need help closing a listing, email support@fundid.is. For full data deletion, email privacy@fundid.is.",
+			"q5": "Is Fundið connected to the police?",
+			"a5": "No. Fundið is an independent community project. We are not affiliated with the police or any government agency.",
+			"q6": "What if someone makes a false claim?",
+			"a6": "The claim code system prevents unauthorized resolution of listings. All communication goes through the relay, so you can verify the person's story before sharing any details."
+		}
 	}
 }

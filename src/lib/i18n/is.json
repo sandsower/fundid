@@ -134,10 +134,43 @@
 	},
 	"about": {
 		"title": "Um Fundið",
-		"description": "Fundið er samfélagsverkefni til að hjálpa fólki á Íslandi að finna týnda hluti.",
-		"howItWorks": "Hvernig virkar þetta?",
-		"step1": "Skráðu týndan eða fundinn hlut",
-		"step2": "Við sendum tilkynningu ef eitthvað passar",
-		"step3": "Hafðu samband og fáðu hlutinn til baka"
+		"what": {
+			"heading": "Hvað er Fundið?",
+			"body": "Fundið er ókeypis og óháður vettvangur fyrir týnda og fundna hluti á Íslandi. Hver sem er getur tilkynnt eitthvað sem týndist eða fannst og samfélagið hjálpar hlutum að finna heim. Engir reikningar, engin gjöld, engir hákarl."
+		},
+		"how": {
+			"heading": "Hvernig virkar þetta?",
+			"step1": "Tilkynntu týndan eða fundinn hlut — bættu við mynd, lýsingu og settu nál á kortið.",
+			"step2": "Skráningin þín birtist á kortinu og í listanum svo aðrir geti skoðað.",
+			"step3": "Einhver þekkir hlutinn og sendir þér skilaboð í gegnum Fundið.",
+			"step4": "Öll samskipti fara í gegnum tölvupóstsmiðlun okkar — engum persónuupplýsingum er deilt beint.",
+			"step5": "Fyrir fundna hluti staðfestir auðkenniskóði að rétti aðilinn fái hlutinn til baka."
+		},
+		"privacy": {
+			"heading": "Persónuvernd",
+			"intro": "Fundið er byggt á einföldu loforði: persónuupplýsingarnar þínar eru óbirtar.",
+			"collected": "Við söfnum netfanginu þínu (til að miðla skilaboðum), lýsingum á hlutum, myndum og áætlaðri staðsetningu. Það er allt.",
+			"email": "Netfangið þitt birtist aldrei opinberlega, er aldrei selt eða deilt með þriðju aðilum. Ekkert ruslpóstur, engin fréttabréf, engin rakning.",
+			"relay": "Öll samskipti milli notenda fara í gegnum tölvupóstsmiðlun Fundið. Hvorugur aðilinn sér netfang hins nema þeir velji sjálfir að deila því.",
+			"processors": "Gögnin þín eru geymd hjá Supabase (gagnagrunnur) og tölvupóstur er sendur í gegnum Resend. Báðir starfa samkvæmt stöðluðum samningsákvæðum um gagnavernd.",
+			"retention": "Skráningar og tengd gögn eru geymd í 90 daga eftir að hlutur er leystur, og allt að 6 mánuði fyrir óleysta hluti. Eftir það er þeim sjálfkrafa eytt.",
+			"rights": "Þú hefur rétt til að fá aðgang að, leiðrétta eða eyða gögnum þínum hvenær sem er. Hafðu samband við privacy@fundid.is.",
+			"complaint": "Þú hefur einnig rétt til að leggja fram kvörtun hjá Persónuvernd."
+		},
+		"faq": {
+			"heading": "Algengar spurningar",
+			"q1": "Er Fundið ókeypis?",
+			"a1": "Já, alveg ókeypis. Engin falin gjöld, ekkert aukaverð.",
+			"q2": "Hver getur séð netfangið mitt?",
+			"a2": "Enginn. Netfangið þitt er eingöngu notað til að áframsenda skilaboð í gegnum miðlunarkerfi okkar. Það birtist aldrei á síðunni.",
+			"q3": "Hvernig virka auðkenniskóðar?",
+			"a3": "Þegar þú tilkynnir fundinn hlut færðu einstakan auðkenniskóða. Þennan kóða þarftu til að merkja hlutinn sem leyst síðar, sem tryggir að eingöngu upphaflegi skráandinn geti lokað skráningunni.",
+			"q4": "Get ég eytt skráningunni minni?",
+			"a4": "Já. Notaðu auðkenniskóðann sem þú fékkst þegar þú skráðir hlutinn til að merkja hann sem leyst. Ef þú hefur týnt auðkenniskóðanum eða þarft aðstoð við að loka skráningu, sendu tölvupóst á support@fundid.is. Fyrir fulla gagnaeyðingu, sendu tölvupóst á privacy@fundid.is.",
+			"q5": "Er Fundið tengt lögreglu?",
+			"a5": "Nei. Fundið er óháð samfélagsverkefni. Við erum ekki tengd lögreglu eða neinum ríkisstofnunum.",
+			"q6": "Hvað ef einhver gerir falskt tilkall?",
+			"a6": "Auðkenniskóðakerfið kemur í veg fyrir óheimilar lausnir á skráningum. Öll samskipti fara í gegnum miðlunina svo þú getur staðfest sögu viðkomandi áður en þú deilir upplýsingum."
+		}
 	}
 }

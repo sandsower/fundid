@@ -21,12 +21,20 @@
 				<img src="/logo-pin-geo.svg" alt="Fundið" class="h-8" />
 				<span class="text-lg font-semibold tracking-tight text-[var(--color-ink)]">Fundið</span>
 			</a>
-			<button
-				onclick={toggleLocale}
-				class="text-xs font-medium text-[var(--color-muted)] border border-[var(--color-border)] px-2.5 py-1 rounded-full hover:border-[var(--color-ink)] hover:text-[var(--color-ink)] transition-colors"
-			>
-				{$locale === 'is' ? 'EN' : 'ÍS'}
-			</button>
+			<div class="flex items-center gap-2">
+				<a
+					href="/about"
+					class="text-xs font-medium text-[var(--color-muted)] border border-[var(--color-border)] px-2.5 py-1 rounded-full hover:border-[var(--color-ink)] hover:text-[var(--color-ink)] transition-colors"
+				>
+					{$_('nav.about')}
+				</a>
+				<button
+					onclick={toggleLocale}
+					class="text-xs font-medium text-white bg-[var(--color-ink)] px-2.5 py-1 rounded-full hover:bg-[var(--color-ink-light)] transition-colors"
+				>
+					{$locale === 'is' ? 'EN' : 'ÍS'}
+				</button>
+			</div>
 		</nav>
 	</header>
 
@@ -34,7 +42,8 @@
 		{@render children()}
 	</main>
 
-	<footer class="border-t border-[var(--color-border)] py-8 text-center">
+	<footer class="border-t border-[var(--color-border)] py-8 text-center space-y-2">
 		<p class="text-sm text-[var(--color-muted)]">Fundið &mdash; {$_('common.tagline')}</p>
+		<a href="/about" class="text-xs text-[var(--color-muted)] hover:text-[var(--color-ink)] transition-colors">{$_('nav.about')}</a>
 	</footer>
 </div>
