@@ -15,7 +15,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 			"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
 			"img-src 'self' blob: data: https://*.supabase.co https://api.qrserver.com https://tile.openstreetmap.org",
 			"font-src 'self' https://fonts.gstatic.com",
-			"connect-src 'self' https://*.supabase.co https://nominatim.openstreetmap.org https://api.maptiler.com",
+			"connect-src 'self' https://*.supabase.co https://nominatim.openstreetmap.org https://api.maptiler.com https://tile.openstreetmap.org",
+			"worker-src 'self' blob:",
 			"frame-ancestors 'none'",
 			"base-uri 'self'",
 			"form-action 'self'"
