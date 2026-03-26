@@ -6,6 +6,12 @@
 -- Enable pg_net for server-side HTTP calls
 create extension if not exists pg_net with schema extensions;
 
+-- Drop existing functions that will be replaced (signature changes)
+drop function if exists send_contact_message(uuid, text, text, text);
+drop function if exists reply_to_message(text, text);
+drop function if exists get_message_by_token(text);
+drop function if exists resolve_item(uuid, text);
+
 -- Config table for internal settings (not exposed via PostgREST API)
 -- Uses a private schema so RLS isn't needed — anon/authenticated roles have no access
 create schema if not exists private;
