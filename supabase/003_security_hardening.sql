@@ -34,12 +34,14 @@ returns void as $$
 declare
   v_url text;
   v_secret text;
+  v_anon_key text;
 begin
   select value into v_url from private.app_config where key = 'edge_function_url';
   select value into v_secret from private.app_config where key = 'edge_function_secret';
+  select value into v_anon_key from private.app_config where key = 'supabase_anon_key';
 
-  if v_url is null or v_secret is null then
-    raise warning 'Edge function URL or secret not configured — email not sent';
+  if v_url is null or v_secret is null or v_anon_key is null then
+    raise warning 'Edge function config not complete — email not sent';
     return;
   end if;
 
@@ -48,6 +50,7 @@ begin
     body := payload::jsonb,
     headers := jsonb_build_object(
       'Content-Type', 'application/json',
+      'Authorization', 'Bearer ' || v_anon_key,
       'x-edge-secret', v_secret
     )
   );
