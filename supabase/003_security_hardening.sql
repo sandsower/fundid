@@ -6,9 +6,19 @@
 -- Enable pg_net for server-side HTTP calls
 create extension if not exists pg_net with schema extensions;
 
--- Store Edge Function URL and secret as database settings
--- Set these via: ALTER DATABASE postgres SET app.edge_function_url = 'https://<project>.supabase.co/functions/v1/send-email';
--- Set these via: ALTER DATABASE postgres SET app.edge_function_secret = '<secret>';
+-- Config table for internal settings (not exposed via PostgREST API)
+-- Uses a private schema so RLS isn't needed — anon/authenticated roles have no access
+create schema if not exists private;
+
+create table if not exists private.app_config (
+  key text primary key,
+  value text not null
+);
+
+-- Populate after running this migration:
+--   INSERT INTO private.app_config (key, value) VALUES
+--     ('edge_function_url', 'https://<project>.supabase.co/functions/v1/send-email'),
+--     ('edge_function_secret', '<your-secret>');
 
 ------------------------------------------------------------------------
 -- Helper: dispatch email via Edge Function (server-side only)
@@ -16,9 +26,12 @@ create extension if not exists pg_net with schema extensions;
 create or replace function _dispatch_email(payload json)
 returns void as $$
 declare
-  v_url text := current_setting('app.edge_function_url', true);
-  v_secret text := current_setting('app.edge_function_secret', true);
+  v_url text;
+  v_secret text;
 begin
+  select value into v_url from private.app_config where key = 'edge_function_url';
+  select value into v_secret from private.app_config where key = 'edge_function_secret';
+
   if v_url is null or v_secret is null then
     raise warning 'Edge function URL or secret not configured — email not sent';
     return;
