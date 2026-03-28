@@ -1,14 +1,13 @@
 import posthog from 'posthog-js';
 import { browser } from '$app/environment';
-import { env } from '$env/dynamic/public';
+import { PUBLIC_POSTHOG_KEY } from '$env/static/public';
 
 let initialized = false;
 
 export function initPostHog() {
 	if (!browser) return;
-	const key = env.PUBLIC_POSTHOG_KEY;
-	if (!key) return;
-	posthog.init(key, {
+	if (!PUBLIC_POSTHOG_KEY) return;
+	posthog.init(PUBLIC_POSTHOG_KEY, {
 		api_host: 'https://eu.i.posthog.com',
 		ui_host: 'https://eu.posthog.com',
 		persistence: 'memory',

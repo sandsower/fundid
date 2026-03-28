@@ -26,6 +26,7 @@ jobs:
           PUBLIC_SUPABASE_URL: ${{ secrets.PROD_SUPABASE_URL }}
           PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY: ${{ secrets.PROD_SUPABASE_PUBLISHABLE_KEY }}
           PUBLIC_IMAGE_BASE_URL: https://img.fundid.is
+          PUBLIC_POSTHOG_KEY: phc_BxnLWEgef23Khlrx6Q1z9IRkAu2YKNPN39Gf0EceHHJ
 
   deploy:
     needs: check
@@ -49,6 +50,7 @@ jobs:
           PUBLIC_SUPABASE_URL: ${{ secrets.PROD_SUPABASE_URL }}
           PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY: ${{ secrets.PROD_SUPABASE_PUBLISHABLE_KEY }}
           PUBLIC_IMAGE_BASE_URL: https://img.fundid.is
+          PUBLIC_POSTHOG_KEY: phc_BxnLWEgef23Khlrx6Q1z9IRkAu2YKNPN39Gf0EceHHJ
 
       # Deploy Pages
       - uses: cloudflare/wrangler-action@v3
