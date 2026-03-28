@@ -11,10 +11,13 @@ function getInitialLocale(): string {
 	return 'is';
 }
 
+const initialLocale = getInitialLocale();
+
 export const tolgee = Tolgee()
 	.use(FormatSimple())
 	.init({
-		language: getInitialLocale(),
+		language: initialLocale,
 		fallbackLanguage: 'is',
 		staticData: { en, is }
 	});
+

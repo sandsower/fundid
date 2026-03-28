@@ -5,12 +5,15 @@
 	import AppShell from '$components/AppShell.svelte';
 	import { initPostHog, capture } from '$lib/posthog';
 	import { afterNavigate } from '$app/navigation';
+	import { browser } from '$app/environment';
 	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
 
 	let { children }: { children: Snippet } = $props();
+	let ready = $state(false);
 
 	onMount(() => {
+		ready = true;
 		initPostHog();
 	});
 
@@ -19,12 +22,12 @@
 	});
 </script>
 
-<TolgeeProvider {tolgee}>
-	<div slot="fallback" class="min-h-screen flex items-center justify-center">
-		<p class="text-sm text-[var(--color-muted)]">...</p>
-	</div>
-
-	<AppShell>
-		{@render children()}
-	</AppShell>
-</TolgeeProvider>
+{#if browser && ready}
+	<TolgeeProvider {tolgee}>
+		<AppShell>
+			{@render children()}
+		</AppShell>
+	</TolgeeProvider>
+{:else}
+	<div class="min-h-screen bg-[var(--color-surface)]"></div>
+{/if}
