@@ -12,6 +12,7 @@
 	import ResolveModal from '$components/ResolveModal.svelte';
 	import ContactModal from '$components/ContactModal.svelte';
 	import { MapPin, Calendar, Clock, Share2, Printer, ArrowLeft, CheckCircle, MessageCircle } from 'lucide-svelte';
+	import { capture } from '$lib/posthog';
 	import type { Item } from '$types/item';
 	import { get } from 'svelte/store';
 
@@ -65,7 +66,8 @@
 
 		<div class="bg-white rounded-2xl border border-[var(--color-border)] overflow-hidden">
 			{#if item.image_url}
-				<img src={item.image_url} alt={item.title} class="w-full max-h-[60vh] object-contain bg-[var(--color-surface)]" />
+				<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+				<img src={item.image_url} alt={item.title} class="w-full max-h-[60vh] object-contain bg-[var(--color-surface)]" onclick={() => capture('photo_viewed', { item_id: item?.id })} />
 			{:else}
 				<div class="w-full h-48 bg-[var(--color-surface)] flex items-center justify-center">
 					<CatIcon size={64} strokeWidth={1} class="text-[var(--color-muted)]" />

@@ -11,11 +11,11 @@ export const handle: Handle = async ({ event, resolve }) => {
 		'Content-Security-Policy',
 		[
 			"default-src 'self'",
-			"script-src 'self' 'unsafe-inline'",
+			"script-src 'self' 'unsafe-inline' https://*.posthog.com",
 			"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
 			"img-src 'self' blob: data: https://*.supabase.co https://api.qrserver.com https://tile.openstreetmap.org",
 			"font-src 'self' https://fonts.gstatic.com",
-			"connect-src 'self' https://*.supabase.co https://nominatim.openstreetmap.org https://api.maptiler.com https://tile.openstreetmap.org",
+			"connect-src 'self' https://*.supabase.co https://nominatim.openstreetmap.org https://api.maptiler.com https://tile.openstreetmap.org https://*.posthog.com",
 			"worker-src 'self' blob:",
 			"frame-ancestors 'none'",
 			"base-uri 'self'",

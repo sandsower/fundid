@@ -17,6 +17,7 @@
 	import { dev } from '$app/environment';
 	import { onMount } from 'svelte';
 
+	import { capture } from '$lib/posthog';
 	import type { MapBounds } from '$components/Map.svelte';
 
 	// Initialize state from URL
@@ -73,6 +74,7 @@
 		visibleCount = 18;
 		if (v === 'list') mapBounds = null;
 		syncUrl();
+		capture('view_toggled', { view: v });
 	}
 
 	function handleBoundsChange(bounds: MapBounds) {
@@ -137,12 +139,14 @@
 		filters.update((f) => ({ ...f, type }));
 		visibleCount = 18;
 		syncUrl();
+		capture('filter_changed', { filter_type: 'type', value: type });
 	}
 
 	function setCategory(category: ItemCategory | 'all') {
 		filters.update((f) => ({ ...f, category }));
 		visibleCount = 18;
 		syncUrl();
+		capture('filter_changed', { filter_type: 'category', value: category });
 	}
 
 	function handleReportSuccess(id: string) {
@@ -161,13 +165,13 @@
 	{#if view === 'map'}
 		<div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
 			<button
-				onclick={() => (showReportModal = 'lost')}
+				onclick={() => { showReportModal = 'lost'; capture('report_form_opened', { type: 'lost' }); }}
 				class="bg-[var(--color-lost)] text-white font-medium text-sm px-5 py-2.5 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all inline-flex items-center gap-1.5"
 			>
 				<SearchX size={16} /> {$t('home.iLostSomething')}
 			</button>
 			<button
-				onclick={() => (showReportModal = 'found')}
+				onclick={() => { showReportModal = 'found'; capture('report_form_opened', { type: 'found' }); }}
 				class="bg-[var(--color-found)] text-white font-medium text-sm px-5 py-2.5 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all inline-flex items-center gap-1.5"
 			>
 				<HandHelping size={16} /> {$t('home.iFoundSomething')}
@@ -180,13 +184,13 @@
 {#if view === 'list'}
 	<div class="flex justify-center gap-2 py-4 border-b border-[var(--color-border)]">
 		<button
-			onclick={() => (showReportModal = 'lost')}
+			onclick={() => { showReportModal = 'lost'; capture('report_form_opened', { type: 'lost' }); }}
 			class="bg-[var(--color-lost)] text-white font-medium text-sm px-5 py-2.5 rounded-full hover:scale-105 transition-all inline-flex items-center gap-1.5"
 		>
 			<SearchX size={16} /> {$t('home.iLostSomething')}
 		</button>
 		<button
-			onclick={() => (showReportModal = 'found')}
+			onclick={() => { showReportModal = 'found'; capture('report_form_opened', { type: 'found' }); }}
 			class="bg-[var(--color-found)] text-white font-medium text-sm px-5 py-2.5 rounded-full hover:scale-105 transition-all inline-flex items-center gap-1.5"
 		>
 			<HandHelping size={16} /> {$t('home.iFoundSomething')}
@@ -241,10 +245,11 @@
 			class="w-full px-4 py-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-amber)] focus:border-transparent placeholder:text-[var(--color-muted)]"
 			value={$filters.query}
 			oninput={(e) => {
-				filters.update((f) => ({ ...f, query: (e.target as HTMLInputElement).value }));
+				const q = (e.target as HTMLInputElement).value;
+				filters.update((f) => ({ ...f, query: q }));
 				visibleCount = 18;
 				clearTimeout(searchSyncTimer);
-				searchSyncTimer = setTimeout(syncUrl, 500);
+				searchSyncTimer = setTimeout(() => { syncUrl(); if (q) capture('filter_changed', { filter_type: 'search', value: q }); }, 500);
 			}}
 		/>
 	</div>

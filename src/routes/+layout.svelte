@@ -3,9 +3,20 @@
 	import { TolgeeProvider } from '@tolgee/svelte';
 	import { tolgee } from '$i18n/index';
 	import AppShell from '$components/AppShell.svelte';
+	import { initPostHog, capture } from '$lib/posthog';
+	import { afterNavigate } from '$app/navigation';
+	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
 
 	let { children }: { children: Snippet } = $props();
+
+	onMount(() => {
+		initPostHog();
+	});
+
+	afterNavigate(() => {
+		capture('$pageview');
+	});
 </script>
 
 <TolgeeProvider {tolgee}>

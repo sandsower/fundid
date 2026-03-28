@@ -11,6 +11,7 @@
 	import AddressSearch from '$components/AddressSearch.svelte';
 	import { Camera, MapPin, X } from 'lucide-svelte';
 	import { generateClaimCode, hashClaimCode } from '$utils/claim';
+	import { capture } from '$lib/posthog';
 	import type { GeoResult } from '$utils/geocode';
 	import type { ItemType, ItemCategory } from '$types/item';
 
@@ -121,6 +122,7 @@
 				.single();
 			if (insertError) throw insertError;
 			if (data) {
+				capture('report_form_submitted', { type, category, has_photo: !!imageFile, has_location: !!locationName.trim() });
 				// Dispatch claim code email server-side
 				await supabase.rpc('send_claim_code_email', {
 					p_item_id: data.id,

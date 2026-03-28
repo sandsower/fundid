@@ -1,9 +1,11 @@
 <script lang="ts">
 	import { getTranslate } from '@tolgee/svelte';
+	import { onMount } from 'svelte';
 	import { X, CheckCircle } from 'lucide-svelte';
 
 	const { t } = getTranslate();
 	import { supabase } from '$lib/supabase';
+	import { capture } from '$lib/posthog';
 	import { hashClaimCode } from '$utils/claim';
 
 	let { itemId, onResolved, onClose }: {
@@ -11,6 +13,8 @@
 		onResolved: () => void;
 		onClose: () => void;
 	} = $props();
+
+	onMount(() => { capture('resolve_started', { item_id: itemId }); });
 
 	let code = $state('');
 	let verifying = $state(false);
@@ -30,6 +34,7 @@
 
 			if (rpcError) throw rpcError;
 			if (data) {
+				capture('resolve_completed', { item_id: itemId });
 				onResolved();
 			} else {
 				error = $t('claim.invalid');

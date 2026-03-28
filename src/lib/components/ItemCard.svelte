@@ -5,6 +5,7 @@
 	const { t } = getTranslate();
 	import type { Item } from '$types/item';
 	import { categoryIcons } from '$utils/categories';
+	import { capture } from '$lib/posthog';
 	import { MapPin } from 'lucide-svelte';
 
 	let { item, onSelect }: { item: Item; onSelect?: (item: Item) => void } = $props();
@@ -23,6 +24,7 @@
 	const Icon = $derived(categoryIcons[item.category] || categoryIcons.other);
 
 	function handleClick() {
+		capture('item_card_clicked', { item_id: item.id, category: item.category, source: onSelect ? 'map' : 'list' });
 		if (onSelect) {
 			onSelect(item);
 		} else {

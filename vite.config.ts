@@ -30,6 +30,10 @@ export default defineConfig({
 						urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
 						handler: 'NetworkFirst',
 						options: { cacheName: 'supabase-api', expiration: { maxEntries: 50, maxAgeSeconds: 300 } }
+					},
+					{
+						urlPattern: /^https:\/\/.*\.posthog\.com\/.*/i,
+						handler: 'NetworkOnly'
 					}
 				]
 			}

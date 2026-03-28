@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { getTranslate, getTolgee } from '@tolgee/svelte';
 	import { browser } from '$app/environment';
+	import { capture } from '$lib/posthog';
 	import type { Snippet } from 'svelte';
 
 	let { children }: { children: Snippet } = $props();
@@ -9,9 +10,11 @@
 	const tolgeeInstance = getTolgee(['language']);
 
 	function toggleLocale() {
-		const next = $tolgeeInstance.getLanguage() === 'is' ? 'en' : 'is';
+		const from = $tolgeeInstance.getLanguage();
+		const next = from === 'is' ? 'en' : 'is';
 		$tolgeeInstance.changeLanguage(next);
 		if (browser) localStorage.setItem('fundid-locale', next);
+		capture('language_changed', { from, to: next });
 	}
 </script>
 

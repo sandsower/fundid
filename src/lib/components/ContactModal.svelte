@@ -1,15 +1,19 @@
 <script lang="ts">
 	import { getTranslate } from '@tolgee/svelte';
+	import { onMount } from 'svelte';
 	import { X, Send, CheckCircle } from 'lucide-svelte';
 
 	const { t } = getTranslate();
 	import { supabase } from '$lib/supabase';
+	import { capture } from '$lib/posthog';
 
 	let { itemId, itemType, onClose }: {
 		itemId: string;
 		itemType: 'lost' | 'found';
 		onClose: () => void;
 	} = $props();
+
+	onMount(() => { capture('contact_modal_opened', { item_id: itemId, item_type: itemType }); });
 
 	let senderName = $state('');
 	let senderEmail = $state('');
@@ -34,7 +38,7 @@
 			if (rpcError) throw rpcError;
 
 			if (data?.success) {
-				// Email dispatched server-side by the RPC
+				capture('contact_message_sent', { item_id: itemId });
 				sent = true;
 			} else if (data?.error === 'rate_limited') {
 				error = $t('contact.rateLimited');
