@@ -69,6 +69,13 @@
 			'top-right'
 		);
 
+		// If there's a single item, center on it
+		if (items.length === 1 && items[0].latitude && items[0].longitude) {
+			map.on('load', () => {
+				map.flyTo({ center: [items[0].longitude, items[0].latitude], zoom: 15 });
+			});
+		}
+
 		updateMarkers(items);
 	});
 

@@ -1,6 +1,6 @@
 /** Default map center: Reykjavik */
 export const ICELAND_CENTER = { lat: 64.1466, lng: -21.9426 };
-export const DEFAULT_ZOOM = 12;
+export const DEFAULT_ZOOM = 11;
 
 /** Haversine distance in km between two points */
 export function distanceKm(
