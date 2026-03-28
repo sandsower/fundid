@@ -179,7 +179,7 @@
 		<label class="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-[var(--color-border)] rounded-xl cursor-pointer hover:border-[var(--color-amber)] transition-colors bg-[var(--color-surface)]">
 			<Camera size={18} class="text-[var(--color-muted)]" />
 			<span class="text-sm text-[var(--color-muted)]">{$t('item.uploadPhoto')}</span>
-			<input type="file" accept="image/*" class="hidden" onchange={handleImageSelect} />
+			<input type="file" accept="image/*" multiple class="hidden" onchange={handleImageSelect} />
 		</label>
 	</div>
 
