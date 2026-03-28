@@ -1,12 +1,12 @@
 <p align="center">
-  <img src="brand/logo-icon.svg" width="64" height="88" alt="Fundid logo">
+  <img src="brand/logo-icon.svg" width="64" height="88" alt="Fundið logo">
 </p>
 
-<h1 align="center">Fundid</h1>
+<h1 align="center">Fundið</h1>
 
 <p align="center">
   Lost and found in Iceland<br>
-  <a href="https://fundid.is">fundid.is</a> · <a href="https://dev.fundid.is">dev.fundid.is</a>
+  <a href="https://fundid.is">fundid.is</a>
 </p>
 
 <p align="center">
@@ -30,15 +30,11 @@ Anyone can post a lost or found item, pin it on the map, and get contacted throu
 
 ```
 Browser (SvelteKit PWA)
-  |
-  +-- Supabase (PostgreSQL + PostGIS, RLS, pg_net)
-  |     +-- Edge Function: send-email (Resend API)
-  |
-  +-- Cloudflare R2 (images, zero egress)
-  |
-  +-- Cloudflare Worker: data-retention (daily cron)
-  |
-  +-- MapLibre GL + OSM tiles
+├── Supabase (PostgreSQL + PostGIS, RLS, pg_net)
+│   └── Edge Function: send-email (Resend API)
+├── Cloudflare R2 (images, zero egress)
+├── Cloudflare Worker: data-retention (daily cron)
+└── MapLibre GL + OSM tiles
 ```
 
 - SvelteKit 5 on Cloudflare Pages

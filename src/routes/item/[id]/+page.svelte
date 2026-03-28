@@ -20,7 +20,7 @@
 	let loading = $state(true);
 	let showContact = $state(false);
 	let showResolve = $state(false);
-	let CatIcon = $derived(item ? (categoryIcons[item.category] || categoryIcons.other) : categoryIcons.other);
+	let CatIcon = $derived(item ? (categoryIcons[(item as Item).category] || categoryIcons.other) : categoryIcons.other);
 
 	onMount(async () => {
 		const id = $page.params.id;
@@ -33,8 +33,8 @@
 			return;
 		}
 
-		const { data, error } = await supabase.from('items').select('id, type, category, title, description, image_url, latitude, longitude, location_name, date_occurred, status, contact_method, created_at, updated_at').eq('id', id).single();
-		if (data && !error) item = data;
+		const { data, error } = await supabase.from('items').select('id, type, category, title, description, image_url, latitude, longitude, location_name, date_occurred, status, contact_method, contact_value, claim_code_hash, created_at, updated_at').eq('id', id).single();
+		if (data && !error) item = data as Item;
 		loading = false;
 	});
 

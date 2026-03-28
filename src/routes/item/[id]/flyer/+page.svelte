@@ -11,11 +11,11 @@
 
 	let item: Item | null = $state(null);
 	let loading = $state(true);
-	let CatIcon = $derived(item ? (categoryIcons[item.category] || categoryIcons.other) : categoryIcons.other);
+	let CatIcon = $derived(item ? (categoryIcons[(item as Item).category] || categoryIcons.other) : categoryIcons.other);
 
 	onMount(async () => {
 		const { data, error } = await supabase.from('items').select('*').eq('id', $page.params.id).single();
-		if (data && !error) item = data;
+		if (data && !error) item = data as Item;
 		loading = false;
 	});
 

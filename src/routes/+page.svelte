@@ -11,7 +11,7 @@
 	import ItemPreview from '$components/ItemPreview.svelte';
 	import { items, filters, loading } from '$stores/items';
 	import { SearchX, HandHelping, Map as MapIcon, LayoutList, Search, X } from 'lucide-svelte';
-	import type { ItemType, ItemCategory } from '$types/item';
+	import type { Item, ItemType, ItemCategory } from '$types/item';
 	import { supabase } from '$lib/supabase';
 	import { generateMockItems } from '$utils/mock-data';
 	import { dev } from '$app/environment';
@@ -98,12 +98,12 @@
 
 		const { data, error } = await supabase
 			.from('items')
-			.select('id, type, category, title, description, image_url, latitude, longitude, location_name, date_occurred, status, contact_method, created_at, updated_at')
+			.select('id, type, category, title, description, image_url, latitude, longitude, location_name, date_occurred, status, contact_method, contact_value, claim_code_hash, created_at, updated_at')
 			.eq('status', 'active')
 			.order('created_at', { ascending: false })
 			.limit(50);
 
-		if (data && !error) items.set(data);
+		if (data && !error) items.set(data as Item[]);
 		loading.set(false);
 	});
 
@@ -126,12 +126,13 @@
 
 	// Items visible on the current map viewport — fed to the card grid
 	let filteredItems = $derived.by(() => {
-		if (!mapBounds) return searchFiltered;
+		const b = mapBounds;
+		if (!b) return searchFiltered;
 		return searchFiltered.filter((i) =>
-			i.latitude >= mapBounds.south &&
-			i.latitude <= mapBounds.north &&
-			i.longitude >= mapBounds.west &&
-			i.longitude <= mapBounds.east
+			i.latitude >= b.south &&
+			i.latitude <= b.north &&
+			i.longitude >= b.west &&
+			i.longitude <= b.east
 		);
 	});
 
