@@ -31,6 +31,7 @@
       "intro": "Fundið is built on a simple promise: your personal information stays private.",
       "processors": "Your data is stored on Supabase (database) and emails are sent through Resend (email relay). Both operate under standard contractual clauses for data protection.",
       "relay": "All communication between users goes through Fundið's email relay. Neither party sees the other's email address unless they choose to share it.",
+      "analytics": "We collect anonymous usage statistics to improve the service. No personal data is stored and no cookies are used.",
       "retention": "Listings and associated data are kept for 90 days after an item is returned and up to 6 months for unclaimed items. After that, they are automatically deleted.",
       "rights": "You have the right to access, correct, or delete your data at any time. Contact us at privacy@fundid.is."
     },

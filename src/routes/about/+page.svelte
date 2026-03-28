@@ -52,6 +52,7 @@
 			<p>{$t('about.privacy.email')}</p>
 			<p>{$t('about.privacy.relay')}</p>
 			<p>{$t('about.privacy.processors')}</p>
+			<p>{$t('about.privacy.analytics')}</p>
 			<p>{$t('about.privacy.retention')}</p>
 			<p>{@html linkifyEmails($t('about.privacy.rights'))}</p>
 			<p class="text-xs text-[var(--color-muted)] pt-1">{$t('about.privacy.complaint')}</p>

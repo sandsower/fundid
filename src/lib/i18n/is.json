@@ -31,6 +31,7 @@
       "intro": "Fundið er byggt á einföldu loforði: persónuupplýsingarnar þínar eru öruggar.",
       "processors": "Gögnin þín eru geymd hjá Supabase (gagnagrunnur) og tölvupóstur er sendur í gegnum Resend (tölvupóstsmiðlun). Bæði fyrirtæki starfa samkvæmt stöðluðum samningsákvæðum um gagnavernd.",
       "relay": "Öll samskipti milli notenda fara í gegnum tölvupóstsmiðlun Fundið. Hvorugur aðilinn sér netfang hins nema þeir velji sjálfir að deila því.",
+      "analytics": "Við söfnum nafnlausum notkunartölum til að bæta þjónustuna. Engar persónuupplýsingar eru vistaðar og engin vefkökur eru notuð.",
       "retention": "Skráningar og tengd gögn eru geymd í 90 daga eftir að hlut er skilað og allt að 6 mánuði fyrir óleystar skráningar. Eftir það er þeim sjálfkrafa eytt.",
       "rights": "Þú hefur rétt til að fá aðgang að, leiðrétta eða eyða gögnum þínum hvenær sem er. Hafðu samband við privacy@fundid.is."
     },
