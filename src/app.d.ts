@@ -6,7 +6,12 @@ declare global {
 		// interface Locals {}
 		// interface PageData {}
 		// interface PageState {}
-		// interface Platform {}
+		interface Platform {
+			env: {
+				ITEM_IMAGES: R2Bucket;
+				RATE_LIMIT: KVNamespace;
+			};
+		}
 	}
 }
 

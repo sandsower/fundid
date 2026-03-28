@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 interface Env {
 	SUPABASE_URL: string;
 	SUPABASE_SERVICE_KEY: string;
+	ITEM_IMAGES: R2Bucket;
 }
 
 export default {
@@ -18,21 +19,21 @@ export default {
 
 		console.log('Data retention cleanup:', JSON.stringify(data));
 
-		// Delete orphaned images from storage
+		// Delete orphaned images from R2
 		const imagePaths: string[] = data.image_paths ?? [];
 		if (imagePaths.length > 0) {
-			const fileNames = imagePaths.map((url: string) => url.split('/').pop()).filter(Boolean) as string[];
-			const { error: storageError } = await supabase.storage.from('item-images').remove(fileNames);
-			if (storageError) {
-				console.error('Storage cleanup failed:', storageError.message);
+			const keys = imagePaths.map((url: string) => url.split('/').pop()).filter(Boolean) as string[];
+			const results = await Promise.allSettled(keys.map((key) => env.ITEM_IMAGES.delete(key)));
+			const failed = results.filter((r) => r.status === 'rejected').length;
+			if (failed > 0) {
+				console.error(`R2 cleanup: ${failed}/${keys.length} deletions failed`);
 			} else {
-				console.log(`Deleted ${fileNames.length} images from storage`);
+				console.log(`Deleted ${keys.length} images from R2`);
 			}
 		}
 	},
 
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
-		// Allow manual trigger via HTTP for testing
 		if (request.method === 'POST') {
 			await this.scheduled({} as ScheduledEvent, env, ctx);
 			return new Response('OK');

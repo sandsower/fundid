@@ -32,6 +32,11 @@ export default defineConfig({
 						options: { cacheName: 'supabase-api', expiration: { maxEntries: 50, maxAgeSeconds: 300 } }
 					},
 					{
+						urlPattern: /^https:\/\/(img\.fundid\.is|.*\.r2\.dev)\/.*/i,
+						handler: 'CacheFirst',
+						options: { cacheName: 'item-images', expiration: { maxEntries: 200, maxAgeSeconds: 86400 } }
+					},
+					{
 						urlPattern: /^https:\/\/.*\.posthog\.com\/.*/i,
 						handler: 'NetworkOnly'
 					}

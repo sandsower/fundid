@@ -1,0 +1,176 @@
+{
+  "about": {
+    "faq": {
+      "a1": "Já, alveg ókeypis. Engin falin gjöld, ekkert kjaftæði.",
+      "a2": "Enginn. Netfangið þitt er eingöngu notað til að áframsenda skilaboð í gegnum miðlunarkerfi okkar. Það birtist aldrei á síðunni.",
+      "a3": "Þegar þú tilkynnir fundinn hlut færðu einnota auðkenniskóða. Þennan kóða þarftu seinna til að merkja að hlutnum hafi verið skilað, sem tryggir að eingöngu upphaflegi skráandinn geti lokað skráningunni.",
+      "a4": "Já. Notaðu auðkenniskóðann sem þú fékkst þegar þú skráðir hlutinn til að merkja að honum hafi verið skilað til eiganda. Ef þú hefur týnt auðkenniskóðanum eða þarft aðstoð við að loka skráningu, sendu tölvupóst á support@fundid.is. Fyrir fulla gagnaeyðingu, sendu tölvupóst á privacy@fundid.is.",
+      "a5": "Nei. Fundið er óháð samfélagsverkefni. Við erum ekki tengd lögreglu eða neinum ríkisstofnunum.",
+      "a6": "Auðkenniskóðakerfið kemur í veg fyrir óheimilar lokanir á skráningum. Öll samskipti fara í gegnum miðlunina svo þú getur staðfest sögu viðkomandi áður en þú deilir upplýsingum.",
+      "heading": "Algengar spurningar",
+      "q1": "Er Fundið ókeypis?",
+      "q2": "Hver getur séð netfangið mitt?",
+      "q3": "Hvernig virka auðkenniskóðar?",
+      "q4": "Get ég eytt skráningunni minni?",
+      "q5": "Er Fundið tengt lögreglu?",
+      "q6": "Hvað ef einhver gerir falskt tilkall?"
+    },
+    "how": {
+      "heading": "Hvernig virkar þetta?",
+      "step1": "Tilkynntu týndan eða fundinn hlut. Bættu við mynd, lýsingu og settu pinna á kortið.",
+      "step2": "Skráningin þín birtist á kortinu og í listanum svo aðrir geti skoðað.",
+      "step3": "Einhver þekkir hlutinn og sendir þér skilaboð í gegnum Fundið.",
+      "step4": "Öll samskipti fara í gegnum tölvupóstsmiðlun okkar, engum persónuupplýsingum er deilt beint.",
+      "step5": "Þegar hlut hefur verið skilað til eiganda er auðkenniskóði notaður til lokað skráningunni."
+    },
+    "privacy": {
+      "collected": "Við höldum tímabundið upplýsingum um netfangið þitt (til að miðla skilaboðum), lýsingu á því týndna/fundna, mynd og staðsetningu sem gefin var upp um hvar fundið/týnt.",
+      "complaint": "Þú hefur einnig rétt til að leggja fram kvörtun hjá Persónuvernd.",
+      "email": "Netfangið þitt birtist aldrei opinberlega, er aldrei selt eða deilt með þriðju aðilum. Enginn ruslpóstur, ekkert kjaftæði.",
+      "heading": "Persónuvernd",
+      "intro": "Fundið er byggt á einföldu loforði: persónuupplýsingarnar þínar eru öruggar.",
+      "processors": "Gögnin þín eru geymd hjá Supabase (gagnagrunnur) og tölvupóstur er sendur í gegnum Resend (tölvupóstsmiðlun). Bæði fyrirtæki starfa samkvæmt stöðluðum samningsákvæðum um gagnavernd.",
+      "relay": "Öll samskipti milli notenda fara í gegnum tölvupóstsmiðlun Fundið. Hvorugur aðilinn sér netfang hins nema þeir velji sjálfir að deila því.",
+      "retention": "Skráningar og tengd gögn eru geymd í 90 daga eftir að hlut er skilað og allt að 6 mánuði fyrir óleystar skráningar. Eftir það er þeim sjálfkrafa eytt.",
+      "rights": "Þú hefur rétt til að fá aðgang að, leiðrétta eða eyða gögnum þínum hvenær sem er. Hafðu samband við privacy@fundid.is."
+    },
+    "title": "Um Fundið",
+    "what": {
+      "body": "Fundið er ókeypis og óháður vettvangur fyrir týnda og fundna hluti á Íslandi. Hver sem er getur tilkynnt eitthvað sem týndist eða fannst og samfélagið hjálpar hlutum að komast heim. Engin gjöld, ekkert kjaftæði.",
+      "heading": "Hvað er Fundið?"
+    }
+  },
+  "categories": {
+    "bag": "Taska",
+    "bicycle": "Reiðhjól",
+    "clothing": "Fatnaður",
+    "documents": "Skjöl",
+    "electronics": "Raftæki",
+    "glasses": "Gleraugu",
+    "jewelry": "Skartgripir",
+    "keys": "Lyklar",
+    "other": "Annað",
+    "pet": "Gæludýr",
+    "phone": "Sími",
+    "wallet": "Veski"
+  },
+  "claim": {
+    "copied": "Afritað!",
+    "copy": "Afrita kóða",
+    "description": "Vistaðu þennan kóða. Þú þarft hann til að merkja hlutinn sem fundinn síðar. Hann birtist ekki aftur.",
+    "invalid": "Ógildur auðkenniskóði. Vinsamlegast athugaðu og reyndu aftur.",
+    "resolveDescription": "Sláðu inn auðkenniskóðann sem þú fékkst þegar þú skráðir hlutinn.",
+    "resolveTitle": "Merkja sem skilað.",
+    "saved": "Ég hef vistað hann",
+    "title": "Auðkenniskóðinn þinn",
+    "verify": "Staðfesta",
+    "warning": "Þessi kóði birtist ekki aftur. Vistaðu hann núna."
+  },
+  "common": {
+    "active": "Virkt",
+    "all": "Allt",
+    "appName": "Fundið",
+    "back": "Til baka",
+    "cancel": "Hætta við",
+    "close": "Loka",
+    "contact": "Hafa samband",
+    "found": "Fundið",
+    "loading": "Hleð...",
+    "lost": "Týnt",
+    "noResults": "Ekkert fannst",
+    "resolved": "Skilað",
+    "search": "Leita",
+    "share": "Deila",
+    "submit": "Senda inn",
+    "tagline": "Týnt og fundið á Íslandi"
+  },
+  "contact": {
+    "description": "Skilaboðin þín verða áframsend til skráandans. Þau geta valið að svara í gegnum Fundið.",
+    "emailPlaceholder": "Netfangið þitt",
+    "emailPrivacy": "Eingöngu notað svo skráandinn geti svarað í gegnum Fundið. Aldrei birt opinberlega.",
+    "failed": "Ekki tókst að senda skilaboð. Vinsamlegast reyndu aftur.",
+    "messagePlaceholder": "Skilaboðin þín...",
+    "namePlaceholder": "Nafnið þitt",
+    "privacy": "Öll samskipti fara í gegnum Fundið. Engum persónuupplýsingum er deilt beint.",
+    "rateLimited": "Of mörg skilaboð send. Vinsamlegast reyndu aftur síðar.",
+    "send": "Senda skilaboð",
+    "sent": "Skilaboð send!",
+    "sentDescription": "Skilaboðin þín hafa verið áframsend. Skráandinn svarar á netfangið þitt ef þau vilja hafa samband.",
+    "titleFound": "Hafa samband við þann sem fann þetta",
+    "titleLost": "Hafa samband við þann sem týndi þessu"
+  },
+  "flyer": {
+    "foundTitle": "FUNDIÐ",
+    "printFlyer": "Prenta veggspjald",
+    "scanFound": "Er þetta þitt? Skannaðu til að sækja",
+    "scanLost": "Hefur þú séð þetta? Skannaðu til að tilkynna",
+    "title": "TÝNT"
+  },
+  "home": {
+    "heroSubtitle": "Eða fannst þú eitthvað? Hjálpaðu við að koma hlutum heim.",
+    "heroTitle": "Týndir þú einhverju?",
+    "iFoundSomething": "Ég fann eitthvað",
+    "iLostSomething": "Ég týndi einhverju",
+    "recentItems": "Nýlegar skráningar",
+    "showMore": "Sýna fleiri",
+    "stats": {
+      "activeListings": "Virkar skráningar",
+      "itemsPosted": "Skráð",
+      "itemsReturned": "Skilað"
+    },
+    "viewAll": "Sjá allt",
+    "viewDetails": "Sjá allar upplýsingar"
+  },
+  "item": {
+    "category": "Flokkur",
+    "contactFinder": "Hafa samband við finnanda",
+    "contactMethod": "Samskiptaleið",
+    "contactOwner": "Hafa samband við eiganda",
+    "date": "Dagsetning",
+    "description": "Lýsing",
+    "descriptionPlaceholder": "Litur, gerð, sérkenni...",
+    "email": "Netfangið þitt",
+    "emailPrivacy": "Netfangið þitt birtist aldrei opinberlega. Það er eingöngu notað til að áframsenda skilaboð um þennan hlut. Enginn ruslpóstur, ekkert kjaftæði.",
+    "generateFlyer": "Búa til veggspjald",
+    "location": "Staðsetning",
+    "locationError": "Ekki tókst að finna staðsetningu þína. Reyndu að leita að heimilisfangi eða settu pinna á kortið.",
+    "locationPlaceholder": "Hvar týndist/fannst hluturinn?",
+    "markResolved": "Merkja sem skilað",
+    "photo": "Mynd",
+    "posted": "Skráð",
+    "reportFound": "Tilkynna fundinn hlut",
+    "reportFoundSub": "Hjálpaðu einhverjum að fá hlutinn sinn til baka.",
+    "reportLost": "Tilkynna týndan hlut",
+    "reportLostSub": "Lýstu því sem þú týndir og hvar.",
+    "tapMap": "Smelltu á kortið til að setja nál",
+    "title": "Titill",
+    "titlePlaceholder": "Stutt lýsing á hlutnum",
+    "uploadPhoto": "Hlaða upp mynd"
+  },
+  "nav": {
+    "about": "Um",
+    "home": "Heim",
+    "report": "Tilkynna"
+  },
+  "reply": {
+    "alreadyReplied": "Þegar svarað",
+    "alreadyRepliedDescription": "Þú hefur þegar svarað þessum skilaboðum.",
+    "description": "Svarið þitt verður sent til þess sem hafði samband. Netfangið þitt helst óbirt.",
+    "from": "Frá",
+    "notFound": "Skilaboð finnast ekki",
+    "notFoundDescription": "Þessi svartengill gæti verið útrunninn eða ógildur.",
+    "placeholder": "Svarið þitt...",
+    "privacy": "Netfangið þitt er aldrei deilt. Þetta svar er sent í gegnum Fundið.",
+    "send": "Senda svar",
+    "sent": "Svar sent!",
+    "sentDescription": "Svarið þitt hefur verið áframsent. Ef þau svara aftur færðu annan tölvupóst.",
+    "title": "Svara skilaboðum",
+    "viewItem": "Skoða hlut"
+  },
+  "resolve": {
+    "errorTitle": "Ekki tókst að leysa",
+    "successDescription": "Frábært! Þessi hlutur hefur verið merktur sem skilað. Takk fyrir að nota Fundið.",
+    "successTitle": "Hlutur merktur sem leystur!",
+    "viewItem": "Skoða hlut"
+  }
+}

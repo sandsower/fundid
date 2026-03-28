@@ -4,3 +4,7 @@ compatibility_date = "2024-12-01"
 
 [triggers]
 crons = ["0 3 * * *"]
+
+[[r2_buckets]]
+binding = "ITEM_IMAGES"
+bucket_name = "fundid-item-images"

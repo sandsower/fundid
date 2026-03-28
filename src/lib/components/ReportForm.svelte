@@ -90,13 +90,12 @@
 			let imageUrl: string | null = null;
 			if (imageFile) {
 				const compressed = await compressImage(imageFile);
-				const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.webp`;
-				const { data: uploadData, error: uploadError } = await supabase.storage
-					.from('item-images')
-					.upload(fileName, compressed, { contentType: 'image/webp' });
-				if (uploadError) throw uploadError;
-				const { data: urlData } = supabase.storage.from('item-images').getPublicUrl(uploadData.path);
-				imageUrl = urlData.publicUrl;
+				const form = new FormData();
+				form.append('file', compressed, 'image.webp');
+				const res = await fetch('/api/upload', { method: 'POST', body: form });
+				const body = await res.json();
+				if (!res.ok) throw new Error(body.message || 'Upload failed');
+				imageUrl = body.url;
 			}
 			const claimCode = generateClaimCode();
 			const claimCodeHash = await hashClaimCode(claimCode);
