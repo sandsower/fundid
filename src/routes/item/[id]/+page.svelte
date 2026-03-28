@@ -15,6 +15,7 @@
 	import { capture } from '$lib/posthog';
 	import type { Item } from '$types/item';
 	import { get } from 'svelte/store';
+	import { formatDate } from '$utils/date';
 
 	let item: Item | null = $state(null);
 	let loading = $state(true);
@@ -49,10 +50,12 @@
 		}
 	}
 
-	function formatDate(dateStr: string): string {
-		return new Date(dateStr).toLocaleDateString('is-IS', { year: 'numeric', month: 'long', day: 'numeric' });
-	}
+	let pageTitle = $derived(item ? `${(item as Item).title} – Fundið` : 'Fundið');
 </script>
+
+<svelte:head>
+	<title>{pageTitle}</title>
+</svelte:head>
 
 <section class="max-w-3xl mx-auto px-4 py-8">
 	{#if loading}

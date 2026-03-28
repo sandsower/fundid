@@ -38,6 +38,10 @@
 	});
 </script>
 
+<svelte:head>
+	<title>{$t('common.resolved')} – Fundið</title>
+</svelte:head>
+
 <section class="max-w-sm mx-auto px-4 py-20 text-center">
 	{#if status === 'verifying'}
 		<div class="w-16 h-16 bg-[var(--color-surface)] rounded-full flex items-center justify-center mx-auto mb-6">

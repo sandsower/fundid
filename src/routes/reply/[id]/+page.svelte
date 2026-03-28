@@ -6,6 +6,7 @@
 	import { onMount } from 'svelte';
 	import { supabase } from '$lib/supabase';
 	import { Send, CheckCircle, XCircle, Loader, ArrowLeft, Lock } from 'lucide-svelte';
+	import { formatDateTime } from '$utils/date';
 
 	let loading = $state(true);
 	let msgData: any = $state(null);
@@ -57,14 +58,13 @@
 		}
 	}
 
-	function formatTime(dateStr: string): string {
-		return new Date(dateStr).toLocaleString('is-IS', {
-			month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-		});
-	}
 
 	let isResolved = $derived(msgData?.item_status === 'resolved');
 </script>
+
+<svelte:head>
+	<title>{$t('reply.title')} – Fundið</title>
+</svelte:head>
 
 <section class="max-w-md mx-auto px-4 py-12">
 	{#if loading}
@@ -111,7 +111,7 @@
 						: 'bg-[var(--color-amber-light)] border border-[var(--color-amber)]/20'}">
 						<div class="flex items-center justify-between mb-1">
 							<p class="text-xs font-medium text-[var(--color-muted)]">{msg.sender_name}</p>
-							<p class="text-xs text-[var(--color-muted)]">{formatTime(msg.created_at)}</p>
+							<p class="text-xs text-[var(--color-muted)]">{formatDateTime(msg.created_at)}</p>
 						</div>
 						<p class="text-sm text-[var(--color-ink)] whitespace-pre-wrap">{msg.message}</p>
 					</div>

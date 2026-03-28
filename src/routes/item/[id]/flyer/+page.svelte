@@ -8,6 +8,7 @@
 	import { categoryIcons } from '$utils/categories';
 	import { ArrowLeft, Printer, MapPin, Calendar } from 'lucide-svelte';
 	import type { Item } from '$types/item';
+	import { formatDate } from '$utils/date';
 
 	let item: Item | null = $state(null);
 	let loading = $state(true);
@@ -23,10 +24,12 @@
 		window.print();
 	}
 
-	$effect(() => {
-		if (item) document.title = `${item.type === 'lost' ? 'TÝNT' : 'FUNDIÐ'}: ${item.title} - Fundið`;
-	});
+	let pageTitle = $derived(item ? `${(item as Item).type === 'lost' ? 'TÝNT' : 'FUNDIÐ'}: ${(item as Item).title} – Fundið` : 'Fundið');
 </script>
+
+<svelte:head>
+	<title>{pageTitle}</title>
+</svelte:head>
 
 {#if loading}
 	<p class="text-center text-[var(--color-muted)] py-16 text-sm">{$t('common.loading')}</p>
@@ -70,7 +73,7 @@
 
 			<div class="text-lg mb-8 space-y-2 text-[var(--color-ink)]">
 				<p class="flex items-center justify-center gap-2"><MapPin size={18} class="text-[var(--color-amber)]" /> <strong>{item.location_name}</strong></p>
-				<p class="flex items-center justify-center gap-2"><Calendar size={18} class="text-[var(--color-amber)]" /> {new Date(item.date_occurred).toLocaleDateString('is-IS')}</p>
+				<p class="flex items-center justify-center gap-2"><Calendar size={18} class="text-[var(--color-amber)]" /> {formatDate(item.date_occurred)}</p>
 			</div>
 
 			<div class="border-t-2 border-[var(--color-border)] pt-6">

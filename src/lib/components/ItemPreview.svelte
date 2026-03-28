@@ -4,17 +4,12 @@
 
 	const { t } = getTranslate();
 	import { categoryIcons } from '$utils/categories';
+	import { formatDate } from '$utils/date';
 	import { MapPin, Calendar, X, ArrowRight } from 'lucide-svelte';
 
 	let { item, onClose }: { item: Item; onClose: () => void } = $props();
 
 	const CatIcon = $derived(categoryIcons[item.category] || categoryIcons.other);
-
-	function formatDate(dateStr: string): string {
-		return new Date(dateStr).toLocaleDateString('is-IS', {
-			year: 'numeric', month: 'long', day: 'numeric'
-		});
-	}
 
 	function handleKeydown(e: KeyboardEvent) {
 		if (e.key === 'Escape') onClose();
