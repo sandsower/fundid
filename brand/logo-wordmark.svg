@@ -1,0 +1,8 @@
+<svg viewBox="0 0 160 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Pin icon -->
+  <path d="M16 42C16 42 30 26 30 16C30 8.268 23.732 2 16 2C8.268 2 2 8.268 2 16C2 26 16 42 16 42Z" fill="#E08A50"/>
+  <!-- Checkmark -->
+  <path d="M10.5 16.5L14.5 21L22.5 12" stroke="white" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Wordmark -->
+  <text x="38" y="28" font-family="Inter, system-ui, sans-serif" font-weight="600" font-size="22" fill="#2C2520" letter-spacing="-0.02em">Fundið</text>
+</svg>

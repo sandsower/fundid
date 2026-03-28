@@ -1,8 +1,24 @@
-# Fundid
+<p align="center">
+  <img src="brand/logo-icon.svg" width="64" height="88" alt="Fundid logo">
+</p>
 
-Lost and found in Iceland. Map-based PWA, anonymous contact relay, no accounts. Free and open.
+<h1 align="center">Fundid</h1>
 
-Live at [fundid.is](https://fundid.is). Dev environment at [dev.fundid.is](https://dev.fundid.is).
+<p align="center">
+  Lost and found in Iceland<br>
+  <a href="https://fundid.is">fundid.is</a> · <a href="https://dev.fundid.is">dev.fundid.is</a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/SvelteKit-5-ff3e00?logo=svelte&logoColor=white" alt="SvelteKit 5">
+  <img src="https://img.shields.io/badge/Cloudflare-Pages-f38020?logo=cloudflare&logoColor=white" alt="Cloudflare Pages">
+  <img src="https://img.shields.io/badge/Supabase-PostGIS-3fcf8e?logo=supabase&logoColor=white" alt="Supabase">
+  <img src="https://img.shields.io/badge/lang-is%20%2F%20en-blue" alt="Bilingual">
+</p>
+
+---
+
+Map-based PWA, anonymous contact relay, no accounts. Free and open.
 
 ## What it does
 
