@@ -1,5 +1,7 @@
--- Enable PostGIS for geospatial queries
+-- Enable required extensions
 create extension if not exists postgis;
+create extension if not exists pgcrypto;
+create extension if not exists pg_net;
 
 -- Items table
 create table public.items (

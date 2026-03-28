@@ -1,3 +1,6 @@
+-- Ensure extensions schema is in search path for gen_random_bytes
+set search_path to public, extensions;
+
 -- Contact messages table
 create table public.contact_messages (
   id uuid primary key default gen_random_uuid(),
