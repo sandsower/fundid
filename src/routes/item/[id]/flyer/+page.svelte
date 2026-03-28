@@ -24,7 +24,7 @@
 	}
 
 	$effect(() => {
-		if (item) document.title = `${item.type === 'lost' ? 'TÝNT' : 'FUNDIÐ'}: ${item.title} — Fundið`;
+		if (item) document.title = `${item.type === 'lost' ? 'TÝNT' : 'FUNDIÐ'}: ${item.title} - Fundið`;
 	});
 </script>
 
@@ -84,7 +84,7 @@
 			</div>
 
 			<p class="mt-8 text-sm font-semibold text-[var(--color-amber-dark)]">
-				Fundið — {$t('common.tagline')}
+				Fundið - {$t('common.tagline')}
 			</p>
 		</div>
 	</div>

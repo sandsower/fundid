@@ -115,7 +115,7 @@
 
 		const body = document.createElementNS(svgNS, 'path');
 		body.setAttribute('d', 'M18 0C8.06 0 0 8.06 0 18c0 12.6 16.2 28.4 16.9 29.1a1.5 1.5 0 0 0 2.2 0C19.8 46.4 36 30.6 36 18 36 8.06 27.94 0 18 0Z');
-		body.setAttribute('fill', '#f59e0b');
+		body.setAttribute('fill', '#E08A50');
 		svg.appendChild(body);
 
 		const highlight = document.createElementNS(svgNS, 'path');

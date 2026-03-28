@@ -82,7 +82,7 @@
 			for (const item of itemList) {
 				if (!item.latitude || !item.longitude) continue;
 
-				const color = item.type === 'lost' ? '#ef4444' : '#22c55e';
+				const color = item.type === 'lost' ? '#D9534F' : '#4A9B6A';
 				const el = document.createElement('div');
 				el.style.cssText = `
 					width: 28px; height: 38px;
@@ -122,11 +122,11 @@
 						${imgHtml}
 						<div style="padding: 10px 12px 12px;">
 							<div style="display: flex; align-items: center; gap: 6px; margin-bottom: 5px;">
-								<span style="font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; padding: 2px 8px; border-radius: 999px; background: ${item.type === 'lost' ? '#fef2f2' : '#f0fdf4'}; color: ${item.type === 'lost' ? '#ef4444' : '#22c55e'};">${item.type === 'lost' ? 'Lost' : 'Found'}</span>
-								<span style="font-size: 11px; color: #a3a3a3;">${item.location_name}</span>
+								<span style="font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; padding: 2px 8px; border-radius: 999px; background: ${item.type === 'lost' ? '#FBF0EF' : '#EEF5F0'}; color: ${item.type === 'lost' ? '#D9534F' : '#4A9B6A'};">${item.type === 'lost' ? 'Lost' : 'Found'}</span>
+								<span style="font-size: 11px; color: #9C8B7E;">${item.location_name}</span>
 							</div>
-							<p style="font-weight: 600; font-size: 14px; margin: 0 0 8px 0; color: #1a1a1a; line-height: 1.3;">${item.title}</p>
-							<a href="/item/${item.id}" style="font-size: 12px; color: #d97706; text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; gap: 4px;">View details <span style="font-size: 14px;">→</span></a>
+							<p style="font-weight: 600; font-size: 14px; margin: 0 0 8px 0; color: #2C2520; line-height: 1.3;">${item.title}</p>
+							<a href="/item/${item.id}" style="font-size: 12px; color: #C87640; text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; gap: 4px;">View details <span style="font-size: 14px;">→</span></a>
 						</div>
 					</div>`
 				);

@@ -41,9 +41,9 @@
 	function shareItem() {
 		if (!item) return;
 		const url = window.location.href;
-		const text = `${item.type === 'lost' ? '🔴 TÝNT' : '🟢 FUNDIÐ'}: ${item.title} — ${item.location_name}`;
+		const text = `${item.type === 'lost' ? '🔴 TÝNT' : '🟢 FUNDIÐ'}: ${item.title} - ${item.location_name}`;
 		if (navigator.share) {
-			navigator.share({ title: `Fundið — ${item.title}`, text, url });
+			navigator.share({ title: `Fundið - ${item.title}`, text, url });
 		} else {
 			navigator.clipboard.writeText(`${text}\n${url}`);
 		}

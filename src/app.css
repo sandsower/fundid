@@ -2,19 +2,19 @@
 @import 'maplibre-gl/dist/maplibre-gl.css';
 
 :root {
-	--color-amber: #f59e0b;
-	--color-amber-dark: #d97706;
-	--color-amber-light: #fef3c7;
-	--color-ink: #1a1a1a;
-	--color-ink-light: #404040;
-	--color-muted: #737373;
-	--color-border: #e5e5e5;
-	--color-surface: #fafafa;
+	--color-amber: #E08A50;
+	--color-amber-dark: #C87640;
+	--color-amber-light: #FBF0E6;
+	--color-ink: #2C2520;
+	--color-ink-light: #5C534D;
+	--color-muted: #9C8B7E;
+	--color-border: #E8E0D8;
+	--color-surface: #FAF7F4;
 	--color-white: #ffffff;
-	--color-lost: #ef4444;
-	--color-lost-light: #fef2f2;
-	--color-found: #22c55e;
-	--color-found-light: #f0fdf4;
+	--color-lost: #D9534F;
+	--color-lost-light: #FBF0EF;
+	--color-found: #4A9B6A;
+	--color-found-light: #EEF5F0;
 }
 
 html {
@@ -23,7 +23,7 @@ html {
 }
 
 body {
-	background-color: var(--color-white);
+	background-color: var(--color-surface);
 	color: var(--color-ink);
 }
 
@@ -31,7 +31,7 @@ body {
 .maplibregl-popup-content {
 	border-radius: 12px !important;
 	padding: 0 !important;
-	box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12) !important;
+	box-shadow: 0 4px 24px rgba(44, 37, 32, 0.10) !important;
 	border: 1px solid var(--color-border) !important;
 }
 

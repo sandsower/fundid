@@ -53,32 +53,32 @@ async function sendClaimCodeEmail(body: {
   const html = `
     <div style="font-family: -apple-system, system-ui, sans-serif; max-width: 480px; margin: 0 auto; padding: 40px 20px;">
       <div style="text-align: center; margin-bottom: 32px;">
-        <span style="display: inline-block; width: 40px; height: 40px; background: #f59e0b; border-radius: 8px; color: white; font-weight: bold; font-size: 18px; line-height: 40px;">F</span>
+        <span style="display: inline-block; width: 40px; height: 40px; background: #E08A50; border-radius: 8px; color: white; font-weight: bold; font-size: 18px; line-height: 40px;">F</span>
       </div>
 
-      <h1 style="font-size: 20px; color: #1a1a1a; margin: 0 0 8px;">Your claim code</h1>
-      <p style="font-size: 14px; color: #737373; margin: 0 0 24px;">
+      <h1 style="font-size: 20px; color: #2C2520; margin: 0 0 8px;">Your claim code</h1>
+      <p style="font-size: 14px; color: #9C8B7E; margin: 0 0 24px;">
         You posted <strong>"${escapeHtml(body.itemTitle)}"</strong> on Fundið. Save this code to manage your listing.
       </p>
 
-      <div style="background: #fafafa; border: 1px solid #e5e5e5; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 24px;">
-        <p style="font-family: monospace; font-size: 22px; font-weight: bold; letter-spacing: 3px; color: #1a1a1a; margin: 0;">
+      <div style="background: #FAF7F4; border: 1px solid #E8E0D8; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 24px;">
+        <p style="font-family: monospace; font-size: 22px; font-weight: bold; letter-spacing: 3px; color: #2C2520; margin: 0;">
           ${body.claimCode}
         </p>
       </div>
 
-      <p style="font-size: 14px; color: #737373; margin: 0 0 24px;">
+      <p style="font-size: 14px; color: #9C8B7E; margin: 0 0 24px;">
         When the item is returned, click the button below or enter your code on the item page to mark it as resolved.
       </p>
 
       <div style="text-align: center; margin-bottom: 32px;">
-        <a href="${resolveUrl}" style="display: inline-block; background: #22c55e; color: white; font-weight: 600; font-size: 14px; padding: 12px 24px; border-radius: 12px; text-decoration: none;">
+        <a href="${resolveUrl}" style="display: inline-block; background: #4A9B6A; color: white; font-weight: 600; font-size: 14px; padding: 12px 24px; border-radius: 12px; text-decoration: none;">
           Mark as resolved
         </a>
       </div>
 
-      <hr style="border: none; border-top: 1px solid #e5e5e5; margin: 24px 0;" />
-      <p style="font-size: 12px; color: #a3a3a3; margin: 0;">
+      <hr style="border: none; border-top: 1px solid #E8E0D8; margin: 24px 0;" />
+      <p style="font-size: 12px; color: #9C8B7E; margin: 0;">
         You received this because you posted an item on fundid.is. We'll never send you anything else.
       </p>
     </div>
@@ -102,34 +102,34 @@ async function sendContactNotification(body: {
   const html = `
     <div style="font-family: -apple-system, system-ui, sans-serif; max-width: 480px; margin: 0 auto; padding: 40px 20px;">
       <div style="text-align: center; margin-bottom: 32px;">
-        <span style="display: inline-block; width: 40px; height: 40px; background: #f59e0b; border-radius: 8px; color: white; font-weight: bold; font-size: 18px; line-height: 40px;">F</span>
+        <span style="display: inline-block; width: 40px; height: 40px; background: #E08A50; border-radius: 8px; color: white; font-weight: bold; font-size: 18px; line-height: 40px;">F</span>
       </div>
 
-      <h1 style="font-size: 20px; color: #1a1a1a; margin: 0 0 8px;">New message about "${escapeHtml(body.itemTitle)}"</h1>
-      <p style="font-size: 14px; color: #737373; margin: 0 0 24px;">
+      <h1 style="font-size: 20px; color: #2C2520; margin: 0 0 8px;">New message about "${escapeHtml(body.itemTitle)}"</h1>
+      <p style="font-size: 14px; color: #9C8B7E; margin: 0 0 24px;">
         <strong>${escapeHtml(body.senderName)}</strong> sent you a message through Fundið.
       </p>
 
-      <div style="background: #fafafa; border: 1px solid #e5e5e5; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
-        <p style="font-size: 14px; color: #1a1a1a; margin: 0; white-space: pre-wrap;">${escapeHtml(body.message)}</p>
+      <div style="background: #FAF7F4; border: 1px solid #E8E0D8; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
+        <p style="font-size: 14px; color: #2C2520; margin: 0; white-space: pre-wrap;">${escapeHtml(body.message)}</p>
       </div>
 
-      <p style="font-size: 14px; color: #737373; margin: 0 0 24px;">
+      <p style="font-size: 14px; color: #9C8B7E; margin: 0 0 24px;">
         If you'd like to respond, click the button below. Your email will not be shared.
       </p>
 
       <div style="text-align: center; margin-bottom: 16px;">
-        <a href="${replyUrl}" style="display: inline-block; background: #f59e0b; color: white; font-weight: 600; font-size: 14px; padding: 12px 24px; border-radius: 12px; text-decoration: none;">
+        <a href="${replyUrl}" style="display: inline-block; background: #E08A50; color: white; font-weight: 600; font-size: 14px; padding: 12px 24px; border-radius: 12px; text-decoration: none;">
           Reply on Fundið
         </a>
       </div>
 
       <div style="text-align: center; margin-bottom: 32px;">
-        <a href="${itemUrl}" style="font-size: 13px; color: #d97706; text-decoration: none;">View listing</a>
+        <a href="${itemUrl}" style="font-size: 13px; color: #C87640; text-decoration: none;">View listing</a>
       </div>
 
-      <hr style="border: none; border-top: 1px solid #e5e5e5; margin: 24px 0;" />
-      <p style="font-size: 12px; color: #a3a3a3; margin: 0;">
+      <hr style="border: none; border-top: 1px solid #E8E0D8; margin: 24px 0;" />
+      <p style="font-size: 12px; color: #9C8B7E; margin: 0;">
         You received this because someone responded to your listing on fundid.is. We'll never send you anything else.
       </p>
     </div>
@@ -156,30 +156,30 @@ async function sendReplyNotification(body: {
   const html = `
     <div style="font-family: -apple-system, system-ui, sans-serif; max-width: 480px; margin: 0 auto; padding: 40px 20px;">
       <div style="text-align: center; margin-bottom: 32px;">
-        <span style="display: inline-block; width: 40px; height: 40px; background: #f59e0b; border-radius: 8px; color: white; font-weight: bold; font-size: 18px; line-height: 40px;">F</span>
+        <span style="display: inline-block; width: 40px; height: 40px; background: #E08A50; border-radius: 8px; color: white; font-weight: bold; font-size: 18px; line-height: 40px;">F</span>
       </div>
 
-      <h1 style="font-size: 20px; color: #1a1a1a; margin: 0 0 8px;">New reply about "${escapeHtml(body.item_title)}"</h1>
-      <p style="font-size: 14px; color: #737373; margin: 0 0 24px;">
+      <h1 style="font-size: 20px; color: #2C2520; margin: 0 0 8px;">New reply about "${escapeHtml(body.item_title)}"</h1>
+      <p style="font-size: 14px; color: #9C8B7E; margin: 0 0 24px;">
         <strong>${escapeHtml(body.sender_name)}</strong> replied through Fundið.
       </p>
 
-      <div style="background: #fafafa; border: 1px solid #e5e5e5; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
-        <p style="font-size: 14px; color: #1a1a1a; margin: 0; white-space: pre-wrap;">${escapeHtml(body.reply_text)}</p>
+      <div style="background: #FAF7F4; border: 1px solid #E8E0D8; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
+        <p style="font-size: 14px; color: #2C2520; margin: 0; white-space: pre-wrap;">${escapeHtml(body.reply_text)}</p>
       </div>
 
       <div style="text-align: center; margin-bottom: 16px;">
-        <a href="${replyUrl}" style="display: inline-block; background: #f59e0b; color: white; font-weight: 600; font-size: 14px; padding: 12px 24px; border-radius: 12px; text-decoration: none;">
+        <a href="${replyUrl}" style="display: inline-block; background: #E08A50; color: white; font-weight: 600; font-size: 14px; padding: 12px 24px; border-radius: 12px; text-decoration: none;">
           Reply on Fundið
         </a>
       </div>
 
       <div style="text-align: center; margin-bottom: 32px;">
-        <a href="${itemUrl}" style="font-size: 13px; color: #d97706; text-decoration: none;">View listing</a>
+        <a href="${itemUrl}" style="font-size: 13px; color: #C87640; text-decoration: none;">View listing</a>
       </div>
 
-      <hr style="border: none; border-top: 1px solid #e5e5e5; margin: 24px 0;" />
-      <p style="font-size: 12px; color: #a3a3a3; margin: 0;">
+      <hr style="border: none; border-top: 1px solid #E8E0D8; margin: 24px 0;" />
+      <p style="font-size: 12px; color: #9C8B7E; margin: 0;">
         You received this because of a conversation on fundid.is. We'll never send you anything else.
       </p>
     </div>

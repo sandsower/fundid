@@ -47,7 +47,7 @@
 	</main>
 
 	<footer class="border-t border-[var(--color-border)] py-8 text-center space-y-2">
-		<p class="text-sm text-[var(--color-muted)]">Fundið &mdash; {$t('common.tagline')}</p>
+		<p class="text-sm text-[var(--color-muted)]">Fundið - {$t('common.tagline')}</p>
 		<a href="/about" class="text-xs text-[var(--color-muted)] hover:text-[var(--color-ink)] transition-colors">{$t('nav.about')}</a>
 	</footer>
 </div>
