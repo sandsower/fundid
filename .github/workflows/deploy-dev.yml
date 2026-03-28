@@ -1,0 +1,36 @@
+name: Deploy to dev
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm check
+
+      - run: pnpm build
+        env:
+          PUBLIC_SUPABASE_URL: ${{ secrets.DEV_SUPABASE_URL }}
+          PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY: ${{ secrets.DEV_SUPABASE_PUBLISHABLE_KEY }}
+          PUBLIC_IMAGE_BASE_URL: https://dev-img.fundid.is
+
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy .svelte-kit/cloudflare --project-name fundid --branch dev
