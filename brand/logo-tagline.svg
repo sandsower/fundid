@@ -1,0 +1,7 @@
+<svg viewBox="0 0 200 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Pin icon, centered horizontally at x=100 -->
+  <path d="M100 52C100 52 114 36 114 26C114 18.268 107.732 12 100 12C92.268 12 86 18.268 86 26C86 36 100 52 100 52Z" fill="#E08A50"/>
+  <path d="M94.5 26.5L98.5 31L106.5 22" stroke="white" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Tagline -->
+  <text x="100" y="68" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-weight="500" font-size="9" fill="#8C7B6B" letter-spacing="0.06em">LOST AND FOUND IN ICELAND</text>
+</svg>

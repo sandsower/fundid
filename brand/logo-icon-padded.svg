@@ -1,0 +1,5 @@
+<svg viewBox="0 0 52 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Map pin with checkmark, 10u padding on all sides -->
+  <path d="M26 52C26 52 40 36 40 26C40 18.268 33.732 12 26 12C18.268 12 12 18.268 12 26C12 36 26 52 26 52Z" fill="#E08A50"/>
+  <path d="M20.5 26.5L24.5 31L32.5 22" stroke="white" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>
