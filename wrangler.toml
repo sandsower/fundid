@@ -2,7 +2,6 @@ name = "fundid"
 pages_build_output_dir = ".svelte-kit/cloudflare"
 compatibility_date = "2024-12-01"
 
-# Production bindings (default)
 [[r2_buckets]]
 binding = "ITEM_IMAGES"
 bucket_name = "fundid-item-images"
@@ -13,15 +12,3 @@ id = "f9949ac056b542218d932e6c2c7c675e"
 
 [vars]
 PUBLIC_IMAGE_BASE_URL = "https://img.fundid.is"
-
-# Preview / dev bindings
-[[env.preview.r2_buckets]]
-binding = "ITEM_IMAGES"
-bucket_name = "fundid-item-images-dev"
-
-[[env.preview.kv_namespaces]]
-binding = "RATE_LIMIT"
-id = "f9949ac056b542218d932e6c2c7c675e"
-
-[env.preview.vars]
-PUBLIC_IMAGE_BASE_URL = "https://dev-img.fundid.is"
