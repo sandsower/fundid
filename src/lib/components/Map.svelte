@@ -69,15 +69,30 @@
 			'top-right'
 		);
 
-		// If there's a single item, center on it
-		if (items.length === 1 && items[0].latitude && items[0].longitude) {
-			map.on('load', () => {
-				map.flyTo({ center: [items[0].longitude, items[0].latitude], zoom: 15 });
-			});
-		}
+		// Fit map to show all items
+		map.on('load', () => {
+			fitToItems(items);
+		});
 
 		updateMarkers(items);
 	});
+
+	function fitToItems(itemList: Item[]) {
+		if (!map) return;
+		const valid = itemList.filter(i => i.latitude && i.longitude);
+		if (valid.length === 0) return;
+		if (valid.length === 1) {
+			map.flyTo({ center: [valid[0].longitude, valid[0].latitude], zoom: 15 });
+			return;
+		}
+		import('maplibre-gl').then(({ LngLatBounds }) => {
+			const bounds = new LngLatBounds();
+			for (const item of valid) {
+				bounds.extend([item.longitude, item.latitude]);
+			}
+			map.fitBounds(bounds, { padding: 50, maxZoom: 15 });
+		});
+	}
 
 	function updateMarkers(itemList: Item[]) {
 		if (!map) return;
@@ -153,8 +168,14 @@
 		});
 	}
 
+	let initialFitDone = false;
+
 	$effect(() => {
 		updateMarkers(items);
+		if (!initialFitDone && items.length > 0) {
+			initialFitDone = true;
+			fitToItems(items);
+		}
 	});
 
 	onDestroy(() => {
