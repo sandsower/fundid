@@ -59,14 +59,14 @@
   "claim": {
     "copied": "Copied!",
     "copy": "Copy code",
-    "description": "Save this code. You'll need it to mark this item as resolved later. It won't be shown again.",
+    "description": "Save this code to manage your listing later.",
     "invalid": "Invalid code. Please check and try again.",
     "resolveDescription": "Enter the code you received when you posted this item.",
     "resolveTitle": "Mark as returned.",
     "saved": "I've saved it",
     "title": "Your code",
     "verify": "Verify",
-    "warning": "This code will not be shown again. Save it now."
+    "warning": "This won't be shown again."
   },
   "common": {
     "active": "Active",
@@ -83,23 +83,22 @@
     "resolved": "Returned",
     "search": "Search",
     "share": "Share",
-    "submit": "Submit",
+    "submit": "Report item",
     "tagline": "Lost and found in Iceland"
   },
   "contact": {
-    "description": "Your message will be forwarded to the poster. They can choose to reply through Fundið.",
+    "description": "They'll get your message by email. Your info stays private.",
     "emailPlaceholder": "Your email",
-    "emailPrivacy": "Only used so the poster can reply through Fundið. Never shown publicly.",
+    "emailPrivacy": "Never shown publicly.",
     "failed": "Failed to send message. Please try again.",
     "messagePlaceholder": "Your message...",
     "namePlaceholder": "Your name",
-    "privacy": "All communication goes through Fundið. No personal info is shared directly.",
     "rateLimited": "Too many messages sent. Please try again later.",
     "send": "Send message",
     "sent": "Message sent!",
-    "sentDescription": "Your message has been forwarded. The poster will reply to your email if they want to get in touch.",
-    "titleFound": "Contact the person who found this",
-    "titleLost": "Contact the person who lost this"
+    "sentDescription": "They'll reply to your email if they want to connect.",
+    "titleFound": "Message the finder",
+    "titleLost": "Message the owner"
   },
   "flyer": {
     "foundTitle": "FOUND",
@@ -132,7 +131,7 @@
     "description": "Description",
     "descriptionPlaceholder": "Color, brand, distinguishing features...",
     "email": "Your email",
-    "emailPrivacy": "Your email is never shown publicly. It's only used to forward messages about this item. No spam, no bullshit.",
+    "emailPrivacy": "Never shared. Only used to relay messages. No spam, no bullshit.",
     "generateFlyer": "Generate flyer",
     "location": "Location",
     "locationError": "Could not get your location. Try searching for the address or dropping a pin on the map.",
@@ -157,12 +156,11 @@
   "reply": {
     "alreadyReplied": "Already replied",
     "alreadyRepliedDescription": "You've already replied to this message.",
-    "description": "Your reply will be sent to the person who contacted you. Your email stays private.",
+    "description": "Your reply goes to them by email. Your address stays private.",
     "from": "From",
     "notFound": "Message not found",
     "notFoundDescription": "This reply link may have expired or is invalid.",
     "placeholder": "Your reply...",
-    "privacy": "Your email is never shared. This reply is sent through Fundið.",
     "send": "Send reply",
     "sent": "Reply sent!",
     "sentDescription": "Your reply has been forwarded. If they respond again, you'll get another email.",

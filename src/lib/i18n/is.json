@@ -59,14 +59,14 @@
   "claim": {
     "copied": "Afritað!",
     "copy": "Afrita kóða",
-    "description": "Vistaðu þennan kóða. Þú þarft hann til að merkja hlutinn sem fundinn síðar. Hann birtist ekki aftur.",
+    "description": "Vistaðu þennan kóða til að stjórna skráningunni þinni.",
     "invalid": "Ógildur auðkenniskóði. Vinsamlegast athugaðu og reyndu aftur.",
     "resolveDescription": "Sláðu inn auðkenniskóðann sem þú fékkst þegar þú skráðir hlutinn.",
     "resolveTitle": "Merkja sem skilað.",
     "saved": "Ég hef vistað hann",
     "title": "Auðkenniskóðinn þinn",
     "verify": "Staðfesta",
-    "warning": "Þessi kóði birtist ekki aftur. Vistaðu hann núna."
+    "warning": "Þetta birtist ekki aftur."
   },
   "common": {
     "active": "Virkt",
@@ -83,23 +83,22 @@
     "resolved": "Skilað",
     "search": "Leita",
     "share": "Deila",
-    "submit": "Senda inn",
+    "submit": "Skrá hlut",
     "tagline": "Týnt og fundið á Íslandi"
   },
   "contact": {
-    "description": "Skilaboðin þín verða áframsend til skráandans. Þau geta valið að svara í gegnum Fundið.",
+    "description": "Þau fá skilaboðin þín í tölvupósti. Upplýsingarnar þínar eru óbirtar.",
     "emailPlaceholder": "Netfangið þitt",
-    "emailPrivacy": "Eingöngu notað svo skráandinn geti svarað í gegnum Fundið. Aldrei birt opinberlega.",
+    "emailPrivacy": "Aldrei birt opinberlega.",
     "failed": "Ekki tókst að senda skilaboð. Vinsamlegast reyndu aftur.",
     "messagePlaceholder": "Skilaboðin þín...",
     "namePlaceholder": "Nafnið þitt",
-    "privacy": "Öll samskipti fara í gegnum Fundið. Engum persónuupplýsingum er deilt beint.",
     "rateLimited": "Of mörg skilaboð send. Vinsamlegast reyndu aftur síðar.",
     "send": "Senda skilaboð",
     "sent": "Skilaboð send!",
-    "sentDescription": "Skilaboðin þín hafa verið áframsend. Skráandinn svarar á netfangið þitt ef þau vilja hafa samband.",
-    "titleFound": "Hafa samband við þann sem fann þetta",
-    "titleLost": "Hafa samband við þann sem týndi þessu"
+    "sentDescription": "Þau svara á netfangið þitt ef þau vilja hafa samband.",
+    "titleFound": "Senda finnanda skilaboð",
+    "titleLost": "Senda eiganda skilaboð"
   },
   "flyer": {
     "foundTitle": "FUNDIÐ",
@@ -132,7 +131,7 @@
     "description": "Lýsing",
     "descriptionPlaceholder": "Litur, gerð, sérkenni...",
     "email": "Netfangið þitt",
-    "emailPrivacy": "Netfangið þitt birtist aldrei opinberlega. Það er eingöngu notað til að áframsenda skilaboð um þennan hlut. Enginn ruslpóstur, ekkert kjaftæði.",
+    "emailPrivacy": "Aldrei deilt. Eingöngu notað til að miðla skilaboðum. Enginn ruslpóstur, ekkert kjaftæði.",
     "generateFlyer": "Búa til veggspjald",
     "location": "Staðsetning",
     "locationError": "Ekki tókst að finna staðsetningu þína. Reyndu að leita að heimilisfangi eða settu pinna á kortið.",
@@ -157,12 +156,11 @@
   "reply": {
     "alreadyReplied": "Þegar svarað",
     "alreadyRepliedDescription": "Þú hefur þegar svarað þessum skilaboðum.",
-    "description": "Svarið þitt verður sent til þess sem hafði samband. Netfangið þitt helst óbirt.",
+    "description": "Svarið þitt fer til þeirra í tölvupósti. Netfangið þitt helst óbirt.",
     "from": "Frá",
     "notFound": "Skilaboð finnast ekki",
     "notFoundDescription": "Þessi svartengill gæti verið útrunninn eða ógildur.",
     "placeholder": "Svarið þitt...",
-    "privacy": "Netfangið þitt er aldrei deilt. Þetta svar er sent í gegnum Fundið.",
     "send": "Senda svar",
     "sent": "Svar sent!",
     "sentDescription": "Svarið þitt hefur verið áframsent. Ef þau svara aftur færðu annan tölvupóst.",

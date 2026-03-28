@@ -132,8 +132,6 @@
 					class="w-full px-4 py-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-amber)] focus:border-transparent resize-none placeholder:text-[var(--color-muted)]"
 				></textarea>
 
-				<p class="text-xs text-[var(--color-muted)]">{$t('reply.privacy')}</p>
-
 				{#if error}
 					<p class="text-[var(--color-lost)] text-xs">{error}</p>
 				{/if}

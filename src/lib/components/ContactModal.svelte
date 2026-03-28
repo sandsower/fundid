@@ -106,8 +106,6 @@
 					<p class="text-xs text-[var(--color-muted)] mt-1 text-right">{message.length}/500</p>
 				</div>
 
-				<p class="text-xs text-[var(--color-muted)]">{$t('contact.privacy')}</p>
-
 				{#if error}
 					<p class="text-[var(--color-lost)] text-xs">{error}</p>
 				{/if}
