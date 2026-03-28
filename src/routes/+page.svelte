@@ -294,7 +294,7 @@
 			aria-label="Close"
 		></button>
 
-		<div class="relative bg-white w-full max-w-lg mx-4 mt-16 mb-8 rounded-2xl shadow-2xl border border-[var(--color-border)] max-h-[calc(100vh-6rem)] overflow-y-auto">
+		<div class="relative bg-white w-full max-w-lg mx-4 mt-4 mb-4 rounded-2xl shadow-2xl border border-[var(--color-border)] max-h-[calc(100vh-2rem)] overflow-y-auto">
 			<div class="sticky top-0 bg-white border-b border-[var(--color-border)] px-6 py-4 rounded-t-2xl flex items-center justify-between">
 				<div>
 					<h2 class="text-lg font-bold text-[var(--color-ink)]">

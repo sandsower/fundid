@@ -1,7 +1,10 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { getTranslate } from '@tolgee/svelte';
 	import { ICELAND_CENTER, DEFAULT_ZOOM } from '$utils/geo';
 	import { reverseGeocode } from '$utils/geocode';
+
+	const { t } = getTranslate();
 
 	let {
 		latitude = $bindable(ICELAND_CENTER.lat),
@@ -274,7 +277,7 @@
 	{#if !hasPin}
 		<div class="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
 			<span class="text-xs font-medium text-[var(--color-muted)] bg-white/90 px-3 py-1.5 rounded-full shadow-sm">
-				Tap the map to drop a pin
+				{$t('item.tapMap')}
 			</span>
 		</div>
 	{/if}
