@@ -1,0 +1,6 @@
+name = "fundid-data-retention"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+
+[triggers]
+crons = ["0 3 * * *"]
