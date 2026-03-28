@@ -26,10 +26,11 @@
 	onMount(() => {
 		ready = true;
 		initPostHog();
+		capture('$pageview');
 	});
 
-	afterNavigate(() => {
-		capture('$pageview');
+	afterNavigate(({ from }) => {
+		if (from) capture('$pageview');
 	});
 </script>
 
