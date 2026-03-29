@@ -15,7 +15,7 @@ export const load: PageServerLoad = async ({ platform, url }) => {
 
 	let query = supabase
 		.from('items')
-		.select('id, type, category, title, location_name, date_occurred, status, created_at')
+		.select('id, type, category, title, image_url, location_name, date_occurred, status, created_at')
 		.order('created_at', { ascending: false });
 
 	if (filter !== 'all') {

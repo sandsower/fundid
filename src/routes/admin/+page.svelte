@@ -2,12 +2,25 @@
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { Check, Trash2, LogOut } from 'lucide-svelte';
+	import { Check, Trash2, LogOut, Search } from 'lucide-svelte';
 
 	let { data, form } = $props();
 
 	let confirmDelete: string | null = $state(null);
 	let activeFilter = $derived(data.filter);
+	let searchQuery = $state('');
+
+	let filteredItems = $derived.by(() => {
+		if (!searchQuery.trim()) return data.items;
+		const q = searchQuery.toLowerCase();
+		return data.items.filter((item: any) =>
+			item.id.toLowerCase().includes(q) ||
+			item.title.toLowerCase().includes(q) ||
+			item.category.toLowerCase().includes(q) ||
+			item.location_name.toLowerCase().includes(q) ||
+			item.type.toLowerCase().includes(q)
+		);
+	});
 
 	function setFilter(filter: string) {
 		const url = new URL($page.url);
@@ -39,7 +52,7 @@
 				<h1 class="text-lg font-bold text-[var(--color-ink)]">Admin</h1>
 			</div>
 			<div class="flex items-center gap-4">
-				<span class="text-sm text-[var(--color-muted)]">{data.items.length} items</span>
+				<span class="text-sm text-[var(--color-muted)]">{filteredItems.length} items</span>
 				<a href="/admin/login?logout" class="text-[var(--color-muted)] hover:text-[var(--color-ink)] transition-colors">
 					<LogOut size={18} />
 				</a>
@@ -47,8 +60,17 @@
 		</div>
 	</div>
 
-	<!-- Filters -->
+	<!-- Search + Filters -->
 	<div class="max-w-5xl mx-auto px-4 pt-4">
+		<div class="relative mb-3">
+			<Search size={16} class="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-muted)]" />
+			<input
+				type="text"
+				bind:value={searchQuery}
+				placeholder="Search by title, category, location..."
+				class="w-full pl-9 pr-4 py-2 bg-white border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-amber)] focus:border-transparent placeholder:text-[var(--color-muted)]"
+			/>
+		</div>
 		<div class="flex gap-2">
 			{#each filters as f}
 				<button
@@ -72,7 +94,7 @@
 			</div>
 		{/if}
 
-		{#if data.items.length === 0}
+		{#if filteredItems.length === 0}
 			<div class="text-center py-16 text-[var(--color-muted)]">
 				<p class="text-lg font-medium">No items found</p>
 			</div>
@@ -82,6 +104,7 @@
 					<table class="w-full text-sm">
 						<thead>
 							<tr class="border-b border-[var(--color-border)] text-left">
+								<th class="px-4 py-3 font-semibold text-[var(--color-muted)]">Image</th>
 								<th class="px-4 py-3 font-semibold text-[var(--color-muted)]">Status</th>
 								<th class="px-4 py-3 font-semibold text-[var(--color-muted)]">Type</th>
 								<th class="px-4 py-3 font-semibold text-[var(--color-muted)]">Title</th>
@@ -93,8 +116,17 @@
 							</tr>
 						</thead>
 						<tbody>
-							{#each data.items as item (item.id)}
+							{#each filteredItems as item (item.id)}
 								<tr class="border-b border-[var(--color-border)] last:border-b-0 hover:bg-[var(--color-surface)] transition-colors">
+									<td class="px-4 py-3">
+										{#if item.image_url}
+											<a href={item.image_url} target="_blank">
+												<img src={item.image_url} alt="" class="w-10 h-10 rounded-lg object-cover" loading="lazy" />
+											</a>
+										{:else}
+											<div class="w-10 h-10 rounded-lg bg-[var(--color-surface)] border border-[var(--color-border)]"></div>
+										{/if}
+									</td>
 									<td class="px-4 py-3">
 										<span class="inline-block px-2 py-0.5 rounded-full text-xs font-medium {statusColors[item.status] || ''}">
 											{item.status}

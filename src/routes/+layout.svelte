@@ -39,11 +39,15 @@
 </svelte:head>
 
 {#if browser && ready}
-	<TolgeeProvider {tolgee}>
-		<AppShell>
-			{@render children()}
-		</AppShell>
-	</TolgeeProvider>
+	{#if $page.url.pathname.startsWith('/admin')}
+		{@render children()}
+	{:else}
+		<TolgeeProvider {tolgee}>
+			<AppShell>
+				{@render children()}
+			</AppShell>
+		</TolgeeProvider>
+	{/if}
 {:else}
 	<div class="min-h-screen bg-[var(--color-surface)]"></div>
 {/if}
