@@ -52,6 +52,13 @@ jobs:
           PUBLIC_IMAGE_BASE_URL: https://img.fundid.is
           PUBLIC_POSTHOG_KEY: phc_BxnLWEgef23Khlrx6Q1z9IRkAu2YKNPN39Gf0EceHHJ
 
+      # Set Supabase service role key as Pages secret
+      - run: echo "$SB_KEY" | npx wrangler pages secret put SUPABASE_SERVICE_ROLE_KEY --project-name fundid
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          SB_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
       # Deploy Pages
       - uses: cloudflare/wrangler-action@v3
         with:
