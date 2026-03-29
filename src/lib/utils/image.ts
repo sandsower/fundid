@@ -22,7 +22,7 @@ export async function compressImage(file: File): Promise<File> {
 	return imageCompression(file, {
 		maxSizeMB: 1,
 		maxWidthOrHeight: 1200,
-		useWebWorker: true,
+		useWebWorker: false,
 		fileType: 'image/webp'
 	});
 }
