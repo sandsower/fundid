@@ -2,7 +2,7 @@
 	import { getTranslate } from '@tolgee/svelte';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
-	import { PUBLIC_TURNSTILE_SITE_KEY } from '$env/static/public';
+	import { env } from '$env/dynamic/public';
 
 	const { t } = getTranslate();
 	import { categoryIcons, allCategories } from '$utils/categories';
@@ -88,7 +88,7 @@
 		function renderWidget() {
 			if (window.turnstile && turnstileContainer) {
 				turnstileWidgetId = window.turnstile.render(turnstileContainer, {
-					sitekey: PUBLIC_TURNSTILE_SITE_KEY,
+					sitekey: env.PUBLIC_TURNSTILE_SITE_KEY!,
 					callback: (token: string) => { turnstileToken = token; },
 					'error-callback': () => { turnstileToken = ''; },
 					'expired-callback': () => { turnstileToken = ''; },
