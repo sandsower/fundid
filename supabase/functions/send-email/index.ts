@@ -2,6 +2,7 @@ const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') || '';
 const EDGE_FUNCTION_SECRET = Deno.env.get('EDGE_FUNCTION_SECRET') || '';
 const FROM_EMAIL = 'Fundið <noreply@fundid.is>';
 const SITE_URL = Deno.env.get('SITE_URL') || 'https://fundid.is';
+const LOGO_URL = 'https://img.fundid.is/logo-email.png';
 const ALLOWED_ORIGINS = (Deno.env.get('ALLOWED_ORIGINS') || 'https://fundid.is').split(',');
 
 Deno.serve(async (req) => {
@@ -53,7 +54,10 @@ async function sendClaimCodeEmail(body: {
   const html = `
     <div style="font-family: -apple-system, system-ui, sans-serif; max-width: 480px; margin: 0 auto; padding: 40px 20px;">
       <div style="text-align: center; margin-bottom: 32px;">
-        <span style="display: inline-block; width: 40px; height: 40px; background: #E08A50; border-radius: 8px; color: white; font-weight: bold; font-size: 18px; line-height: 40px;">F</span>
+        <a href="${SITE_URL}" style="text-decoration: none;">
+          <img src="${LOGO_URL}" alt="Fundið" width="32" height="44" style="display: inline-block; vertical-align: middle;" />
+          <span style="display: inline-block; vertical-align: middle; margin-left: 8px; font-size: 20px; font-weight: 700; color: #2C2520; letter-spacing: -0.5px;">Fundið</span>
+        </a>
       </div>
 
       <h1 style="font-size: 20px; color: #2C2520; margin: 0 0 8px;">Your claim code</h1>
@@ -102,7 +106,10 @@ async function sendContactNotification(body: {
   const html = `
     <div style="font-family: -apple-system, system-ui, sans-serif; max-width: 480px; margin: 0 auto; padding: 40px 20px;">
       <div style="text-align: center; margin-bottom: 32px;">
-        <span style="display: inline-block; width: 40px; height: 40px; background: #E08A50; border-radius: 8px; color: white; font-weight: bold; font-size: 18px; line-height: 40px;">F</span>
+        <a href="${SITE_URL}" style="text-decoration: none;">
+          <img src="${LOGO_URL}" alt="Fundið" width="32" height="44" style="display: inline-block; vertical-align: middle;" />
+          <span style="display: inline-block; vertical-align: middle; margin-left: 8px; font-size: 20px; font-weight: 700; color: #2C2520; letter-spacing: -0.5px;">Fundið</span>
+        </a>
       </div>
 
       <h1 style="font-size: 20px; color: #2C2520; margin: 0 0 8px;">New message about "${escapeHtml(body.itemTitle)}"</h1>
@@ -156,7 +163,10 @@ async function sendReplyNotification(body: {
   const html = `
     <div style="font-family: -apple-system, system-ui, sans-serif; max-width: 480px; margin: 0 auto; padding: 40px 20px;">
       <div style="text-align: center; margin-bottom: 32px;">
-        <span style="display: inline-block; width: 40px; height: 40px; background: #E08A50; border-radius: 8px; color: white; font-weight: bold; font-size: 18px; line-height: 40px;">F</span>
+        <a href="${SITE_URL}" style="text-decoration: none;">
+          <img src="${LOGO_URL}" alt="Fundið" width="32" height="44" style="display: inline-block; vertical-align: middle;" />
+          <span style="display: inline-block; vertical-align: middle; margin-left: 8px; font-size: 20px; font-weight: 700; color: #2C2520; letter-spacing: -0.5px;">Fundið</span>
+        </a>
       </div>
 
       <h1 style="font-size: 20px; color: #2C2520; margin: 0 0 8px;">New reply about "${escapeHtml(body.item_title)}"</h1>
