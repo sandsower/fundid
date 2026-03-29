@@ -3,14 +3,12 @@
 	import { goto } from '$app/navigation';
 
 	const { t } = getTranslate();
-	import { supabase } from '$lib/supabase';
 	import { categoryIcons, allCategories } from '$utils/categories';
 	import { extractGps, compressImage } from '$utils/image';
 	import { ICELAND_CENTER } from '$utils/geo';
 	import LocationPicker from '$components/LocationPicker.svelte';
 	import AddressSearch from '$components/AddressSearch.svelte';
 	import { Camera, MapPin, X } from 'lucide-svelte';
-	import { generateClaimCode, hashClaimCode } from '$utils/claim';
 	import { capture } from '$lib/posthog';
 	import type { GeoResult } from '$utils/geocode';
 	import type { ItemType, ItemCategory } from '$types/item';
@@ -79,11 +77,28 @@
 		locationName = name;
 	}
 
+	let honeypot = $state('');
+
+	const URL_PATTERN = /https?:\/\/|www\./i;
+
 	async function handleSubmit() {
 		if (!title.trim() || !locationName.trim() || !contactValue.trim()) {
 			error = 'Please fill in title, location, and email';
 			return;
 		}
+
+		// Client-side honeypot check
+		if (honeypot) {
+			error = $t('error.submissionFailed');
+			return;
+		}
+
+		// Client-side URL check
+		if (URL_PATTERN.test(title) || URL_PATTERN.test(description) || URL_PATTERN.test(locationName)) {
+			error = $t('error.urlNotAllowed');
+			return;
+		}
+
 		submitting = true;
 		error = '';
 		try {
@@ -93,16 +108,16 @@
 				const form = new FormData();
 				form.append('file', compressed, 'image.webp');
 				const res = await fetch('/api/upload', { method: 'POST', body: form });
-				const body = await res.json();
-				if (!res.ok) throw new Error(body.message || 'Upload failed');
+				let body;
+				try { body = await res.json(); } catch { body = {}; }
+				if (!res.ok) throw new Error(body.message || $t('error.submissionFailed'));
 				imageUrl = body.url;
 			}
-			const claimCode = generateClaimCode();
-			const claimCodeHash = await hashClaimCode(claimCode);
 
-			const { data, error: insertError } = await supabase
-				.from('items')
-				.insert({
+			const res = await fetch('/api/items', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
 					type,
 					category,
 					title: title.trim(),
@@ -112,29 +127,36 @@
 					longitude,
 					location_name: locationName.trim(),
 					date_occurred: dateOccurred,
-					contact_method: 'email',
 					contact_value: contactValue.trim(),
-					claim_code_hash: claimCodeHash,
-					status: 'active'
+					website: honeypot
 				})
-				.select()
-				.single();
-			if (insertError) throw insertError;
-			if (data) {
-				capture('report_form_submitted', { type, category, has_photo: !!imageFile, has_location: !!locationName.trim() });
-				// Dispatch claim code email server-side
-				await supabase.rpc('send_claim_code_email', {
-					p_item_id: data.id,
-					p_to_email: contactValue.trim(),
-					p_claim_code: claimCode,
-					p_item_title: title.trim()
-				});
+			});
 
-				if (onSuccess) onSuccess(data.id);
-				else goto(`/item/${data.id}`);
+			let data;
+			try { data = await res.json(); } catch { data = {}; }
+
+			if (!res.ok) {
+				if (data.error === 'rate_limited') error = $t('error.rateLimited');
+				else if (data.error === 'url_detected') error = $t('error.urlNotAllowed');
+				else error = $t('error.submissionFailed');
+				return;
 			}
-		} catch (e: any) {
-			error = e.message || 'Something went wrong';
+
+			if (!data.id) {
+				error = $t('error.submissionFailed');
+				return;
+			}
+
+			capture('report_form_submitted', { type, category, has_photo: !!imageFile, has_location: !!locationName.trim() });
+
+			if (!data.claim_code_sent) {
+				console.warn('Claim code email may not have been sent for item', data.id);
+			}
+
+			if (onSuccess) onSuccess(data.id);
+			else goto(`/item/${data.id}`);
+		} catch {
+			error = $t('error.submissionFailed');
 		} finally {
 			submitting = false;
 		}
@@ -236,6 +258,11 @@
 			class="w-full px-4 py-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-amber)] focus:border-transparent placeholder:text-[var(--color-muted)]"
 		/>
 		<p class="text-xs text-[var(--color-muted)] mt-1.5">{$t('item.emailPrivacy')}</p>
+	</div>
+
+	<!-- Honeypot -->
+	<div style="display:none" aria-hidden="true">
+		<input type="text" name="website" bind:value={honeypot} tabindex="-1" autocomplete="off" />
 	</div>
 
 	{#if error}

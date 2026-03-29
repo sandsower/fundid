@@ -18,12 +18,14 @@
 	let senderName = $state('');
 	let senderEmail = $state('');
 	let message = $state('');
+	let honeypot = $state('');
 	let sending = $state(false);
 	let sent = $state(false);
 	let error = $state('');
 
 	async function handleSend() {
 		if (!senderName.trim() || !senderEmail.trim() || !message.trim()) return;
+		if (honeypot) { error = $t('error.submissionFailed'); return; }
 		sending = true;
 		error = '';
 
@@ -45,8 +47,8 @@
 			} else {
 				error = $t('contact.failed');
 			}
-		} catch (e: any) {
-			error = e.message || 'Something went wrong';
+		} catch {
+			error = $t('contact.failed');
 		} finally {
 			sending = false;
 		}
@@ -104,6 +106,11 @@
 						class="w-full px-4 py-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-amber)] focus:border-transparent resize-none placeholder:text-[var(--color-muted)]"
 					></textarea>
 					<p class="text-xs text-[var(--color-muted)] mt-1 text-right">{message.length}/500</p>
+				</div>
+
+				<!-- Honeypot -->
+				<div style="display:none" aria-hidden="true">
+					<input type="text" name="website" bind:value={honeypot} tabindex="-1" autocomplete="off" />
 				</div>
 
 				{#if error}

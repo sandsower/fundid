@@ -10,6 +10,7 @@ declare global {
 			env: {
 				ITEM_IMAGES: R2Bucket;
 				RATE_LIMIT: KVNamespace;
+				SUPABASE_SERVICE_ROLE_KEY: string;
 			};
 		}
 	}

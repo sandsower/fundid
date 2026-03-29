@@ -68,6 +68,11 @@
     "verify": "Verify",
     "warning": "This won't be shown again."
   },
+  "error": {
+    "rateLimited": "Too many submissions. Please try again later.",
+    "submissionFailed": "Something went wrong. Please try again.",
+    "urlNotAllowed": "Links are not allowed in item descriptions."
+  },
   "common": {
     "active": "Active",
     "all": "All",
@@ -166,6 +171,7 @@
     "send": "Send reply",
     "sent": "Reply sent!",
     "sentDescription": "Your reply has been forwarded. If they respond again, you'll get another email.",
+    "itemResolved": "This item has been returned and is no longer accepting replies.",
     "title": "Reply to message",
     "viewItem": "View item"
   },

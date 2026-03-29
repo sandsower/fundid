@@ -9,9 +9,11 @@
 	import { formatDateTime } from '$utils/date';
 
 	let loading = $state(true);
+	let loadError = $state(false);
 	let msgData: any = $state(null);
 	let history: any[] = $state([]);
 	let reply = $state('');
+	let honeypot = $state('');
 	let sending = $state(false);
 	let sent = $state(false);
 	let error = $state('');
@@ -22,7 +24,9 @@
 			p_reply_token: replyId
 		});
 
-		if (data?.success) {
+		if (rpcError) {
+			loadError = true;
+		} else if (data?.success) {
 			msgData = data;
 			history = data.history || [];
 		}
@@ -31,6 +35,7 @@
 
 	async function handleReply() {
 		if (!reply.trim()) return;
+		if (honeypot) { error = $t('error.submissionFailed'); return; }
 		sending = true;
 		error = '';
 
@@ -49,10 +54,10 @@
 			} else if (data?.error === 'item_resolved') {
 				error = $t('reply.itemResolved');
 			} else {
-				error = data?.error || 'Something went wrong';
+				error = $t('error.submissionFailed');
 			}
-		} catch (e: any) {
-			error = e.message || 'Something went wrong';
+		} catch {
+			error = $t('error.submissionFailed');
 		} finally {
 			sending = false;
 		}
@@ -71,6 +76,13 @@
 		<div class="text-center py-16">
 			<Loader size={32} class="text-[var(--color-amber)] animate-spin mx-auto mb-4" />
 			<p class="text-sm text-[var(--color-muted)]">{$t('common.loading')}</p>
+		</div>
+	{:else if loadError}
+		<div class="text-center py-16">
+			<div class="w-16 h-16 bg-[var(--color-lost-light)] rounded-full flex items-center justify-center mx-auto mb-4">
+				<XCircle size={32} class="text-[var(--color-lost)]" />
+			</div>
+			<h1 class="text-xl font-bold text-[var(--color-ink)] mb-2">{$t('error.submissionFailed')}</h1>
 		</div>
 	{:else if !msgData}
 		<div class="text-center py-16">
@@ -131,6 +143,11 @@
 					bind:value={reply} placeholder={$t('reply.placeholder')} rows="4" required maxlength="500"
 					class="w-full px-4 py-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-amber)] focus:border-transparent resize-none placeholder:text-[var(--color-muted)]"
 				></textarea>
+
+				<!-- Honeypot -->
+				<div style="display:none" aria-hidden="true">
+					<input type="text" name="website" bind:value={honeypot} tabindex="-1" autocomplete="off" />
+				</div>
 
 				{#if error}
 					<p class="text-[var(--color-lost)] text-xs">{error}</p>

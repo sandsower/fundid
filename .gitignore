@@ -34,3 +34,6 @@ plans/
 # Scripts that source .env
 scripts/run-load-test.sh
 scripts/setup-billing-alert.sh
+
+# Local MCP config
+.mcp.json

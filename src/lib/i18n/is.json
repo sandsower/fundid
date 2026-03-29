@@ -68,6 +68,11 @@
     "verify": "Staðfesta",
     "warning": "Þetta birtist ekki aftur."
   },
+  "error": {
+    "rateLimited": "Of margar innsendingar. Vinsamlegast reyndu aftur síðar.",
+    "submissionFailed": "Eitthvað fór úrskeiðis. Vinsamlegast reyndu aftur.",
+    "urlNotAllowed": "Tenglar eru ekki leyfðir í lýsingum á hlutum."
+  },
   "common": {
     "active": "Virkt",
     "all": "Allt",
@@ -166,6 +171,7 @@
     "send": "Senda svar",
     "sent": "Svar sent!",
     "sentDescription": "Svarið þitt hefur verið áframsent. Ef þau svara aftur færðu annan tölvupóst.",
+    "itemResolved": "Þessum hlut hefur verið skilað og tekur ekki við fleiri svörum.",
     "title": "Svara skilaboðum",
     "viewItem": "Skoða hlut"
   },
