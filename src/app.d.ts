@@ -29,6 +29,7 @@ declare global {
 				RATE_LIMIT: KVNamespace;
 				SUPABASE_SERVICE_ROLE_KEY: string;
 				TURNSTILE_SECRET_KEY: string;
+				ADMIN_PASSWORD: string;
 			};
 		}
 	}
