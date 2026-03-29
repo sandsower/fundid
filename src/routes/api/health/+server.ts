@@ -37,13 +37,21 @@ export const GET: RequestHandler = async ({ platform }) => {
 		checks.storage = { ok: false, ms: Date.now() - storageStart, error: String(e) };
 	}
 
+	// Check platform bindings availability
+	const bindings = {
+		ITEM_IMAGES: !!platform?.env?.ITEM_IMAGES,
+		RATE_LIMIT: !!platform?.env?.RATE_LIMIT,
+		SUPABASE_SERVICE_ROLE_KEY: !!platform?.env?.SUPABASE_SERVICE_ROLE_KEY
+	};
+
 	const allOk = Object.values(checks).every((c) => c.ok);
 
 	return json(
 		{
 			status: allOk ? 'healthy' : 'degraded',
 			total_ms: Date.now() - start,
-			checks
+			checks,
+			bindings
 		},
 		{ status: allOk ? 200 : 503 }
 	);
