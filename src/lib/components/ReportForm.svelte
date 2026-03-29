@@ -91,8 +91,7 @@
 					sitekey: TURNSTILE_SITE_KEY,
 					callback: (token: string) => { turnstileToken = token; },
 					'error-callback': () => { turnstileToken = ''; },
-					'expired-callback': () => { turnstileToken = ''; },
-					size: 'invisible'
+					'expired-callback': () => { turnstileToken = ''; }
 				});
 			}
 		}

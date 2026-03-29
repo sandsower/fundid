@@ -8,7 +8,7 @@ declare global {
 			'error-callback'?: () => void;
 			'expired-callback'?: () => void;
 			appearance?: 'always' | 'execute' | 'interaction-only';
-			size?: 'normal' | 'compact' | 'invisible';
+			size?: 'normal' | 'compact' | 'flexible';
 		}): string;
 		reset(widgetId?: string): void;
 		remove(widgetId?: string): void;
