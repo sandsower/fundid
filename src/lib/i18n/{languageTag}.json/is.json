@@ -71,7 +71,8 @@
   "error": {
     "rateLimited": "Of margar innsendingar. Vinsamlegast reyndu aftur síðar.",
     "submissionFailed": "Eitthvað fór úrskeiðis. Vinsamlegast reyndu aftur.",
-    "urlNotAllowed": "Tenglar eru ekki leyfðir í lýsingum á hlutum."
+    "urlNotAllowed": "Tenglar eru ekki leyfðir í lýsingum á hlutum.",
+    "turnstileFailed": "Staðfesting mistókst. Vinsamlegast endurnýjaðu síðuna og reyndu aftur."
   },
   "common": {
     "active": "Virkt",

@@ -34,24 +34,42 @@ async function hashClaimCode(code: string): Promise<string> {
 		.join('');
 }
 
+async function verifyTurnstile(token: string, secret: string, ip: string): Promise<boolean> {
+	const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+		body: new URLSearchParams({ secret, response: token, remoteip: ip })
+	});
+	const data = await res.json() as { success: boolean };
+	return data.success;
+}
+
 export const POST: RequestHandler = async ({ request, platform }) => {
 	const serviceRoleKey = platform?.env?.SUPABASE_SERVICE_ROLE_KEY;
-	if (!serviceRoleKey) throw error(503, 'Service not available');
+	const turnstileSecret = platform?.env?.TURNSTILE_SECRET_KEY;
+	if (!serviceRoleKey || !turnstileSecret) throw error(503, 'Service not available');
 
-	// Rate limit: single read, check, validate, then increment with cached count
-	const kv = platform?.env?.RATE_LIMIT;
 	const ip = request.headers.get('cf-connecting-ip') || 'unknown';
-	const rlKey = kv ? `items:${ip}` : '';
-	const rlCount = kv ? parseInt((await kv.get(rlKey)) || '0') : 0;
-	if (kv && rlCount >= RATE_LIMIT) {
-		return json({ error: 'rate_limited' }, { status: 429 });
-	}
 
+	// Turnstile verification
 	let body: Record<string, unknown>;
 	try {
 		body = await request.json();
 	} catch {
 		return json({ error: 'invalid_request' }, { status: 400 });
+	}
+
+	const turnstileToken = body['cf-turnstile-response'] as string;
+	if (!turnstileToken || !(await verifyTurnstile(turnstileToken, turnstileSecret, ip))) {
+		return json({ error: 'turnstile_failed' }, { status: 403 });
+	}
+
+	// Rate limit: single read, check, validate, then increment with cached count
+	const kv = platform?.env?.RATE_LIMIT;
+	const rlKey = kv ? `items:${ip}` : '';
+	const rlCount = kv ? parseInt((await kv.get(rlKey)) || '0') : 0;
+	if (kv && rlCount >= RATE_LIMIT) {
+		return json({ error: 'rate_limited' }, { status: 429 });
 	}
 
 	// Honeypot check — silent rejection

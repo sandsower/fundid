@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { getTranslate } from '@tolgee/svelte';
 	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
+	import { PUBLIC_TURNSTILE_SITE_KEY } from '$env/static/public';
 
 	const { t } = getTranslate();
 	import { categoryIcons, allCategories } from '$utils/categories';
@@ -78,12 +80,48 @@
 	}
 
 	let honeypot = $state('');
+	let turnstileToken = $state('');
+	let turnstileWidgetId: string | undefined;
+	let turnstileContainer: HTMLDivElement;
+
+	onMount(() => {
+		function renderWidget() {
+			if (window.turnstile && turnstileContainer) {
+				turnstileWidgetId = window.turnstile.render(turnstileContainer, {
+					sitekey: PUBLIC_TURNSTILE_SITE_KEY,
+					callback: (token: string) => { turnstileToken = token; },
+					'error-callback': () => { turnstileToken = ''; },
+					'expired-callback': () => { turnstileToken = ''; },
+					size: 'invisible'
+				});
+			}
+		}
+
+		// Script may still be loading (async defer)
+		if (window.turnstile) {
+			renderWidget();
+		} else {
+			const interval = setInterval(() => {
+				if (window.turnstile) {
+					clearInterval(interval);
+					renderWidget();
+				}
+			}, 100);
+			return () => clearInterval(interval);
+		}
+	});
 
 	const URL_PATTERN = /https?:\/\/|www\./i;
 
 	async function handleSubmit() {
 		if (!title.trim() || !locationName.trim() || !contactValue.trim()) {
 			error = 'Please fill in title, location, and email';
+			return;
+		}
+
+		// Turnstile token required
+		if (!turnstileToken) {
+			error = $t('error.turnstileFailed');
 			return;
 		}
 
@@ -128,7 +166,8 @@
 					location_name: locationName.trim(),
 					date_occurred: dateOccurred,
 					contact_value: contactValue.trim(),
-					website: honeypot
+					website: honeypot,
+					'cf-turnstile-response': turnstileToken
 				})
 			});
 
@@ -136,9 +175,15 @@
 			try { data = await res.json(); } catch { data = {}; }
 
 			if (!res.ok) {
-				if (data.error === 'rate_limited') error = $t('error.rateLimited');
+				if (data.error === 'turnstile_failed') error = $t('error.turnstileFailed');
+				else if (data.error === 'rate_limited') error = $t('error.rateLimited');
 				else if (data.error === 'url_detected') error = $t('error.urlNotAllowed');
 				else error = $t('error.submissionFailed');
+				// Reset Turnstile for retry
+				if (window.turnstile && turnstileWidgetId) {
+					window.turnstile.reset(turnstileWidgetId);
+					turnstileToken = '';
+				}
 				return;
 			}
 
@@ -264,6 +309,9 @@
 	<div style="display:none" aria-hidden="true">
 		<input type="text" name="website" bind:value={honeypot} tabindex="-1" autocomplete="off" />
 	</div>
+
+	<!-- Turnstile (invisible) -->
+	<div bind:this={turnstileContainer}></div>
 
 	{#if error}
 		<p class="text-[var(--color-lost)] text-sm">{error}</p>

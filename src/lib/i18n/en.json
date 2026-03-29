@@ -71,7 +71,8 @@
   "error": {
     "rateLimited": "Too many submissions. Please try again later.",
     "submissionFailed": "Something went wrong. Please try again.",
-    "urlNotAllowed": "Links are not allowed in item descriptions."
+    "urlNotAllowed": "Links are not allowed in item descriptions.",
+    "turnstileFailed": "Verification failed. Please refresh the page and try again."
   },
   "common": {
     "active": "Active",
