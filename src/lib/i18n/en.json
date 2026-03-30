@@ -178,8 +178,20 @@
   },
   "resolve": {
     "errorTitle": "Could not resolve",
+    "lostCode": "Need help?",
+    "lostCodeDescription": "Enter your email so we can help you out.",
+    "lostCodeSent": "Request sent!",
+    "lostCodeSentDescription": "We'll look into this and get back to you.",
+    "lostCodeSubmit": "Send request",
     "successDescription": "Great news! This item has been marked as returned. Thanks for using Fundið.",
     "successTitle": "Item marked as resolved!",
     "viewItem": "View item"
+  },
+  "success": {
+    "title": "Item posted!",
+    "description": "Your item is on the map. Share it to reach more people.",
+    "shareOnFacebook": "Share on Facebook",
+    "viewItem": "View listing",
+    "shareTip": "The more people who see it, the better the chances of a match."
   }
 }

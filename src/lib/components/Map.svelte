@@ -158,6 +158,18 @@
 					.setPopup(popup)
 					.addTo(map);
 
+				popup.on('open', () => {
+					const px = map.project([item.longitude, item.latitude]);
+					const container = map.getContainer();
+					const h = container.clientHeight;
+					// Offset upward so popup clears the floating action buttons (~80px from bottom)
+					const targetY = h * 0.4;
+					const offsetY = px.y - targetY;
+					if (offsetY > 20) {
+						map.panBy([0, offsetY], { duration: 300 });
+					}
+				});
+
 				if (onMarkerClick) {
 					el.addEventListener('click', () => onMarkerClick(item));
 				}

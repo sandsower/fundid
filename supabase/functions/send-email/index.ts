@@ -35,6 +35,8 @@ Deno.serve(async (req) => {
       return await sendContactNotification(body);
     } else if (body.type === 'reply_notification') {
       return await sendReplyNotification(body);
+    } else if (body.type === 'support_request') {
+      return await sendSupportRequest(body);
     }
 
     return new Response(JSON.stringify({ error: 'unknown type' }), { status: 400 });
@@ -198,6 +200,54 @@ async function sendReplyNotification(body: {
   return await sendEmail(
     body.recipient_email,
     sanitizeSubject(`Reply about: ${body.item_title}`),
+    html
+  );
+}
+
+async function sendSupportRequest(body: {
+  requesterEmail: string;
+  itemId: string;
+  itemTitle: string;
+  itemStatus: string;
+  matchesContact: boolean;
+}) {
+  const ADMIN_EMAIL = Deno.env.get('ADMIN_EMAIL') || 'victor.val.mtz@gmail.com';
+  const itemUrl = `${SITE_URL}/item/${body.itemId}`;
+
+  const html = `
+    <div style="font-family: -apple-system, system-ui, sans-serif; max-width: 480px; margin: 0 auto; padding: 40px 20px;">
+      <div style="text-align: center; margin-bottom: 32px;">
+        <a href="${SITE_URL}" style="text-decoration: none;">
+          <img src="${LOGO_URL}" alt="Fundið" width="32" height="44" style="display: inline-block; vertical-align: middle;" />
+          <span style="display: inline-block; vertical-align: middle; margin-left: 8px; font-size: 20px; font-weight: 700; color: #2C2520; letter-spacing: -0.5px;">Fundið</span>
+        </a>
+      </div>
+
+      <h1 style="font-size: 20px; color: #2C2520; margin: 0 0 8px;">Support request: lost claim code</h1>
+      <p style="font-size: 14px; color: #9C8B7E; margin: 0 0 24px;">
+        A user is requesting help resolving an item because they lost their claim code.
+      </p>
+
+      <div style="background: #FAF7F4; border: 1px solid #E8E0D8; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
+        <p style="font-size: 14px; color: #2C2520; margin: 0 0 8px;"><strong>Item:</strong> ${escapeHtml(body.itemTitle)}</p>
+        <p style="font-size: 14px; color: #2C2520; margin: 0 0 8px;"><strong>Status:</strong> ${body.itemStatus}</p>
+        <p style="font-size: 14px; color: #2C2520; margin: 0 0 8px;"><strong>Requester:</strong> ${escapeHtml(body.requesterEmail)}</p>
+        <p style="font-size: 14px; color: ${body.matchesContact ? '#4A9B6A' : '#D9534F'}; margin: 0;">
+          <strong>Email match:</strong> ${body.matchesContact ? 'Yes (matches item contact)' : 'No (different from item contact)'}
+        </p>
+      </div>
+
+      <div style="text-align: center; margin-bottom: 32px;">
+        <a href="${itemUrl}" style="display: inline-block; background: #E08A50; color: white; font-weight: 600; font-size: 14px; padding: 12px 24px; border-radius: 12px; text-decoration: none;">
+          View item
+        </a>
+      </div>
+    </div>
+  `;
+
+  return await sendEmail(
+    ADMIN_EMAIL,
+    sanitizeSubject(`Support: lost claim code for "${body.itemTitle}"`),
     html
   );
 }

@@ -9,6 +9,7 @@
 	import Map from '$components/Map.svelte';
 	import ReportForm from '$components/ReportForm.svelte';
 	import ItemPreview from '$components/ItemPreview.svelte';
+	import SuccessModal from '$components/SuccessModal.svelte';
 	import { items, filters, loading } from '$stores/items';
 	import { SearchX, HandHelping, Map as MapIcon, LayoutList, Search, X } from 'lucide-svelte';
 	import type { Item, ItemType, ItemCategory } from '$types/item';
@@ -29,6 +30,7 @@
 
 	let view: 'map' | 'list' = $state(initialView === 'list' ? 'list' : 'map');
 	let showReportModal: 'lost' | 'found' | null = $state(null);
+	let successItemId: string | null = $state(null);
 	let previewItem: import('$types/item').Item | null = $state(null);
 	let visibleCount = $state(18);
 	let mapBounds: MapBounds | null = $state(null);
@@ -152,7 +154,7 @@
 
 	function handleReportSuccess(id: string) {
 		showReportModal = null;
-		goto(`/item/${id}`);
+		successItemId = id;
 	}
 </script>
 
@@ -320,5 +322,9 @@
 
 {#if previewItem}
 	<ItemPreview item={previewItem} onClose={() => (previewItem = null)} />
+{/if}
+
+{#if successItemId}
+	<SuccessModal itemId={successItemId} onClose={() => { goto(`/item/${successItemId}`); successItemId = null; }} />
 {/if}
 

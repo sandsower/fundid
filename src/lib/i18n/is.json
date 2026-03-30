@@ -178,8 +178,20 @@
   },
   "resolve": {
     "errorTitle": "Ekki tókst að leysa",
+    "lostCode": "Þarftu aðstoð?",
+    "lostCodeDescription": "Sláðu inn netfangið þitt svo við getum aðstoðað þig.",
+    "lostCodeSent": "Beiðni send!",
+    "lostCodeSentDescription": "Við skoðum þetta og höfum samband við þig.",
+    "lostCodeSubmit": "Senda beiðni",
     "successDescription": "Frábært! Þessi hlutur hefur verið merktur sem skilað. Takk fyrir að nota Fundið.",
     "successTitle": "Hlutur merktur sem leystur!",
     "viewItem": "Skoða hlut"
+  },
+  "success": {
+    "title": "Skráning móttekin!",
+    "description": "Hluturinn þinn er kominn á kortið. Deildu til að ná til fleiri.",
+    "shareOnFacebook": "Deila á Facebook",
+    "viewItem": "Skoða skráningu",
+    "shareTip": "Því fleiri sem vita, þeim mun meiri líkur á samsvörun."
   }
 }
