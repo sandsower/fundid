@@ -50,6 +50,11 @@
 		</div>
 
 		<div class="flyer bg-white border-4 rounded-2xl p-10 text-center {item.type === 'lost' ? 'border-[var(--color-lost)]' : 'border-[var(--color-found)]'}">
+			<div class="mb-6 flex items-center justify-center gap-2">
+				<img src="/logo-v2-pin-checkmark.svg" alt="Fundið" class="w-8 h-11" />
+				<span class="text-xl font-bold text-[var(--color-ink)] tracking-tight">Fundið</span>
+			</div>
+
 			<h1 class="text-6xl font-black tracking-tight mb-1 {item.type === 'lost' ? 'text-[var(--color-lost)]' : 'text-[var(--color-found)]'}">
 				{item.type === 'lost' ? $t('flyer.title') : $t('flyer.foundTitle')}
 			</h1>
@@ -86,8 +91,8 @@
 				<p class="text-xs text-[var(--color-muted)] mt-2">fundid.is/item/{item.id}</p>
 			</div>
 
-			<p class="mt-8 text-sm font-semibold text-[var(--color-amber-dark)]">
-				Fundið - {$t('common.tagline')}
+			<p class="mt-8 text-xs text-[var(--color-muted)]">
+				fundid.is · {$t('common.tagline')}
 			</p>
 		</div>
 	</div>
