@@ -122,7 +122,7 @@ export function generateMockItems(count: number): Item[] {
 			category,
 			title: rand(titles),
 			description: rand(DESCRIPTIONS),
-			image_url: hasImage ? `https://cataas.com/cat?width=400&height=300&t=${i}` : null,
+			image_url: hasImage ? `https://picsum.photos/seed/${i}/400/300` : null,
 			latitude: jitter(loc.lat, loc.spread),
 			longitude: jitter(loc.lng, loc.spread),
 			location_name: loc.name,
