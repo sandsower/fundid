@@ -114,7 +114,7 @@ export function generateMockItems(count: number): Item[] {
 		const loc = rand(LOCATIONS);
 		const titles = TITLES_LOST[category];
 		const daysAgo = Math.floor(Math.random() * 30);
-		const hasImage = Math.random() > 0.3;
+		const hasImage = true;
 
 		items.push({
 			id: uuid(),
@@ -122,7 +122,7 @@ export function generateMockItems(count: number): Item[] {
 			category,
 			title: rand(titles),
 			description: rand(DESCRIPTIONS),
-			image_url: hasImage ? `https://picsum.photos/seed/${i}/400/300` : null,
+			image_url: hasImage ? '/mock-card.png' : null,
 			latitude: jitter(loc.lat, loc.spread),
 			longitude: jitter(loc.lng, loc.spread),
 			location_name: loc.name,
