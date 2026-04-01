@@ -85,13 +85,8 @@ export const LogoDrop: React.FC = () => {
     : anticipateSwing;
   const swingX = frame >= SWING_START ? swingDrive : 0;
 
-  // Stretch horizontally during swing (moving left = squish Y, stretch X)
-  const swingStretchX = frame >= SWING_START + 4
-    ? interpolate(swingSpring, [0, 0.3, 1], [1.25, 1.15, 1])
-    : 1;
-  const swingStretchY = frame >= SWING_START + 4
-    ? interpolate(swingSpring, [0, 0.3, 1], [0.8, 0.88, 1])
-    : 1;
+  const swingStretchX = 1;
+  const swingStretchY = 1;
 
   // === BRAND NAME — moves left with pin, fades in synced ===
   const nameOpacity = frame >= SWING_START + 4
@@ -133,7 +128,7 @@ export const LogoDrop: React.FC = () => {
       <div
         style={{
           position: "absolute",
-          top: "62%",
+          top: "56%",
           width: 100,
           height: 10,
           borderRadius: "50%",
