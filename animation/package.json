@@ -1,0 +1,23 @@
+{
+  "name": "animation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "preview": "remotion studio",
+    "render": "remotion render LogoDrop --codec gif out/logo-drop.gif"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.30.3",
+  "dependencies": {
+    "@remotion/cli": "^4.0.443",
+    "@remotion/gif": "^4.0.443",
+    "@types/react": "^19.2.14",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "remotion": "^4.0.443",
+    "typescript": "^6.0.2"
+  }
+}

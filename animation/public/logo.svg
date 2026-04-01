@@ -1,0 +1,6 @@
+<svg viewBox="0 0 32 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Map pin with checkmark — "found it!" -->
+  <path d="M16 42C16 42 30 26 30 16C30 8.268 23.732 2 16 2C8.268 2 2 8.268 2 16C2 26 16 42 16 42Z" fill="#E08A50"/>
+  <!-- Checkmark — optically centered in the pin head -->
+  <path d="M10.5 16.5L14.5 21L22.5 12" stroke="white" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>
