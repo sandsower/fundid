@@ -8,7 +8,8 @@ function getInitialLocale(): string {
 	if (!browser) return 'is';
 	const saved = localStorage.getItem('fundid-locale');
 	if (saved === 'is' || saved === 'en') return saved;
-	return 'is';
+	const browserLang = navigator.language?.split('-')[0];
+	return browserLang === 'is' ? 'is' : 'en';
 }
 
 const initialLocale = getInitialLocale();

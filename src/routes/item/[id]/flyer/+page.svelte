@@ -7,6 +7,7 @@
 	import { supabase } from '$lib/supabase';
 	import { categoryIcons } from '$utils/categories';
 	import { ArrowLeft, Printer, MapPin, Calendar } from 'lucide-svelte';
+	import { capture } from '$lib/posthog';
 	import type { Item } from '$types/item';
 	import { formatDate } from '$utils/date';
 
@@ -16,11 +17,15 @@
 
 	onMount(async () => {
 		const { data, error } = await supabase.from('items').select('*').eq('id', $page.params.id).single();
-		if (data && !error) item = data as Item;
+		if (data && !error) {
+			item = data as Item;
+			capture('flyer_viewed', { item_id: data.id, item_type: data.type });
+		}
 		loading = false;
 	});
 
 	function printFlyer() {
+		if (item) capture('flyer_printed', { item_id: item.id });
 		window.print();
 	}
 

@@ -11,36 +11,64 @@
 	import Map from '$components/Map.svelte';
 	import ResolveModal from '$components/ResolveModal.svelte';
 	import ContactModal from '$components/ContactModal.svelte';
+	import ItemCard from '$components/ItemCard.svelte';
 	import { MapPin, Calendar, Clock, Share2, Printer, ArrowLeft, CheckCircle, MessageCircle } from 'lucide-svelte';
 	import { capture } from '$lib/posthog';
 	import type { Item } from '$types/item';
 	import { get } from 'svelte/store';
 	import { formatDate } from '$utils/date';
 
-	let item: Item | null = $state(null);
-	let loading = $state(true);
+	let { data } = $props();
+
+	let item: Item | null = $state(data.item as Item | null);
+	let loading = $state(!data.item);
 	let showContact = $state(false);
 	let showResolve = $state(false);
 	let CatIcon = $derived(item ? (categoryIcons[(item as Item).category] || categoryIcons.other) : categoryIcons.other);
 
+	let mockSimilar: Item[] = $state([]);
+
 	onMount(async () => {
+		// If SSR already loaded the item, nothing to do
+		if (item) {
+			// In dev, generate mock similar items from the store
+			if (dev && !data.similarItems?.length) {
+				const all = get(itemsStore);
+				const oppositeType = item.type === 'lost' ? 'found' : 'lost';
+				mockSimilar = all
+					.filter((i) => i.id !== item!.id && i.type === oppositeType && i.category === item!.category)
+					.slice(0, 6);
+			}
+			return;
+		}
+
 		const id = $page.params.id;
 
-		// Check the in-memory store first (has mock data in dev)
+		// Check the in-memory store (has mock data in dev)
 		const cached = get(itemsStore).find((i) => i.id === id);
 		if (cached) {
 			item = cached;
 			loading = false;
+			if (dev) {
+				const all = get(itemsStore);
+				const oppositeType = cached.type === 'lost' ? 'found' : 'lost';
+				mockSimilar = all
+					.filter((i) => i.id !== cached.id && i.type === oppositeType && i.category === cached.category)
+					.slice(0, 6);
+			}
 			return;
 		}
 
-		const { data, error } = await supabase.from('items').select('id, type, category, title, description, image_url, latitude, longitude, location_name, date_occurred, status, contact_method, contact_value, claim_code_hash, created_at, updated_at').eq('id', id).single();
-		if (data && !error) item = data as Item;
+		const { data: fetched, error } = await supabase.from('items').select('id, type, category, title, description, image_url, latitude, longitude, location_name, date_occurred, status, contact_method, contact_value, claim_code_hash, created_at, updated_at').eq('id', id).single();
+		if (fetched && !error) item = fetched as Item;
 		loading = false;
 	});
 
+	let similarToShow = $derived(data.similarItems?.length ? data.similarItems : mockSimilar);
+
 	function shareItem() {
 		if (!item) return;
+		capture('share_clicked', { item_id: item.id, method: 'native' });
 		const url = window.location.href;
 		const text = `${item.type === 'lost' ? '🔴 TÝNT' : '🟢 FUNDIÐ'}: ${item.title} - ${item.location_name}`;
 		if (navigator.share) {
@@ -51,6 +79,7 @@
 	}
 
 	function shareOnFacebook() {
+		if (item) capture('share_clicked', { item_id: item.id, method: 'facebook' });
 		const url = window.location.href;
 		window.open(
 			`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
@@ -64,6 +93,18 @@
 
 <svelte:head>
 	<title>{pageTitle}</title>
+	{#if data.og}
+		<meta property="og:title" content={data.og.title} />
+		<meta property="og:description" content={data.og.description} />
+		<meta property="og:image" content={data.og.image} />
+		<meta property="og:url" content={data.og.url} />
+		<meta property="og:type" content="article" />
+		<meta name="twitter:card" content={data.og.image !== 'https://fundid.is/og-image.png' ? 'summary_large_image' : 'summary'} />
+		<meta name="twitter:title" content={data.og.title} />
+		<meta name="twitter:description" content={data.og.description} />
+		<meta name="twitter:image" content={data.og.image} />
+		<meta name="description" content={data.og.description} />
+	{/if}
 </svelte:head>
 
 <section class="max-w-3xl mx-auto px-4 py-8">
@@ -170,9 +211,22 @@
 					>
 						<Printer size={14} /> {$t('item.generateFlyer')}
 					</a>
+
 				</div>
 			</div>
 		</div>
+		{#if similarToShow.length > 0}
+			<div class="mt-8">
+				<h2 class="text-lg font-bold text-[var(--color-ink)] mb-4">
+					{item.type === 'lost' ? $t('item.similarFound') : $t('item.similarLost')}
+				</h2>
+				<div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+					{#each similarToShow as similar (similar.id)}
+						<ItemCard item={similar} />
+					{/each}
+				</div>
+			</div>
+		{/if}
 	{/if}
 </section>
 

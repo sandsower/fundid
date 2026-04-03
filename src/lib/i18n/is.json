@@ -120,6 +120,7 @@
     "iFoundSomething": "Ég fann eitthvað",
     "iLostSomething": "Ég týndi einhverju",
     "recentItems": "Nýlegar skráningar",
+    "loadMore": "Hlaða fleiri",
     "showMore": "Sýna fleiri",
     "stats": {
       "activeListings": "Virkar skráningar",
@@ -153,6 +154,8 @@
     "tapMap": "Smelltu á kortið til að setja pinna",
     "title": "Titill",
     "titlePlaceholder": "Stutt lýsing á hlutnum",
+    "similarFound": "Fundið í nágrenninu",
+    "similarLost": "Týnt í nágrenninu",
     "uploadPhoto": "Hlaða upp mynd"
   },
   "nav": {

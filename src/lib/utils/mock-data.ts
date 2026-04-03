@@ -122,7 +122,7 @@ export function generateMockItems(count: number): Item[] {
 			category,
 			title: rand(titles),
 			description: rand(DESCRIPTIONS),
-			image_url: hasImage ? '/mock-card.png' : null,
+			image_url: `/mock-${(i % 5) + 1}.jpg`,
 			latitude: jitter(loc.lat, loc.spread),
 			longitude: jitter(loc.lng, loc.spread),
 			location_name: loc.name,

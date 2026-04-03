@@ -120,6 +120,7 @@
     "iFoundSomething": "I found something",
     "iLostSomething": "I lost something",
     "recentItems": "Recent listings",
+    "loadMore": "Load more",
     "showMore": "Show more",
     "stats": {
       "activeListings": "Active listings",
@@ -153,6 +154,8 @@
     "tapMap": "Tap the map to drop a pin",
     "title": "Title",
     "titlePlaceholder": "Brief description of the item",
+    "similarFound": "Found nearby",
+    "similarLost": "Lost nearby",
     "uploadPhoto": "Upload photo"
   },
   "nav": {
