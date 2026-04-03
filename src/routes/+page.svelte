@@ -36,6 +36,8 @@
 	let mapBounds: MapBounds | null = $state(null);
 	let boundsTimer: ReturnType<typeof setTimeout>;
 	let searchSyncTimer: ReturnType<typeof setTimeout>;
+	let hasMore = $state(false);
+	let loadingMore = $state(false);
 
 	// Set initial filters from URL
 	if (initialType === 'lost' || initialType === 'found') {
@@ -89,8 +91,40 @@
 
 	const USE_MOCK = dev;
 
-	onMount(async () => {
+	async function fetchItems(cursor?: string) {
+		const params = new URLSearchParams();
+		if ($filters.type !== 'all') params.set('type', $filters.type);
+		if ($filters.category !== 'all') params.set('category', $filters.category);
+		if ($filters.query) params.set('q', $filters.query);
+		if (cursor) params.set('cursor', cursor);
+
+		const res = await fetch(`/api/items/search?${params}`);
+		if (!res.ok) return { items: [] as Item[], hasMore: false };
+		return res.json() as Promise<{ items: Item[]; hasMore: boolean }>;
+	}
+
+	async function loadItems() {
 		loading.set(true);
+		const result = await fetchItems();
+		items.set(result.items);
+		hasMore = result.hasMore;
+		loading.set(false);
+	}
+
+	async function loadMore() {
+		const current = $items;
+		if (current.length === 0 || loadingMore) return;
+		loadingMore = true;
+		const cursor = current[current.length - 1].created_at;
+		const result = await fetchItems(cursor);
+		items.update((prev) => [...prev, ...result.items]);
+		hasMore = result.hasMore;
+		loadingMore = false;
+	}
+
+	onMount(async () => {
+		// Skip if we already have items (e.g. navigating back)
+		if ($items.length > 0) return;
 
 		if (USE_MOCK) {
 			items.set(generateMockItems(300));
@@ -98,19 +132,23 @@
 			return;
 		}
 
-		const { data, error } = await supabase
-			.from('items')
-			.select('id, type, category, title, description, image_url, latitude, longitude, location_name, date_occurred, status, contact_method, contact_value, claim_code_hash, created_at, updated_at')
-			.eq('status', 'active')
-			.order('created_at', { ascending: false })
-			.limit(50);
-
-		if (data && !error) items.set(data as Item[]);
-		loading.set(false);
+		await loadItems();
 	});
 
-	// Items filtered by type/category/query — fed to the map
+	// Server-side refetch when filters change (skip during mock/dev)
+	let lastFilterKey = '';
+	$effect(() => {
+		const key = `${$filters.type}|${$filters.category}|${$filters.query}`;
+		if (key === lastFilterKey) return;
+		lastFilterKey = key;
+		if (USE_MOCK || $loading) return;
+		visibleCount = 18;
+		loadItems();
+	});
+
+	// In dev, filter mock data client-side; in prod, items are already filtered by the API
 	let searchFiltered = $derived.by(() => {
+		if (!USE_MOCK) return $items;
 		let result = $items;
 		if ($filters.type !== 'all') result = result.filter((i) => i.type === $filters.type);
 		if ($filters.category !== 'all') result = result.filter((i) => i.category === $filters.category);
@@ -277,6 +315,16 @@
 					class="text-sm font-medium text-[var(--color-amber-dark)] hover:text-[var(--color-amber)] transition-colors px-5 py-2.5 border border-[var(--color-border)] rounded-full hover:border-[var(--color-amber)] inline-flex items-center gap-1.5"
 				>
 					{$t('home.showMore')} ({filteredItems.length - visibleCount})
+				</button>
+			</div>
+		{:else if hasMore}
+			<div class="text-center mt-6">
+				<button
+					onclick={loadMore}
+					disabled={loadingMore}
+					class="text-sm font-medium text-[var(--color-amber-dark)] hover:text-[var(--color-amber)] transition-colors px-5 py-2.5 border border-[var(--color-border)] rounded-full hover:border-[var(--color-amber)] inline-flex items-center gap-1.5 disabled:opacity-50"
+				>
+					{loadingMore ? $t('common.loading') : $t('home.loadMore')}
 				</button>
 			</div>
 		{/if}

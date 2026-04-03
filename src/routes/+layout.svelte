@@ -36,6 +36,21 @@
 
 <svelte:head>
 	<title>{title}</title>
+	{#if !$page.url.pathname.startsWith('/item/')}
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content="https://fundid.is" />
+		<meta property="og:title" content="Fundið — Týnt og fundið á Íslandi" />
+		<meta property="og:description" content="Ókeypis vettvangur fyrir týnda og fundna hluti á Íslandi. Tilkynntu, finndu, tengdu saman." />
+		<meta property="og:image" content="https://fundid.is/og-image.png" />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta property="og:image:type" content="image/png" />
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content="Fundið — Týnt og fundið á Íslandi" />
+		<meta name="twitter:description" content="Ókeypis vettvangur fyrir týnda og fundna hluti á Íslandi." />
+		<meta name="twitter:image" content="https://fundid.is/og-image.png" />
+		<meta name="description" content="Týnt og fundið á Íslandi / Lost and found in Iceland" />
+	{/if}
 </svelte:head>
 
 {#if browser && ready}
