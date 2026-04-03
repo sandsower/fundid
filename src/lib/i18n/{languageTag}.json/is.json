@@ -3,7 +3,7 @@
     "faq": {
       "a1": "Já, alveg ókeypis. Engin falin gjöld, ekkert kjaftæði.",
       "a2": "Enginn. Netfangið þitt er eingöngu notað til að áframsenda skilaboð í gegnum miðlunarkerfi okkar. Það birtist aldrei á síðunni.",
-      "a3": "Þegar þú tilkynnir fundinn hlut færðu einnota auðkenniskóða. Þennan kóða þarftu seinna til að merkja að hlutnum hafi verið skilað, sem tryggir að eingöngu upphaflegi skráandinn geti lokað skráningunni.",
+      "a3": "Þegar þú tilkynnir eitthvað færðu einnota auðkenniskóða. Þennan kóða þarftu seinna til að merkja að því hafi verið skilað, sem tryggir að þú getir lokað skráningunni.",
       "a4": "Já. Notaðu auðkenniskóðann sem þú fékkst þegar þú skráðir hlutinn til að merkja að honum hafi verið skilað til eiganda. Ef þú hefur týnt auðkenniskóðanum eða þarft aðstoð við að loka skráningu, sendu tölvupóst á support@fundid.is. Fyrir fulla gagnaeyðingu, sendu tölvupóst á privacy@fundid.is.",
       "a5": "Nei. Fundið er óháð samfélagsverkefni. Við erum ekki tengd lögreglu eða neinum ríkisstofnunum.",
       "a6": "Auðkenniskóðakerfið kemur í veg fyrir óheimilar lokanir á skráningum. Öll samskipti fara í gegnum miðlunina svo þú getur staðfest sögu viðkomandi áður en þú deilir upplýsingum.",
@@ -25,7 +25,7 @@
     },
     "madeBy": "Smíðað af Vic í Reykjavík.",
     "privacy": {
-      "analytics": "Við söfnum nafnlausum notkunartölum til að bæta þjónustuna. Engar persónuupplýsingar eru vistaðar og engin vefkökur eru notuð.",
+      "analytics": "Við söfnum nafnlausum notkunartölum til að bæta þjónustuna. Engar persónuupplýsingar eru vistaðar og engar vefkökur eru notaðar.",
       "collected": "Við höldum tímabundið upplýsingum um netfangið þitt (til að miðla skilaboðum), lýsingu á því týndna/fundna, mynd og staðsetningu sem gefin var upp um hvar fundið/týnt.",
       "complaint": "Þú hefur einnig rétt til að leggja fram kvörtun hjá Persónuvernd.",
       "email": "Netfangið þitt birtist aldrei opinberlega, er aldrei selt eða deilt með þriðju aðilum. Enginn ruslpóstur, ekkert kjaftæði.",
@@ -59,7 +59,7 @@
   "claim": {
     "copied": "Afritað!",
     "copy": "Afrita kóða",
-    "description": "Vistaðu þennan kóða til að stjórna skráningunni þinni.",
+    "description": "Vistaðu þennan kóða til að geta breytt færslunni þinni seinna.",
     "invalid": "Ógildur auðkenniskóði. Vinsamlegast athugaðu og reyndu aftur.",
     "resolveDescription": "Sláðu inn auðkenniskóðann sem þú fékkst þegar þú skráðir hlutinn.",
     "resolveTitle": "Merkja sem skilað.",
@@ -67,12 +67,6 @@
     "title": "Auðkenniskóðinn þinn",
     "verify": "Staðfesta",
     "warning": "Þetta birtist ekki aftur."
-  },
-  "error": {
-    "rateLimited": "Of margar innsendingar. Vinsamlegast reyndu aftur síðar.",
-    "submissionFailed": "Eitthvað fór úrskeiðis. Vinsamlegast reyndu aftur.",
-    "urlNotAllowed": "Tenglar eru ekki leyfðir í lýsingum á hlutum.",
-    "turnstileFailed": "Staðfesting mistókst. Vinsamlegast endurnýjaðu síðuna og reyndu aftur."
   },
   "common": {
     "active": "Virkt",
@@ -89,11 +83,11 @@
     "resolved": "Skilað",
     "search": "Leita",
     "share": "Deila",
-    "submit": "Skrá hlut",
+    "submit": "Setja upp skráningu",
     "tagline": "Týnt og fundið á Íslandi"
   },
   "contact": {
-    "description": "Þau fá skilaboðin þín í tölvupósti. Upplýsingarnar þínar eru óbirtar.",
+    "description": "Þau fá skilaboðin þín í tölvupósti. Upplýsingarnar þínar eru faldar.",
     "emailPlaceholder": "Netfangið þitt",
     "emailPrivacy": "Aldrei birt opinberlega.",
     "failed": "Ekki tókst að senda skilaboð. Vinsamlegast reyndu aftur.",
@@ -103,9 +97,15 @@
     "rateLimited": "Of mörg skilaboð send. Vinsamlegast reyndu aftur síðar.",
     "send": "Senda skilaboð",
     "sent": "Skilaboð send!",
-    "sentDescription": "Þau svara á netfangið þitt ef þau vilja hafa samband.",
+    "sentDescription": "Þau svara þér ef þau vilja hafa samband.",
     "titleFound": "Senda finnanda skilaboð",
     "titleLost": "Senda eiganda skilaboð"
+  },
+  "error": {
+    "rateLimited": "Of margar innsendingar. Vinsamlegast reyndu aftur síðar.",
+    "submissionFailed": "Eitthvað fór úrskeiðis. Vinsamlegast reyndu aftur.",
+    "turnstileFailed": "Staðfesting mistókst. Vinsamlegast endurnýjaðu síðuna og reyndu aftur.",
+    "urlNotAllowed": "Tenglar eru ekki leyfðir í lýsingum á hlutum."
   },
   "flyer": {
     "foundTitle": "FUNDIÐ",
@@ -163,8 +163,9 @@
   "reply": {
     "alreadyReplied": "Þegar svarað",
     "alreadyRepliedDescription": "Þú hefur þegar svarað þessum skilaboðum.",
-    "description": "Svarið þitt fer til þeirra í tölvupósti. Netfangið þitt helst óbirt.",
+    "description": "Svarið þitt fer til þeirra í tölvupósti. Netfangið þitt birtist ekki.",
     "from": "Frá",
+    "itemResolved": "Þessum hlut hefur verið skilað og tekur ekki við fleiri svörum.",
     "notFound": "Skilaboð finnast ekki",
     "notFoundDescription": "Þessi svartengill gæti verið útrunninn eða ógildur.",
     "placeholder": "Svarið þitt...",
@@ -172,7 +173,6 @@
     "send": "Senda svar",
     "sent": "Svar sent!",
     "sentDescription": "Svarið þitt hefur verið áframsent. Ef þau svara aftur færðu annan tölvupóst.",
-    "itemResolved": "Þessum hlut hefur verið skilað og tekur ekki við fleiri svörum.",
     "title": "Svara skilaboðum",
     "viewItem": "Skoða hlut"
   },

@@ -3,7 +3,7 @@
     "faq": {
       "a1": "Yes, completely free. No hidden fees, no bullshit.",
       "a2": "Nobody. Your email is only used to forward messages through our relay system. It's never displayed on the site.",
-      "a3": "When you report a found item, you receive a one-time identification code. This code is used to mark the item as returned later, ensuring only the original reporter can close the listing.",
+      "a3": "When you report something, you receive a one-time identification code. This code is used to mark it as returned later, ensuring only you can close the listing.",
       "a4": "Yes. Use the code you received when you posted the item to mark it as returned. If you've lost your code or need help closing a listing, email support@fundid.is. For full data deletion, email privacy@fundid.is.",
       "a5": "No. Fundið is an independent community project. We are not affiliated with the police or any government agency.",
       "a6": "The code system prevents unauthorized closures of listings. All communication goes through the relay, so you can verify the person's story before sharing any details.",
@@ -68,12 +68,6 @@
     "verify": "Verify",
     "warning": "This won't be shown again."
   },
-  "error": {
-    "rateLimited": "Too many submissions. Please try again later.",
-    "submissionFailed": "Something went wrong. Please try again.",
-    "urlNotAllowed": "Links are not allowed in item descriptions.",
-    "turnstileFailed": "Verification failed. Please refresh the page and try again."
-  },
   "common": {
     "active": "Active",
     "all": "All",
@@ -89,7 +83,7 @@
     "resolved": "Returned",
     "search": "Search",
     "share": "Share",
-    "submit": "Report item",
+    "submit": "Set up a listing",
     "tagline": "Lost and found in Iceland"
   },
   "contact": {
@@ -103,9 +97,15 @@
     "rateLimited": "Too many messages sent. Please try again later.",
     "send": "Send message",
     "sent": "Message sent!",
-    "sentDescription": "They'll reply to your email if they want to connect.",
+    "sentDescription": "They'll reply to you if they want to connect.",
     "titleFound": "Message the finder",
     "titleLost": "Message the owner"
+  },
+  "error": {
+    "rateLimited": "Too many submissions. Please try again later.",
+    "submissionFailed": "Something went wrong. Please try again.",
+    "turnstileFailed": "Verification failed. Please refresh the page and try again.",
+    "urlNotAllowed": "Links are not allowed in item descriptions."
   },
   "flyer": {
     "foundTitle": "FOUND",
@@ -165,6 +165,7 @@
     "alreadyRepliedDescription": "You've already replied to this message.",
     "description": "Your reply goes to them by email. Your address stays private.",
     "from": "From",
+    "itemResolved": "This item has been returned and is no longer accepting replies.",
     "notFound": "Message not found",
     "notFoundDescription": "This reply link may have expired or is invalid.",
     "placeholder": "Your reply...",
@@ -172,7 +173,6 @@
     "send": "Send reply",
     "sent": "Reply sent!",
     "sentDescription": "Your reply has been forwarded. If they respond again, you'll get another email.",
-    "itemResolved": "This item has been returned and is no longer accepting replies.",
     "title": "Reply to message",
     "viewItem": "View item"
   },
