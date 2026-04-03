@@ -37,3 +37,6 @@ scripts/setup-billing-alert.sh
 
 # Local MCP config
 .mcp.json
+
+# Remotion animation project (local only)
+animation/
