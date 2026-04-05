@@ -17,14 +17,27 @@
 
 	let senderName = $state('');
 	let senderEmail = $state('');
-	let message = $state('');
+	let message = $state(
+		itemType === 'found' ? $t('contact.defaultMessageFound') : $t('contact.defaultMessageLost')
+	);
 	let honeypot = $state('');
 	let sending = $state(false);
 	let sent = $state(false);
 	let error = $state('');
 
+	let trackedFields = new Set<string>();
+	function trackField(field: string) {
+		if (!trackedFields.has(field)) {
+			trackedFields.add(field);
+			capture('contact_form_field_focused', { item_id: itemId, field });
+			if (trackedFields.size === 1) {
+				capture('contact_form_started', { item_id: itemId, item_type: itemType });
+			}
+		}
+	}
+
 	async function handleSend() {
-		if (!senderName.trim() || !senderEmail.trim() || !message.trim()) return;
+		if (!senderEmail.trim() || !message.trim()) return;
 		if (honeypot) { error = $t('error.submissionFailed'); return; }
 		sending = true;
 		error = '';
@@ -89,13 +102,8 @@
 			<form onsubmit={(e) => { e.preventDefault(); handleSend(); }} class="space-y-3">
 				<div>
 					<input
-						type="text" bind:value={senderName} placeholder={$t('contact.namePlaceholder')} required
-						class="w-full px-4 py-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-amber)] focus:border-transparent placeholder:text-[var(--color-muted)]"
-					/>
-				</div>
-				<div>
-					<input
 						type="email" bind:value={senderEmail} placeholder={$t('contact.emailPlaceholder')} required
+						onfocus={() => trackField('email')}
 						class="w-full px-4 py-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-amber)] focus:border-transparent placeholder:text-[var(--color-muted)]"
 					/>
 					<p class="text-xs text-[var(--color-muted)] mt-1">{$t('contact.emailPrivacy')}</p>
@@ -103,9 +111,17 @@
 				<div>
 					<textarea
 						bind:value={message} placeholder={$t('contact.messagePlaceholder')} rows="3" required maxlength="500"
+						onfocus={() => trackField('message')}
 						class="w-full px-4 py-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-amber)] focus:border-transparent resize-none placeholder:text-[var(--color-muted)]"
 					></textarea>
 					<p class="text-xs text-[var(--color-muted)] mt-1 text-right">{message.length}/500</p>
+				</div>
+				<div>
+					<input
+						type="text" bind:value={senderName} placeholder={$t('contact.namePlaceholder')}
+						onfocus={() => trackField('name')}
+						class="w-full px-4 py-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-amber)] focus:border-transparent placeholder:text-[var(--color-muted)]"
+					/>
 				</div>
 
 				<!-- Honeypot -->
@@ -118,7 +134,7 @@
 				{/if}
 
 				<button
-					type="submit" disabled={sending || !senderName.trim() || !senderEmail.trim() || !message.trim()}
+					type="submit" disabled={sending || !senderEmail.trim() || !message.trim()}
 					class="w-full py-2.5 rounded-xl font-semibold text-sm bg-[var(--color-amber)] text-white hover:bg-[var(--color-amber-dark)] transition-colors disabled:opacity-50 inline-flex items-center justify-center gap-2"
 				>
 					<Send size={14} />

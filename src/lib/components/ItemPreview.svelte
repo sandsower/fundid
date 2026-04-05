@@ -5,14 +5,20 @@
 	const { t } = getTranslate();
 	import { categoryIcons } from '$utils/categories';
 	import { formatDate } from '$utils/date';
-	import { MapPin, Calendar, X, ArrowRight } from 'lucide-svelte';
+	import { MapPin, Calendar, X, ArrowRight, MessageCircle } from 'lucide-svelte';
+	import { capture } from '$lib/posthog';
+	import ContactModal from '$components/ContactModal.svelte';
 
 	let { item, onClose }: { item: Item; onClose: () => void } = $props();
 
+	let showContact = $state(false);
 	const CatIcon = $derived(categoryIcons[item.category] || categoryIcons.other);
 
 	function handleKeydown(e: KeyboardEvent) {
-		if (e.key === 'Escape') onClose();
+		if (e.key === 'Escape') {
+			if (showContact) showContact = false;
+			else onClose();
+		}
 	}
 </script>
 
@@ -70,12 +76,36 @@
 				</p>
 			</div>
 
-			<a
-				href="/item/{item.id}"
-				class="w-full py-2.5 rounded-xl font-medium text-sm bg-[var(--color-ink)] text-white hover:bg-[var(--color-ink-light)] transition-colors inline-flex items-center justify-center gap-1.5"
-			>
-				{$t('home.viewDetails')} <ArrowRight size={14} />
-			</a>
+			{#if item.status === 'active'}
+				<div class="flex gap-2">
+					<button
+						onclick={() => { showContact = true; capture('item_preview_contact_clicked', { item_id: item.id, item_type: item.type }); }}
+						class="flex-1 py-2.5 rounded-xl font-medium text-sm text-white transition-colors bg-[var(--color-amber)] hover:bg-[var(--color-amber-dark)] inline-flex items-center justify-center gap-1.5"
+					>
+						<MessageCircle size={14} />
+						{item.type === 'lost' ? $t('item.contactOwner') : $t('item.contactFinder')}
+					</button>
+					<a
+						href="/item/{item.id}"
+						onclick={() => capture('item_preview_details_clicked', { item_id: item.id })}
+						class="flex-1 py-2.5 rounded-xl font-medium text-sm bg-[var(--color-ink)] text-white hover:bg-[var(--color-ink-light)] transition-colors inline-flex items-center justify-center gap-1.5"
+					>
+						{$t('home.viewDetails')} <ArrowRight size={14} />
+					</a>
+				</div>
+			{:else}
+				<a
+					href="/item/{item.id}"
+					onclick={() => capture('item_preview_details_clicked', { item_id: item.id })}
+					class="w-full py-2.5 rounded-xl font-medium text-sm bg-[var(--color-ink)] text-white hover:bg-[var(--color-ink-light)] transition-colors inline-flex items-center justify-center gap-1.5"
+				>
+					{$t('home.viewDetails')} <ArrowRight size={14} />
+				</a>
+			{/if}
 		</div>
 	</div>
 </div>
+
+{#if showContact}
+	<ContactModal itemId={item.id} itemType={item.type} onClose={() => (showContact = false)} />
+{/if}

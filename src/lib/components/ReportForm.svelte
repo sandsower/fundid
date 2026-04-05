@@ -79,6 +79,17 @@
 		locationName = name;
 	}
 
+	let trackedFields = new Set<string>();
+	function trackField(field: string) {
+		if (!trackedFields.has(field)) {
+			trackedFields.add(field);
+			capture('report_form_field_focused', { type, field });
+			if (trackedFields.size === 1) {
+				capture('report_form_started', { type });
+			}
+		}
+	}
+
 	let honeypot = $state('');
 	let turnstileToken = $state('');
 	let turnstileWidgetId: string | undefined;
@@ -216,7 +227,7 @@
 				{@const Icon = categoryIcons[cat]}
 				<button
 					type="button"
-					onclick={() => (category = cat)}
+					onclick={() => { category = cat; trackField('category'); }}
 					class="flex flex-col items-center p-2.5 rounded-xl text-xs font-medium transition-all border
 						{category === cat
 							? 'border-[var(--color-amber)] bg-[var(--color-amber-light)] text-[var(--color-ink)]'
@@ -245,7 +256,7 @@
 		<label class="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-[var(--color-border)] rounded-xl cursor-pointer hover:border-[var(--color-amber)] transition-colors bg-[var(--color-surface)]">
 			<Camera size={18} class="text-[var(--color-muted)]" />
 			<span class="text-sm text-[var(--color-muted)]">{$t('item.uploadPhoto')}</span>
-			<input type="file" accept="image/*" multiple class="hidden" onchange={handleImageSelect} />
+			<input type="file" accept="image/*" multiple class="hidden" onchange={(e) => { trackField('photo'); handleImageSelect(e); }} />
 		</label>
 	</div>
 
@@ -254,6 +265,7 @@
 		<label for="modal-title" class="text-sm font-semibold text-[var(--color-ink)] mb-1 block">{$t('item.title')}</label>
 		<input
 			id="modal-title" type="text" bind:value={title} placeholder={$t('item.titlePlaceholder')} required
+			onfocus={() => trackField('title')}
 			class="w-full px-4 py-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-amber)] focus:border-transparent placeholder:text-[var(--color-muted)]"
 		/>
 	</div>
@@ -263,6 +275,7 @@
 		<label for="modal-desc" class="text-sm font-semibold text-[var(--color-ink)] mb-1 block">{$t('item.description')}</label>
 		<textarea
 			id="modal-desc" bind:value={description} placeholder={$t('item.descriptionPlaceholder')} rows="2"
+			onfocus={() => trackField('description')}
 			class="w-full px-4 py-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-amber)] focus:border-transparent resize-none placeholder:text-[var(--color-muted)]"
 		></textarea>
 	</div>
@@ -271,11 +284,12 @@
 	<div>
 		<label class="text-sm font-semibold text-[var(--color-ink)] mb-2 block">{$t('item.location')}</label>
 		<div class="flex gap-2 mb-2">
-			<div class="flex-1 min-w-0">
+			<!-- svelte-ignore a11y_no_static_element_interactions -->
+			<div class="flex-1 min-w-0" onfocusin={() => trackField('location')}>
 				<AddressSearch bind:value={locationName} onSelect={handleAddressSelect} />
 			</div>
 			<button
-				type="button" onclick={useMyLocation} disabled={locating}
+				type="button" onclick={() => { trackField('location'); useMyLocation(); }} disabled={locating}
 				class="shrink-0 px-3 py-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl hover:border-[var(--color-amber)] transition-colors disabled:opacity-50"
 				title="Use my location"
 			>{#if locating}<span class="w-[18px] h-[18px] border-2 border-[var(--color-amber)] border-t-transparent rounded-full animate-spin inline-block"></span>{:else}<MapPin size={18} />{/if}</button>
@@ -290,6 +304,7 @@
 		<label for="modal-date" class="text-sm font-semibold text-[var(--color-ink)] mb-1 block">{$t('item.date')}</label>
 		<input
 			id="modal-date" type="date" bind:value={dateOccurred} max={new Date().toISOString().split('T')[0]}
+			onfocus={() => trackField('date')}
 			class="w-full px-4 py-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-amber)] focus:border-transparent"
 		/>
 	</div>
@@ -299,6 +314,7 @@
 		<label for="modal-email" class="text-sm font-semibold text-[var(--color-ink)] mb-1 block">{$t('item.email')}</label>
 		<input
 			id="modal-email" type="email" bind:value={contactValue} placeholder="your@email.com" required
+			onfocus={() => trackField('email')}
 			class="w-full px-4 py-2.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-amber)] focus:border-transparent placeholder:text-[var(--color-muted)]"
 		/>
 		<p class="text-xs text-[var(--color-muted)] mt-1.5">{$t('item.emailPrivacy')}</p>
