@@ -93,12 +93,14 @@
     "tagline": "Týnt og fundið á Íslandi"
   },
   "contact": {
+    "defaultMessageFound": "Hæ, ég held að þetta sé mitt. Getum við mælt okkur mót?",
+    "defaultMessageLost": "Hæ, ég held að ég sé með þetta hjá mér. Er þetta þitt?",
     "description": "Þau fá skilaboðin þín í tölvupósti. Upplýsingarnar þínar eru óbirtar.",
     "emailPlaceholder": "Netfangið þitt",
     "emailPrivacy": "Aldrei birt opinberlega.",
     "failed": "Ekki tókst að senda skilaboð. Vinsamlegast reyndu aftur.",
     "messagePlaceholder": "Skilaboðin þín...",
-    "namePlaceholder": "Nafnið þitt",
+    "namePlaceholder": "Nafnið þitt (valfrjálst)",
     "privacy": "Öll samskipti fara í gegnum Fundið. Engum persónuupplýsingum er deilt beint.",
     "rateLimited": "Of mörg skilaboð send. Vinsamlegast reyndu aftur síðar.",
     "send": "Senda skilaboð",

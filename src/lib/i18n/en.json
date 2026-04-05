@@ -93,12 +93,14 @@
     "tagline": "Lost and found in Iceland"
   },
   "contact": {
+    "defaultMessageFound": "Hi, I think this is mine. Can we arrange a pickup?",
+    "defaultMessageLost": "Hi, I think I found this. Is it yours?",
     "description": "They'll get your message by email. Your info stays private.",
     "emailPlaceholder": "Your email",
     "emailPrivacy": "Never shown publicly.",
     "failed": "Failed to send message. Please try again.",
     "messagePlaceholder": "Your message...",
-    "namePlaceholder": "Your name",
+    "namePlaceholder": "Your name (optional)",
     "privacy": "All communication goes through Fundið. No personal info is shared directly.",
     "rateLimited": "Too many messages sent. Please try again later.",
     "send": "Send message",
