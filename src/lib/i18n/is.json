@@ -160,7 +160,11 @@
   "nav": {
     "about": "Um",
     "home": "Heim",
-    "report": "Tilkynna"
+    "report": "Tilkynna",
+    "updates": "Nýjungar"
+  },
+  "updates": {
+    "title": "Nýjungar"
   },
   "reply": {
     "alreadyReplied": "Þegar svarað",

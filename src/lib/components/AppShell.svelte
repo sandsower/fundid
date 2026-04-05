@@ -27,6 +27,12 @@
 			</a>
 			<div class="flex items-center gap-2">
 				<a
+					href="/updates"
+					class="text-xs font-medium text-[var(--color-muted)] border border-[var(--color-border)] px-2.5 py-1 rounded-full hover:border-[var(--color-ink)] hover:text-[var(--color-ink)] transition-colors"
+				>
+					{$t('nav.updates')}
+				</a>
+				<a
 					href="/about"
 					class="text-xs font-medium text-[var(--color-muted)] border border-[var(--color-border)] px-2.5 py-1 rounded-full hover:border-[var(--color-ink)] hover:text-[var(--color-ink)] transition-colors"
 				>
@@ -48,6 +54,9 @@
 
 	<footer class="border-t border-[var(--color-border)] py-8 text-center space-y-2">
 		<p class="text-sm text-[var(--color-muted)]">Fundið - {$t('common.tagline')}</p>
-		<a href="/about" class="text-xs text-[var(--color-muted)] hover:text-[var(--color-ink)] transition-colors">{$t('nav.about')}</a>
+		<div class="flex justify-center gap-3">
+			<a href="/updates" class="text-xs text-[var(--color-muted)] hover:text-[var(--color-ink)] transition-colors">{$t('nav.updates')}</a>
+			<a href="/about" class="text-xs text-[var(--color-muted)] hover:text-[var(--color-ink)] transition-colors">{$t('nav.about')}</a>
+		</div>
 	</footer>
 </div>

@@ -160,7 +160,11 @@
   "nav": {
     "about": "About",
     "home": "Home",
-    "report": "Report"
+    "report": "Report",
+    "updates": "Updates"
+  },
+  "updates": {
+    "title": "What's new"
   },
   "reply": {
     "alreadyReplied": "Already replied",
