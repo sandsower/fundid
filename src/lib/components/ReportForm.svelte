@@ -8,12 +8,15 @@
 	import { categoryIcons, allCategories } from '$utils/categories';
 	import { extractGps, compressImage } from '$utils/image';
 	import { ICELAND_CENTER } from '$utils/geo';
+	import { PET_SITE_ENABLED } from '$utils/features';
 	import LocationPicker from '$components/LocationPicker.svelte';
 	import AddressSearch from '$components/AddressSearch.svelte';
-	import { Camera, MapPin, X } from 'lucide-svelte';
+	import { Camera, MapPin, X, ExternalLink } from 'lucide-svelte';
 	import { capture } from '$lib/posthog';
 	import type { GeoResult } from '$utils/geocode';
 	import type { ItemType, ItemCategory } from '$types/item';
+
+	let showPetRedirect = $state(false);
 
 	let { type = 'found' as ItemType, onSuccess, onCancel }: {
 		type?: ItemType;
@@ -227,7 +230,16 @@
 				{@const Icon = categoryIcons[cat]}
 				<button
 					type="button"
-					onclick={() => { category = cat; trackField('category'); }}
+					onclick={() => {
+						if (cat === 'pet' && PET_SITE_ENABLED) {
+							showPetRedirect = true;
+							capture('pet_redirect_shown', { type });
+							return;
+						}
+						showPetRedirect = false;
+						category = cat;
+						trackField('category');
+					}}
 					class="flex flex-col items-center p-2.5 rounded-xl text-xs font-medium transition-all border
 						{category === cat
 							? 'border-[var(--color-amber)] bg-[var(--color-amber-light)] text-[var(--color-ink)]'
@@ -239,6 +251,19 @@
 			{/each}
 		</div>
 	</fieldset>
+
+	{#if showPetRedirect}
+		<div class="rounded-xl border border-[var(--color-amber)] bg-[var(--color-amber-light)] p-4">
+			<p class="text-sm font-medium text-[var(--color-ink)] mb-2">{$t('pets.redirectTitle')}</p>
+			<p class="text-xs text-[var(--color-muted)] mb-3">{$t('pets.redirectDescription')}</p>
+			<a
+				href="/dyr/report"
+				class="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--color-amber)] hover:underline"
+			>
+				{$t('pets.redirectLink')} <ExternalLink size={14} />
+			</a>
+		</div>
+	{/if}
 
 	<!-- Photo -->
 	<div>

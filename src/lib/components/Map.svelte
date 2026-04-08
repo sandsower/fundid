@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { ICELAND_CENTER, DEFAULT_ZOOM } from '$utils/geo';
+	import { PET_SITE_ENABLED } from '$utils/features';
 	import type { Item } from '$types/item';
 
 	export interface MapBounds {
@@ -104,6 +105,7 @@
 			for (const item of itemList) {
 				if (!item.latitude || !item.longitude) continue;
 
+				const isPet = item.category === 'pet';
 				const color = item.type === 'lost' ? '#D9534F' : '#4A9B6A';
 				const el = document.createElement('div');
 				el.style.cssText = `
@@ -125,12 +127,39 @@
 				path.setAttribute('d', 'M14 0C6.27 0 0 6.27 0 14c0 9.8 12.6 22.1 13.15 22.65a1.2 1.2 0 0 0 1.7 0C15.4 36.1 28 23.8 28 14 28 6.27 21.73 0 14 0Z');
 				path.setAttribute('fill', color);
 				svg.appendChild(path);
-				const dot = document.createElementNS(svgNS, 'circle');
-				dot.setAttribute('cx', '14');
-				dot.setAttribute('cy', '14');
-				dot.setAttribute('r', '5');
-				dot.setAttribute('fill', 'white');
-				svg.appendChild(dot);
+
+				if (isPet) {
+					// Paw print icon inside the pin
+					const paw = document.createElementNS(svgNS, 'g');
+					paw.setAttribute('transform', 'translate(7, 6.5) scale(0.58)');
+					paw.setAttribute('fill', 'white');
+					// Main pad
+					const mainPad = document.createElementNS(svgNS, 'path');
+					mainPad.setAttribute('d', 'M12 17c-1.5 2.5-5 2.5-6.5 0C4 14.5 5.5 12 8.75 10c3.25 2 4.75 4.5 3.25 7Z');
+					paw.appendChild(mainPad);
+					// Toe pads
+					const toes = [
+						{ cx: '6', cy: '8', r: '1.8' },
+						{ cx: '10', cy: '7', r: '1.8' },
+						{ cx: '13.5', cy: '9.5', r: '1.5' },
+						{ cx: '3.5', cy: '10.5', r: '1.5' }
+					];
+					for (const toe of toes) {
+						const c = document.createElementNS(svgNS, 'circle');
+						c.setAttribute('cx', toe.cx);
+						c.setAttribute('cy', toe.cy);
+						c.setAttribute('r', toe.r);
+						paw.appendChild(c);
+					}
+					svg.appendChild(paw);
+				} else {
+					const dot = document.createElementNS(svgNS, 'circle');
+					dot.setAttribute('cx', '14');
+					dot.setAttribute('cy', '14');
+					dot.setAttribute('r', '5');
+					dot.setAttribute('fill', 'white');
+					svg.appendChild(dot);
+				}
 				el.appendChild(svg);
 
 				el.onmouseenter = () => (svg.style.transform = 'scale(1.2)');
@@ -139,16 +168,19 @@
 				const imgHtml = item.image_url
 						? `<img src="${item.image_url}" alt="" style="width: 100%; height: 120px; object-fit: cover; border-radius: 10px 10px 0 0; display: block;" />`
 						: '';
+				const detailUrl = isPet && PET_SITE_ENABLED ? `/dyr/pet/${item.id}` : `/item/${item.id}`;
+				const detailLabel = isPet && PET_SITE_ENABLED ? 'View on Fundið Dýr →' : 'View details →';
 				const popup = new maplibregl.Popup({ offset: 25, maxWidth: '260px', closeButton: false }).setHTML(
 					`<div style="overflow: hidden;">
 						${imgHtml}
 						<div style="padding: 10px 12px 12px;">
 							<div style="display: flex; align-items: center; gap: 6px; margin-bottom: 5px;">
 								<span style="font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; padding: 2px 8px; border-radius: 999px; background: ${item.type === 'lost' ? '#FBF0EF' : '#EEF5F0'}; color: ${item.type === 'lost' ? '#D9534F' : '#4A9B6A'};">${item.type === 'lost' ? 'Lost' : 'Found'}</span>
+								${isPet ? '<span style="font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: #FFF3E0; color: #C87640;">🐾 Pet</span>' : ''}
 								<span style="font-size: 11px; color: #9C8B7E;">${item.location_name}</span>
 							</div>
 							<p style="font-weight: 600; font-size: 14px; margin: 0 0 8px 0; color: #2C2520; line-height: 1.3;">${item.title}</p>
-							<a href="/item/${item.id}" style="font-size: 12px; color: #C87640; text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; gap: 4px;">View details <span style="font-size: 14px;">→</span></a>
+							<a href="${detailUrl}" style="font-size: 12px; color: #C87640; text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; gap: 4px;">${detailLabel}</a>
 						</div>
 					</div>`
 				);

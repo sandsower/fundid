@@ -163,6 +163,11 @@
     "report": "Report",
     "updates": "Updates"
   },
+  "pets": {
+    "redirectTitle": "For pets, we have a dedicated tool",
+    "redirectDescription": "Fundið Dýr offers better matching, sighting trails, and faster contact for lost and found pets.",
+    "redirectLink": "Go to Fundið Dýr"
+  },
   "updates": {
     "title": "What's new"
   },
