@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { ICELAND_CENTER, DEFAULT_ZOOM } from '$utils/geo';
-	import { PET_SITE_ENABLED } from '$utils/features';
+	import { petSiteEnabled } from '$utils/features';
+	import { get } from 'svelte/store';
 	import type { Item } from '$types/item';
 
 	export interface MapBounds {
@@ -168,8 +169,8 @@
 				const imgHtml = item.image_url
 						? `<img src="${item.image_url}" alt="" style="width: 100%; height: 120px; object-fit: cover; border-radius: 10px 10px 0 0; display: block;" />`
 						: '';
-				const detailUrl = isPet && PET_SITE_ENABLED ? `/dyr/pet/${item.id}` : `/item/${item.id}`;
-				const detailLabel = isPet && PET_SITE_ENABLED ? 'View on Fundið Dýr →' : 'View details →';
+				const detailUrl = isPet && get(petSiteEnabled) ? `/dyr/pet/${item.id}` : `/item/${item.id}`;
+				const detailLabel = isPet && get(petSiteEnabled) ? 'View on Fundið Dýr →' : 'View details →';
 				const popup = new maplibregl.Popup({ offset: 25, maxWidth: '260px', closeButton: false }).setHTML(
 					`<div style="overflow: hidden;">
 						${imgHtml}

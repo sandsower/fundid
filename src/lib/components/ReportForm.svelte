@@ -8,7 +8,7 @@
 	import { categoryIcons, allCategories } from '$utils/categories';
 	import { extractGps, compressImage } from '$utils/image';
 	import { ICELAND_CENTER } from '$utils/geo';
-	import { PET_SITE_ENABLED } from '$utils/features';
+	import { petSiteEnabled } from '$utils/features';
 	import LocationPicker from '$components/LocationPicker.svelte';
 	import AddressSearch from '$components/AddressSearch.svelte';
 	import { Camera, MapPin, X, ExternalLink } from 'lucide-svelte';
@@ -231,7 +231,7 @@
 				<button
 					type="button"
 					onclick={() => {
-						if (cat === 'pet' && PET_SITE_ENABLED) {
+						if (cat === 'pet' && $petSiteEnabled) {
 							showPetRedirect = true;
 							capture('pet_redirect_shown', { type });
 							return;
