@@ -106,7 +106,7 @@
 			for (const item of itemList) {
 				if (!item.latitude || !item.longitude) continue;
 
-				const isPet = item.category === 'pet';
+				const isPet = item.category === 'pet' && get(petSiteEnabled);
 				const color = item.type === 'lost' ? '#D9534F' : '#4A9B6A';
 				const el = document.createElement('div');
 				el.style.cssText = `
@@ -169,8 +169,8 @@
 				const imgHtml = item.image_url
 						? `<img src="${item.image_url}" alt="" style="width: 100%; height: 120px; object-fit: cover; border-radius: 10px 10px 0 0; display: block;" />`
 						: '';
-				const detailUrl = isPet && get(petSiteEnabled) ? `/dyr/pet/${item.id}` : `/item/${item.id}`;
-				const detailLabel = isPet && get(petSiteEnabled) ? 'View on Fundið Dýr →' : 'View details →';
+				const detailUrl = isPet ? `/dyr/pet/${item.id}` : `/item/${item.id}`;
+				const detailLabel = isPet ? 'View on Fundið Dýr →' : 'View details →';
 				const popup = new maplibregl.Popup({ offset: 25, maxWidth: '260px', closeButton: false }).setHTML(
 					`<div style="overflow: hidden;">
 						${imgHtml}
