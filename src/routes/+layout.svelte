@@ -2,7 +2,6 @@
 	import '../app.css';
 	import { TolgeeProvider } from '@tolgee/svelte';
 	import { tolgee } from '$i18n/index';
-	import AppShell from '$components/AppShell.svelte';
 	import { initPostHog, capture } from '$lib/posthog';
 	import { afterNavigate } from '$app/navigation';
 	import { browser } from '$app/environment';
@@ -43,9 +42,7 @@
 		{@render children()}
 	{:else}
 		<TolgeeProvider {tolgee}>
-			<AppShell>
-				{@render children()}
-			</AppShell>
+			{@render children()}
 		</TolgeeProvider>
 	{/if}
 {:else}

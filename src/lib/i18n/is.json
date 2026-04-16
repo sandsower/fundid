@@ -163,6 +163,11 @@
     "report": "Tilkynna",
     "updates": "Nýjungar"
   },
+  "pets": {
+    "redirectTitle": "Fyrir gæludýr höfum við sérhæft verkfæri",
+    "redirectDescription": "Fundið Dýr býður upp á betri leit, sjónarspor og hraðari samskipti fyrir týnd og fundin dýr.",
+    "redirectLink": "Fara á Fundið Dýr"
+  },
   "updates": {
     "title": "Nýjungar"
   },

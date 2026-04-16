@@ -1,6 +1,10 @@
 import type { Handle } from '@sveltejs/kit';
 
 export const handle: Handle = async ({ event, resolve }) => {
+	// Detect which site we're serving based on subdomain
+	const host = event.request.headers.get('host') || '';
+	event.locals.site = host.startsWith('dyr.') ? 'pets' : 'main';
+
 	const response = await resolve(event);
 
 	response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');

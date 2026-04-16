@@ -20,7 +20,9 @@ declare global {
 
 	namespace App {
 		// interface Error {}
-		// interface Locals {}
+		interface Locals {
+			site: 'main' | 'pets';
+		}
 		// interface PageData {}
 		// interface PageState {}
 		interface Platform {
