@@ -72,7 +72,14 @@
     "rateLimited": "Too many submissions. Please try again later.",
     "submissionFailed": "Something went wrong. Please try again.",
     "urlNotAllowed": "Links are not allowed in item descriptions.",
-    "turnstileFailed": "Verification failed. Please refresh the page and try again."
+    "turnstileFailed": "Verification failed. Please refresh the page and try again.",
+    "page": {
+      "heading": "Oh no, something went wrong.",
+      "subheading": "An error occurred",
+      "description": "Sorry about that. The page may be temporarily unavailable, or the URL is wrong.",
+      "goHome": "Go to homepage",
+      "tryAgain": "Try again"
+    }
   },
   "common": {
     "active": "Active",

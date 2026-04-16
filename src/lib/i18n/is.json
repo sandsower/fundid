@@ -72,7 +72,14 @@
     "rateLimited": "Of margar innsendingar. Vinsamlegast reyndu aftur síðar.",
     "submissionFailed": "Eitthvað fór úrskeiðis. Vinsamlegast reyndu aftur.",
     "urlNotAllowed": "Tenglar eru ekki leyfðir í lýsingum á hlutum.",
-    "turnstileFailed": "Staðfesting mistókst. Vinsamlegast endurnýjaðu síðuna og reyndu aftur."
+    "turnstileFailed": "Staðfesting mistókst. Vinsamlegast endurnýjaðu síðuna og reyndu aftur.",
+    "page": {
+      "heading": "Ónei, eitthvað fór úrskeiðis.",
+      "subheading": "Villa kom upp",
+      "description": "Við biðjumst velvirðingar á þessu. Síðan gæti verið tímabundið óaðgengileg eða slóðin er röng.",
+      "goHome": "Fara á forsíðu",
+      "tryAgain": "Reyna aftur"
+    }
   },
   "common": {
     "active": "Virkt",

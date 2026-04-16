@@ -40,3 +40,9 @@ scripts/setup-billing-alert.sh
 
 # Remotion animation project (local only)
 animation/
+
+# Showcase video mock assets (local only)
+static/mock-[1-5].jpg
+
+# Outreach drafts (local only)
+outreach/
