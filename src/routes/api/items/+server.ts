@@ -1,6 +1,7 @@
 import { json, error } from '@sveltejs/kit';
 import { createClient } from '@supabase/supabase-js';
 import { PUBLIC_SUPABASE_URL } from '$env/static/public';
+import { env } from '$env/dynamic/private';
 import type { RequestHandler } from './$types';
 import type { ItemType, ItemCategory } from '$types/item';
 
@@ -45,8 +46,8 @@ async function verifyTurnstile(token: string, secret: string, ip: string): Promi
 }
 
 export const POST: RequestHandler = async ({ request, platform }) => {
-	const serviceRoleKey = platform?.env?.SUPABASE_SERVICE_ROLE_KEY;
-	const turnstileSecret = platform?.env?.TURNSTILE_SECRET_KEY;
+	const serviceRoleKey = platform?.env?.SUPABASE_SERVICE_ROLE_KEY ?? env.SUPABASE_SERVICE_ROLE_KEY;
+	const turnstileSecret = platform?.env?.TURNSTILE_SECRET_KEY ?? env.TURNSTILE_SECRET_KEY;
 	if (!serviceRoleKey || !turnstileSecret) throw error(503, 'Service not available');
 
 	const ip = request.headers.get('cf-connecting-ip') || 'unknown';

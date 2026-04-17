@@ -28,6 +28,9 @@ dev-dist
 # Supabase local
 supabase/.temp/
 
+# Hurl local variables (contain local service-role key)
+tests/hurl/.vars*
+
 # Plans (local drafts)
 plans/
 
@@ -37,6 +40,9 @@ scripts/setup-billing-alert.sh
 
 # Local MCP config
 .mcp.json
+
+# Local Claude Code settings
+.claude/
 
 # Remotion animation project (local only)
 animation/
