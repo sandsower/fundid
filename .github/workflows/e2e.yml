@@ -1,0 +1,90 @@
+name: E2E
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    paths:
+      - 'src/routes/api/**'
+      - 'supabase/**'
+      - 'tests/hurl/**'
+      - '.github/workflows/e2e.yml'
+
+jobs:
+  hurl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Install Hurl
+        run: |
+          curl -sL https://github.com/Orange-OpenSource/hurl/releases/download/7.1.0/hurl_7.1.0_amd64.deb -o /tmp/hurl.deb
+          sudo dpkg -i /tmp/hurl.deb
+
+      - name: Start Supabase (slim stack)
+        run: supabase start
+
+      - name: Write test env files
+        run: |
+          ENV=$(supabase status -o env)
+          SB_URL=$(echo "$ENV" | grep '^API_URL=' | cut -d= -f2- | tr -d '"')
+          SB_PUB=$(echo "$ENV" | grep '^PUBLISHABLE_KEY=' | cut -d= -f2- | tr -d '"')
+          SB_SECRET=$(echo "$ENV" | grep '^SECRET_KEY=' | cut -d= -f2- | tr -d '"')
+          cat > tests/hurl/.vars.local <<EOF
+          supabase_url=$SB_URL
+          service_role_key=$SB_SECRET
+          publishable_key=$SB_PUB
+          base_url=http://localhost:5173
+          EOF
+          cat > .env.local <<EOF
+          PUBLIC_SUPABASE_URL=$SB_URL
+          PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=$SB_PUB
+          SUPABASE_SERVICE_ROLE_KEY=$SB_SECRET
+          PUBLIC_TURNSTILE_SITE_KEY=1x00000000000000000000AA
+          TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
+          PUBLIC_IMAGE_BASE_URL=http://localhost:5173
+          PUBLIC_ENABLE_PET_SITE=false
+          EOF
+
+      - name: Start vite dev server
+        run: |
+          pnpm dev > /tmp/vite.log 2>&1 &
+          echo "VITE_PID=$!" >> $GITHUB_ENV
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:5173/api/health > /dev/null 2>&1; then
+              echo "vite up after ${i}s"
+              break
+            fi
+            sleep 1
+          done
+
+      - name: Run Hurl suite
+        run: |
+          tests/hurl/reset.sh
+          hurl --test --variables-file tests/hurl/.vars.local tests/hurl/*.hurl
+
+      - name: Dump vite log on failure
+        if: failure()
+        run: cat /tmp/vite.log || true
+
+      - name: Stop services
+        if: always()
+        run: |
+          [ -n "${VITE_PID:-}" ] && kill "$VITE_PID" 2>/dev/null || true
+          supabase stop --no-backup || true
