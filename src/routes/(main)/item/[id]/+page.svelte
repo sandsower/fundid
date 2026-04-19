@@ -37,6 +37,16 @@
 		return inst ? formatWeekHours(inst.hours_json, currentLocale as 'is' | 'en') : [];
 	});
 
+	async function loadInstitutionFor(loaded: Item) {
+		if (!loaded.institution_id) return;
+		const { data: instData } = await supabase
+			.from('institutions_public')
+			.select('id, slug, name, address, latitude, longitude, phone, hours_json')
+			.eq('id', loaded.institution_id)
+			.maybeSingle();
+		if (instData) institution = instData as Institution;
+	}
+
 	onMount(async () => {
 		const id = $page.params.id;
 
@@ -44,6 +54,7 @@
 		const cached = get(itemsStore).find((i) => i.id === id);
 		if (cached) {
 			item = cached;
+			await loadInstitutionFor(cached);
 			loading = false;
 			return;
 		}
@@ -51,14 +62,7 @@
 		const { data, error } = await supabase.from('items').select('id, type, category, title, description, image_url, latitude, longitude, location_name, date_occurred, status, contact_method, contact_value, claim_code_hash, institution_id, created_at, updated_at').eq('id', id).single();
 		if (data && !error) {
 			item = data as Item;
-			if (item.institution_id) {
-				const { data: instData } = await supabase
-					.from('institutions_public')
-					.select('id, slug, name, address, latitude, longitude, phone, hours_json')
-					.eq('id', item.institution_id)
-					.maybeSingle();
-				if (instData) institution = instData as Institution;
-			}
+			await loadInstitutionFor(item);
 		}
 		loading = false;
 	});
