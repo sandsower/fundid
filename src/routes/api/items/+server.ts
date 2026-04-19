@@ -184,7 +184,7 @@ async function handleInstitutionalSubmission(
 ) {
 	const { data: inst, error: instError } = await supabase
 		.from('institutions')
-		.select('id, name, address, latitude, longitude, token_hash')
+		.select('id, token_hash')
 		.eq('slug', slug)
 		.maybeSingle();
 
@@ -214,43 +214,29 @@ async function handleInstitutionalSubmission(
 		return json({ error: 'url_detected' }, { status: 400 });
 	}
 
-	const { data: rateLimitResult, error: rateLimitError } = await supabase.rpc(
-		'increment_institution_submission_count',
-		{ p_institution_id: inst.id }
-	);
-	if (rateLimitError) {
-		console.error('Institution rate limit check failed:', rateLimitError.message);
+	const { data: rpcData, error: rpcError } = await supabase.rpc('insert_institutional_item', {
+		p_institution_id: inst.id,
+		p_category: category,
+		p_title: title.trim(),
+		p_description: (description || '').trim(),
+		p_image_url: image_url || ''
+	});
+
+	if (rpcError) {
+		console.error('insert_institutional_item failed:', rpcError.message);
 		return json({ error: 'submission_failed' }, { status: 500 });
 	}
-	if (rateLimitResult === -1) {
+
+	const row = Array.isArray(rpcData) ? rpcData[0] : rpcData;
+	if (!row) {
+		return json({ error: 'submission_failed' }, { status: 500 });
+	}
+	if (row.rate_limited) {
 		return json({ error: 'rate_limited' }, { status: 429 });
 	}
-
-	const { data, error: insertError } = await supabase
-		.from('items')
-		.insert({
-			type: 'found',
-			category,
-			title: title.trim(),
-			description: (description || '').trim(),
-			image_url: image_url || null,
-			latitude: inst.latitude,
-			longitude: inst.longitude,
-			location_name: inst.name,
-			date_occurred: new Date().toISOString().split('T')[0],
-			contact_method: 'anonymous',
-			contact_value: null,
-			claim_code_hash: null,
-			institution_id: inst.id,
-			status: 'active'
-		})
-		.select('id')
-		.single();
-
-	if (insertError) {
-		console.error('Institutional item insert failed:', insertError.message);
-		return json({ error: 'submission_failed' }, { status: 500 });
+	if (!row.item_id) {
+		return json({ error: 'invalid_institution' }, { status: 403 });
 	}
 
-	return json({ id: data.id, institutional: true });
+	return json({ id: row.item_id, institutional: true });
 }

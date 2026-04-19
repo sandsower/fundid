@@ -66,47 +66,84 @@ alter table public.institution_submissions_daily enable row level security;
 -- No public policies — service role only
 
 ------------------------------------------------------------------------
--- 4. Atomic increment + rate-limit check
--- Returns new count, or -1 if over limit.
--- Locks institutions row FOR UPDATE so concurrent requests serialize.
+-- 4. Atomic institutional item insert with rate-limit check
+-- Locks the institutions row, verifies daily count below limit, inserts
+-- the item, then bumps the counter — all in one transaction. If the insert
+-- fails the counter is not bumped, so failed requests never burn quota.
+-- Returns (item_id, rate_limited): if rate_limited=true, item_id is null;
+-- if the institution is missing both are null/false (callers validate
+-- existence separately via token lookup).
 ------------------------------------------------------------------------
-create or replace function increment_institution_submission_count(
-  p_institution_id uuid
+create or replace function insert_institutional_item(
+  p_institution_id uuid,
+  p_category text,
+  p_title text,
+  p_description text,
+  p_image_url text
 )
-returns int as $$
+returns table (item_id uuid, rate_limited boolean) as $$
 declare
-  v_limit int;
-  v_new_count int;
+  v_inst record;
+  v_current_count int;
+  v_new_id uuid;
 begin
-  select rate_limit_per_day into v_limit
+  select id, name, latitude, longitude, rate_limit_per_day
+  into v_inst
   from public.institutions
   where id = p_institution_id
   for update;
 
-  if v_limit is null then
-    return -1;
+  if not found then
+    return query select null::uuid, false;
+    return;
   end if;
+
+  select coalesce(count, 0)
+  into v_current_count
+  from public.institution_submissions_daily
+  where institution_id = p_institution_id and date = current_date;
+
+  if v_current_count >= v_inst.rate_limit_per_day then
+    return query select null::uuid, true;
+    return;
+  end if;
+
+  insert into public.items (
+    type, category, title, description, image_url,
+    latitude, longitude, location_name, date_occurred,
+    contact_method, contact_value, claim_code_hash,
+    institution_id, status
+  )
+  values (
+    'found',
+    p_category,
+    p_title,
+    coalesce(p_description, ''),
+    nullif(p_image_url, ''),
+    v_inst.latitude,
+    v_inst.longitude,
+    v_inst.name,
+    current_date,
+    'anonymous',
+    null,
+    null,
+    p_institution_id,
+    'active'
+  )
+  returning id into v_new_id;
 
   insert into public.institution_submissions_daily (institution_id, date, count)
   values (p_institution_id, current_date, 1)
   on conflict (institution_id, date) do update
-    set count = institution_submissions_daily.count + 1
-  returning count into v_new_count;
+    set count = institution_submissions_daily.count + 1;
 
-  if v_new_count > v_limit then
-    update public.institution_submissions_daily
-    set count = count - 1
-    where institution_id = p_institution_id and date = current_date;
-    return -1;
-  end if;
-
-  return v_new_count;
+  return query select v_new_id, false;
 end;
 $$ language plpgsql security definer;
 
-revoke execute on function increment_institution_submission_count(uuid)
+revoke execute on function insert_institutional_item(uuid, text, text, text, text)
   from anon, authenticated;
-grant execute on function increment_institution_submission_count(uuid)
+grant execute on function insert_institutional_item(uuid, text, text, text, text)
   to service_role;
 
 ------------------------------------------------------------------------

@@ -2,6 +2,8 @@
 	import { enhance } from '$app/forms';
 	import { Building2, Printer, ExternalLink, Copy } from 'lucide-svelte';
 
+	const PRINT_HINT = "Save the QR URL above — the plaintext token isn't stored, so the poster can't be regenerated later.";
+
 	let { data, form } = $props();
 	let hoursPreset = $state(
 		'{"mon":[["06:30","22:00"]],"tue":[["06:30","22:00"]],"wed":[["06:30","22:00"]],"thu":[["06:30","22:00"]],"fri":[["06:30","22:00"]],"sat":[["08:00","20:00"]],"sun":[["08:00","20:00"]]}'
@@ -35,7 +37,7 @@
 						<div class="flex gap-2 items-center">
 							<code class="flex-1 px-2 py-1.5 bg-white border border-[var(--color-border)] rounded text-xs break-all">{form.created.qrUrl}</code>
 							<button onclick={() => copy(form.created.qrUrl, 'qr')} class="p-1.5 rounded border border-[var(--color-border)] hover:border-[var(--color-amber)]"><Copy size={14} /></button>
-							<a href="/admin/institutions/{form.created.id}/poster" target="_blank" class="px-3 py-1.5 rounded bg-[var(--color-ink)] text-white text-xs font-medium inline-flex items-center gap-1.5"><Printer size={12} /> Print</a>
+							<a href="/admin/institutions/{form.created.id}/poster?t={encodeURIComponent(form.created.token)}" target="_blank" class="px-3 py-1.5 rounded bg-[var(--color-ink)] text-white text-xs font-medium inline-flex items-center gap-1.5"><Printer size={12} /> Print</a>
 						</div>
 					</div>
 
@@ -124,8 +126,8 @@
 							<td class="px-4 py-2 text-[var(--color-muted)] max-w-[240px] truncate">{inst.address}</td>
 							<td class="px-4 py-2 font-mono text-xs">{inst.rate_limit_per_day}</td>
 							<td class="px-4 py-2">
-								<div class="flex gap-2">
-									<a href="/admin/institutions/{inst.id}/poster" target="_blank" class="px-2 py-1 rounded text-xs font-medium bg-[var(--color-ink)] text-white inline-flex items-center gap-1"><Printer size={12} /> Poster</a>
+								<div class="flex gap-2 items-center">
+									<span class="px-2 py-1 text-xs text-[var(--color-muted)] inline-flex items-center gap-1" title={PRINT_HINT}><Printer size={12} /> —</span>
 									<a href="/i/{inst.slug}/{inst.audit_slug}" target="_blank" class="px-2 py-1 rounded text-xs font-medium border border-[var(--color-border)] inline-flex items-center gap-1"><ExternalLink size={12} /> Audit</a>
 								</div>
 							</td>
