@@ -69,6 +69,38 @@ HTTP 200
 jsonpath "$" count == 1
 jsonpath "$[0].count" == 2
 
+# Expiring a same-day item through the audit URL restores a quota slot so
+# the institution can recover from abuse without waiting until midnight.
+POST {{base_url}}/api/institution/expire
+Content-Type: application/json
+{
+  "slug": "test-inst-rate",
+  "audit_slug": "audit-rate-bbbbbbbbbbbbbbbbbbbbbbbbb",
+  "item_id": "{{id_one}}"
+}
+HTTP 200
+
+GET {{supabase_url}}/rest/v1/institution_submissions_daily?select=count&institution_id=eq.{{inst_id}}
+apikey: {{service_role_key}}
+Authorization: Bearer {{service_role_key}}
+HTTP 200
+[Asserts]
+jsonpath "$[0].count" == 1
+
+# Fresh submission fits the restored slot.
+POST {{base_url}}/api/items
+Content-Type: application/json
+{
+  "cf-turnstile-response": "XXXX.DUMMY.TOKEN.XXXX",
+  "inst": "test-inst-rate",
+  "t": "TESTTOKENRATEBBBBBBBBBBBBBBBBBBBB",
+  "category": "keys",
+  "title": "Rate four after restore"
+}
+HTTP 200
+[Captures]
+id_four: jsonpath "$.id"
+
 # Cleanup
 DELETE {{supabase_url}}/rest/v1/items?id=eq.{{id_one}}
 apikey: {{service_role_key}}
@@ -76,6 +108,11 @@ Authorization: Bearer {{service_role_key}}
 HTTP 204
 
 DELETE {{supabase_url}}/rest/v1/items?id=eq.{{id_two}}
+apikey: {{service_role_key}}
+Authorization: Bearer {{service_role_key}}
+HTTP 204
+
+DELETE {{supabase_url}}/rest/v1/items?id=eq.{{id_four}}
 apikey: {{service_role_key}}
 Authorization: Bearer {{service_role_key}}
 HTTP 204

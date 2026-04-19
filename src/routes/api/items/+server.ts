@@ -93,7 +93,7 @@ export const POST: RequestHandler = async ({ request, platform, cookies }) => {
 	const cookieToken = instSlug ? cookies.get(`inst_session_${instSlug}`) ?? '' : '';
 	const instToken = bodyToken || cookieToken;
 	if (instSlug && instToken) {
-		return await handleInstitutionalSubmission(supabase, body, instSlug, instToken);
+		return await handleInstitutionalSubmission(supabase, body, instSlug, instToken, platform);
 	}
 
 	return await handlePeerSubmission(supabase, body, platform, ip);
@@ -193,11 +193,33 @@ async function handlePeerSubmission(
 	return json({ id: data.id, claim_code_sent: claimCodeSent });
 }
 
+// Delete an uploaded R2 object when an institutional submission is rejected
+// after upload. Mirrors /api/upload's key shape; silently no-ops if the URL
+// isn't one of ours or if the bucket is unavailable (dev without wrangler).
+async function cleanupOrphanedUpload(
+	platform: App.Platform | undefined,
+	image_url: string | null | undefined
+): Promise<void> {
+	if (!image_url) return;
+	const bucket = platform?.env?.ITEM_IMAGES;
+	if (!bucket) return;
+	const base = PUBLIC_IMAGE_BASE_URL?.replace(/\/+$/, '');
+	if (!base || !image_url.startsWith(`${base}/`)) return;
+	const key = image_url.slice(base.length + 1);
+	if (!key) return;
+	try {
+		await bucket.delete(key);
+	} catch (e) {
+		console.error('R2 orphan cleanup failed for', key, (e as Error).message);
+	}
+}
+
 async function handleInstitutionalSubmission(
 	supabase: SupabaseClient,
 	body: Record<string, unknown>,
 	slug: string,
-	token: string
+	token: string,
+	platform: App.Platform | undefined
 ) {
 	const { data: inst, error: instError } = await supabase
 		.from('institutions')
@@ -245,17 +267,21 @@ async function handleInstitutionalSubmission(
 
 	if (rpcError) {
 		console.error('insert_institutional_item failed:', rpcError.message);
+		await cleanupOrphanedUpload(platform, image_url);
 		return json({ error: 'submission_failed' }, { status: 500 });
 	}
 
 	const row = Array.isArray(rpcData) ? rpcData[0] : rpcData;
 	if (!row) {
+		await cleanupOrphanedUpload(platform, image_url);
 		return json({ error: 'submission_failed' }, { status: 500 });
 	}
 	if (row.rate_limited) {
+		await cleanupOrphanedUpload(platform, image_url);
 		return json({ error: 'rate_limited' }, { status: 429 });
 	}
 	if (!row.item_id) {
+		await cleanupOrphanedUpload(platform, image_url);
 		return json({ error: 'invalid_institution' }, { status: 403 });
 	}
 
