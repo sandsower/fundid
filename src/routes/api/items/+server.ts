@@ -1,6 +1,6 @@
 import { json, error } from '@sveltejs/kit';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import { PUBLIC_SUPABASE_URL } from '$env/static/public';
+import { PUBLIC_SUPABASE_URL, PUBLIC_IMAGE_BASE_URL } from '$env/static/public';
 import { env } from '$env/dynamic/private';
 import type { RequestHandler } from './$types';
 import type { ItemType, ItemCategory } from '$types/item';
@@ -14,8 +14,20 @@ const VALID_CATEGORIES: ItemCategory[] = [
 	'phone', 'wallet', 'keys', 'bag', 'glasses', 'clothing',
 	'jewelry', 'documents', 'electronics', 'pet', 'bicycle', 'other'
 ];
+// Pets route through dyr's flow; institutional submissions must not land in
+// the pet pipeline without pet_details. Keep in sync with report/inst UI.
+const INSTITUTIONAL_CATEGORIES: ItemCategory[] = VALID_CATEGORIES.filter((c) => c !== 'pet');
 
 const URL_PATTERN = /https?:\/\/|www\./i;
+
+// Reject image URLs that don't point at our R2 bucket. The audit page renders
+// these images; an external URL would leak the audit_slug via Referer.
+function isTrustedImageUrl(url: string | undefined | null): boolean {
+	if (!url) return true; // no image is fine
+	const base = PUBLIC_IMAGE_BASE_URL?.replace(/\/+$/, '');
+	if (!base) return false;
+	return url.startsWith(`${base}/`);
+}
 
 function generateClaimCode(): string {
 	const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // 32 chars — divides 256 evenly, no modulo bias
@@ -206,12 +218,16 @@ async function handleInstitutionalSubmission(
 		return json({ error: 'missing_fields' }, { status: 400 });
 	}
 
-	if (!VALID_CATEGORIES.includes(category as ItemCategory)) {
+	if (!INSTITUTIONAL_CATEGORIES.includes(category as ItemCategory)) {
 		return json({ error: 'invalid_category' }, { status: 400 });
 	}
 
 	if (URL_PATTERN.test(title) || URL_PATTERN.test(description || '')) {
 		return json({ error: 'url_detected' }, { status: 400 });
+	}
+
+	if (!isTrustedImageUrl(image_url)) {
+		return json({ error: 'invalid_image_url' }, { status: 400 });
 	}
 
 	const { data: rpcData, error: rpcError } = await supabase.rpc('insert_institutional_item', {

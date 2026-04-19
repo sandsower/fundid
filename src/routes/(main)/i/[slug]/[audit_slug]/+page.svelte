@@ -45,6 +45,8 @@
 <svelte:head>
 	<title>Audit — {data.institution.name} — Fundið</title>
 	<meta name="robots" content="noindex, nofollow" />
+	<!-- Audit URL embeds the bearer credential; never leak it in Referer. -->
+	<meta name="referrer" content="no-referrer" />
 </svelte:head>
 
 <section class="max-w-2xl mx-auto px-4 py-8">
@@ -81,7 +83,7 @@
 				{@const Icon = categoryIcons[item.category] ?? categoryIcons.other}
 				<li class="flex gap-3 items-start rounded-xl border border-[var(--color-border)] p-3 bg-white">
 					{#if item.image_url}
-						<img src={item.image_url} alt={item.title} class="w-16 h-16 object-cover rounded-lg shrink-0" />
+						<img src={item.image_url} alt={item.title} referrerpolicy="no-referrer" class="w-16 h-16 object-cover rounded-lg shrink-0" />
 					{:else}
 						<div class="w-16 h-16 rounded-lg bg-[var(--color-surface)] flex items-center justify-center shrink-0">
 							<Icon size={24} strokeWidth={1.5} class="text-[var(--color-muted)]" />
