@@ -6,6 +6,8 @@
 <svelte:head>
 	<title>Poster — {data.institution.name}</title>
 	<meta name="robots" content="noindex, nofollow" />
+	<!-- URL carries the submission token; never leak it as Referer. -->
+	<meta name="referrer" content="no-referrer" />
 	<style>
 		@page { size: A4; margin: 0; }
 		body { margin: 0; }

@@ -160,6 +160,8 @@
 
 <svelte:head>
 	<title>{$t('institutional.reportTitle')} – {data.institution.name} – Fundið</title>
+	<!-- URL carries the submission token; strip it from outbound Referers. -->
+	<meta name="referrer" content="no-referrer" />
 </svelte:head>
 
 <section class="max-w-md mx-auto px-4 py-8">
