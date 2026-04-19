@@ -120,11 +120,8 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           SB_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
-      # Institutional auto-expire stays in dry-run until the first week of logs
-      # looks clean. Flip manually via: wrangler secret put INSTITUTIONAL_EXPIRE_DRY_RUN
-      # (set to "false") or update this literal and redeploy.
-      - run: echo "true" | npx wrangler secret put INSTITUTIONAL_EXPIRE_DRY_RUN
-        working-directory: workers/data-retention
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      # INSTITUTIONAL_EXPIRE_DRY_RUN is managed manually via
+      # `wrangler secret put` from workers/data-retention. The worker defaults
+      # to dry-run when the secret is absent, so first deploys are safe. Do not
+      # set it unconditionally here — flipping to "false" in production must
+      # persist across deploys.
