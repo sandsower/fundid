@@ -30,11 +30,8 @@
 	let turnstileContainer: HTMLDivElement = $state()!;
 
 	onMount(() => {
-		// Remove the bearer token from the visible URL so it can't be shared or
-		// copy-pasted. posthog.ts also strips it from analytics properties.
-		const cleanUrl = `${window.location.pathname}?inst=${encodeURIComponent(data.institution.slug)}`;
-		history.replaceState(null, '', cleanUrl);
-
+		// Token is stripped server-side via a 303 to the tokenless URL and
+		// replayed from an HttpOnly cookie, so the address bar never shows `?t=`.
 		capture('institutional_report_opened', { institution: data.institution.slug });
 
 		function renderWidget() {
