@@ -100,7 +100,7 @@
 
 		const { data, error } = await supabase
 			.from('items')
-			.select('id, type, category, title, description, image_url, latitude, longitude, location_name, date_occurred, status, contact_method, contact_value, claim_code_hash, created_at, updated_at')
+			.select('id, type, category, title, description, image_url, latitude, longitude, location_name, date_occurred, status, contact_method, contact_value, claim_code_hash, institution_id, created_at, updated_at')
 			.eq('status', 'active')
 			.order('created_at', { ascending: false })
 			.limit(50);
