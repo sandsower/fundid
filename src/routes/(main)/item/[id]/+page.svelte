@@ -49,7 +49,7 @@
 			item = data as Item;
 			if (item.institution_id) {
 				const { data: instData } = await supabase
-					.from('institutions')
+					.from('institutions_public')
 					.select('id, slug, name, address, latitude, longitude, phone, hours_json')
 					.eq('id', item.institution_id)
 					.maybeSingle();

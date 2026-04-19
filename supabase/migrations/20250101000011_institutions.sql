@@ -26,13 +26,21 @@ create index idx_institutions_audit_slug on public.institutions (audit_slug);
 
 alter table public.institutions enable row level security;
 
--- Anon can read institutions (needed for slug→details lookup on detail page)
--- token_hash and audit_slug are safe to expose: token_hash is one-way,
--- audit_slug is only useful at its bespoke URL which also requires knowing the slug.
-create policy "Anyone can view institutions"
-  on public.institutions for select
-  to anon, authenticated
-  using (true);
+-- Base table has no public SELECT policy. token_hash is a submission credential
+-- (anyone knowing it can file items) and audit_slug is a kill-switch credential
+-- (anyone knowing it + slug + item_id can expire items via /api/institution/expire).
+-- Neither may be exposed to anon. Server routes that need these columns read via
+-- service role, which bypasses RLS.
+revoke all on public.institutions from anon, authenticated;
+
+-- Public-safe projection for the client item detail page (and any future public
+-- reads). Owner is postgres, so the view bypasses RLS on the base table but only
+-- exposes the columns listed here. Never add token_hash or audit_slug.
+create view public.institutions_public as
+  select id, slug, name, address, latitude, longitude, phone, hours_json
+  from public.institutions;
+
+grant select on public.institutions_public to anon, authenticated;
 
 ------------------------------------------------------------------------
 -- 2. Items: add nullable institution FK
