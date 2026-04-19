@@ -159,11 +159,13 @@ grant execute on function insert_institutional_item(uuid, text, text, text, text
 ------------------------------------------------------------------------
 -- 5. Expire institutional item (audit-page kill-switch + auto-expire cron)
 ------------------------------------------------------------------------
--- Restores same-day quota when an item is expired through the audit
--- kill-switch (or auto-expire). Without this, abusing the daily limit early
--- would permanently wedge the institution until midnight even after bad
--- rows are removed. Only the same-day counter is affected; older rows don't
--- touch today's budget.
+-- Daily submission counter is monotonic by design: the audit kill-switch
+-- removes rows from the public map but never restores quota. Decrementing
+-- would let someone with the poster token and audit URL loop submit/expire
+-- to bypass the daily cap entirely, turning `rate_limit_per_day` from an
+-- abuse ceiling into a concurrent-active-item cap. If operators need to
+-- unwedge an institution after an abuse incident, do it admin-side (rotate
+-- the poster token or manually bump the counter).
 create or replace function expire_institutional_item(
   p_item_id uuid,
   p_institution_id uuid
@@ -171,14 +173,7 @@ create or replace function expire_institutional_item(
 returns boolean as $$
 declare
   v_updated int;
-  v_created_date date;
 begin
-  select created_at::date into v_created_date
-  from public.items
-  where id = p_item_id
-    and institution_id = p_institution_id
-    and status = 'active';
-
   update public.items
   set status = 'expired'
   where id = p_item_id
@@ -186,13 +181,6 @@ begin
     and status = 'active';
 
   get diagnostics v_updated = row_count;
-
-  if v_updated > 0 and v_created_date = current_date then
-    update public.institution_submissions_daily
-    set count = greatest(count - 1, 0)
-    where institution_id = p_institution_id and date = current_date;
-  end if;
-
   return v_updated > 0;
 end;
 $$ language plpgsql security definer;

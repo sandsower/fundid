@@ -69,8 +69,9 @@ HTTP 200
 jsonpath "$" count == 1
 jsonpath "$[0].count" == 2
 
-# Expiring a same-day item through the audit URL restores a quota slot so
-# the institution can recover from abuse without waiting until midnight.
+# Audit expiry removes a row from the public map but does NOT restore a
+# quota slot — the daily counter is monotonic to block submit/expire abuse
+# loops by anyone with poster + audit access.
 POST {{base_url}}/api/institution/expire
 Content-Type: application/json
 {
@@ -85,9 +86,9 @@ apikey: {{service_role_key}}
 Authorization: Bearer {{service_role_key}}
 HTTP 200
 [Asserts]
-jsonpath "$[0].count" == 1
+jsonpath "$[0].count" == 2
 
-# Fresh submission fits the restored slot.
+# Subsequent submission is still rejected even after the expire.
 POST {{base_url}}/api/items
 Content-Type: application/json
 {
@@ -95,11 +96,9 @@ Content-Type: application/json
   "inst": "test-inst-rate",
   "t": "TESTTOKENRATEBBBBBBBBBBBBBBBBBBBB",
   "category": "keys",
-  "title": "Rate four after restore"
+  "title": "Rate four after expire — should still 429"
 }
-HTTP 200
-[Captures]
-id_four: jsonpath "$.id"
+HTTP 429
 
 # Cleanup
 DELETE {{supabase_url}}/rest/v1/items?id=eq.{{id_one}}
@@ -108,11 +107,6 @@ Authorization: Bearer {{service_role_key}}
 HTTP 204
 
 DELETE {{supabase_url}}/rest/v1/items?id=eq.{{id_two}}
-apikey: {{service_role_key}}
-Authorization: Bearer {{service_role_key}}
-HTTP 204
-
-DELETE {{supabase_url}}/rest/v1/items?id=eq.{{id_four}}
 apikey: {{service_role_key}}
 Authorization: Bearer {{service_role_key}}
 HTTP 204

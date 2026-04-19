@@ -22,20 +22,25 @@ export const load: PageServerLoad = async ({ params, platform }) => {
 
 	const supabase = createClient(PUBLIC_SUPABASE_URL, serviceRoleKey);
 
-	const { data: inst } = await supabase
+	const { data: inst, error: instError } = await supabase
 		.from('institutions')
 		.select('id, slug, name, address, phone, audit_slug, rate_limit_per_day')
 		.eq('slug', params.slug)
 		.maybeSingle();
 
+	if (instError) {
+		console.error('Audit institution lookup failed for', params.slug, instError.message);
+		throw error(503, 'Audit view temporarily unavailable');
+	}
 	if (!inst || inst.audit_slug !== params.audit_slug) throw error(404, 'Not found');
 
 	// Active items must always be fully visible — they are what the audit
 	// kill-switch acts on. 20/day × 30-day auto-expire = ~600 active rows at
-	// steady state for a standard partner; never cap the active list below
-	// that ceiling. Inactive (removed/expired) history is truncated for
-	// render cost; operators don't act on it.
-	const [{ data: activeItems }, { data: inactiveItems }] = await Promise.all([
+	// steady state (capped at 100/day → ~3000). Inactive (removed/expired)
+	// history is truncated for render cost; operators don't act on it. Fail
+	// closed on query error — silent empty arrays would hide the exact rows
+	// the operator needs to remove.
+	const [activeResult, inactiveResult] = await Promise.all([
 		supabase
 			.from('items')
 			.select('id, title, description, image_url, category, status, created_at')
@@ -51,6 +56,15 @@ export const load: PageServerLoad = async ({ params, platform }) => {
 			.limit(50)
 	]);
 
+	if (activeResult.error || inactiveResult.error) {
+		console.error(
+			'Audit item queries failed for',
+			inst.slug,
+			activeResult.error?.message ?? inactiveResult.error?.message
+		);
+		throw error(503, 'Audit view temporarily unavailable');
+	}
+
 	return {
 		institution: {
 			slug: inst.slug,
@@ -60,6 +74,6 @@ export const load: PageServerLoad = async ({ params, platform }) => {
 			rate_limit_per_day: inst.rate_limit_per_day
 		},
 		auditSlug: params.audit_slug,
-		items: [...(activeItems ?? []), ...(inactiveItems ?? [])] as AuditItem[]
+		items: [...(activeResult.data ?? []), ...(inactiveResult.data ?? [])] as AuditItem[]
 	};
 };
