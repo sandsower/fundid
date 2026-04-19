@@ -5,9 +5,11 @@ import { env } from '$env/dynamic/private';
 import { hashInstitutionToken } from '$utils/institution-token';
 import type { PageServerLoad } from './$types';
 
-// Persist the verified token in an HttpOnly cookie so refreshes of the
-// tokenless URL still work. Scoped to this route + SameSite=Strict so it
-// only rides on same-origin navigations, never cross-origin fetches.
+// The poster bearer token never leaves the server. On first load from a QR
+// poster URL, the server validates `?t=`, stashes the plaintext in an
+// HttpOnly cookie, and redirects to the tokenless URL. `/api/items` reads
+// the same cookie server-side to authorize institutional submissions, so the
+// token is never serialized into page data or POST bodies.
 const COOKIE_PREFIX = 'inst_session_';
 const COOKIE_MAX_AGE = 60 * 60; // 1 hour
 
@@ -43,9 +45,11 @@ export const load: PageServerLoad = async ({ url, platform, cookies }) => {
 	// First load via QR: seat the cookie and redirect to the tokenless URL so
 	// external resources (fonts, Turnstile, PostHog) never see `?t=` in Referer
 	// or analytics, and later refreshes still reload the form from the cookie.
+	// Path is `/` so `/api/items` can read it; SameSite=Strict keeps it on
+	// same-origin navigations/POSTs only.
 	if (urlToken) {
 		cookies.set(cookieName(slug), urlToken, {
-			path: '/report/inst',
+			path: '/',
 			httpOnly: true,
 			secure: url.protocol === 'https:',
 			sameSite: 'strict',
@@ -59,7 +63,6 @@ export const load: PageServerLoad = async ({ url, platform, cookies }) => {
 			slug: inst.slug,
 			name: inst.name,
 			address: inst.address
-		},
-		token
+		}
 	};
 };

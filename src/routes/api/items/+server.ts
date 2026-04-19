@@ -58,7 +58,7 @@ async function verifyTurnstile(token: string, secret: string, ip: string): Promi
 	return data.success;
 }
 
-export const POST: RequestHandler = async ({ request, platform }) => {
+export const POST: RequestHandler = async ({ request, platform, cookies }) => {
 	const serviceRoleKey = platform?.env?.SUPABASE_SERVICE_ROLE_KEY ?? env.SUPABASE_SERVICE_ROLE_KEY;
 	const turnstileSecret = platform?.env?.TURNSTILE_SECRET_KEY ?? env.TURNSTILE_SECRET_KEY;
 	if (!serviceRoleKey || !turnstileSecret) throw error(503, 'Service not available');
@@ -84,9 +84,14 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 
 	const supabase = createClient(PUBLIC_SUPABASE_URL, serviceRoleKey);
 
-	// Institutional submissions carry `inst` (slug) + `t` (token)
+	// Institutional submissions carry `inst` (slug). The bearer token rides on
+	// an HttpOnly cookie seeded by `/report/inst` after QR validation; the
+	// browser never sees the plaintext. Body `t` stays supported for CLI/Hurl
+	// flows that can't carry cookies.
 	const instSlug = typeof body.inst === 'string' ? body.inst.trim() : '';
-	const instToken = typeof body.t === 'string' ? body.t.trim() : '';
+	const bodyToken = typeof body.t === 'string' ? body.t.trim() : '';
+	const cookieToken = instSlug ? cookies.get(`inst_session_${instSlug}`) ?? '' : '';
+	const instToken = bodyToken || cookieToken;
 	if (instSlug && instToken) {
 		return await handleInstitutionalSubmission(supabase, body, instSlug, instToken);
 	}
