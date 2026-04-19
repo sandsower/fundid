@@ -131,6 +131,7 @@ export function generateMockItems(count: number): Item[] {
 			contact_method: 'email',
 			contact_value: null,
 			claim_code_hash: null,
+			institution_id: null,
 			created_at: randomDate(daysAgo),
 			updated_at: randomDate(daysAgo),
 		});

@@ -138,6 +138,19 @@
     "viewAll": "Sjá allt",
     "viewDetails": "Sjá allar upplýsingar"
   },
+  "institutional": {
+    "reportTitle": "Skrá óskilamun",
+    "reportContext": "Skráning hjá",
+    "submit": "Skrá hlut",
+    "successTitle": "Skráning móttekin",
+    "successDescription": "Hluturinn birtist á Fundið með pinna við borðið ykkar. Hann dettur sjálfkrafa út eftir 30 daga.",
+    "addAnother": "Skrá annan hlut",
+    "pickedUpAt": "Afhentur hjá óskilamunum {name}",
+    "claimInstructions": "Sótt við borðið með skilríki eða skýrri lýsingu.",
+    "openingHours": "Opnunartímar",
+    "address": "Heimilisfang",
+    "phone": "Sími"
+  },
   "item": {
     "category": "Flokkur",
     "contactFinder": "Hafa samband við finnanda",

@@ -107,7 +107,12 @@
 				if (!item.latitude || !item.longitude) continue;
 
 				const isPet = item.category === 'pet' && get(petSiteEnabled);
-				const color = item.type === 'lost' ? '#D9534F' : '#4A9B6A';
+				const isInstitutional = !!item.institution_id;
+				const color = isInstitutional
+					? '#C87640'
+					: item.type === 'lost'
+						? '#D9534F'
+						: '#4A9B6A';
 				const el = document.createElement('div');
 				el.style.cssText = `
 					width: 28px; height: 38px;
@@ -153,6 +158,31 @@
 						paw.appendChild(c);
 					}
 					svg.appendChild(paw);
+				} else if (isInstitutional) {
+					// Building glyph for institutional pickup points
+					const bld = document.createElementNS(svgNS, 'g');
+					bld.setAttribute('transform', 'translate(8, 7)');
+					bld.setAttribute('fill', 'white');
+					// Roof (triangle)
+					const roof = document.createElementNS(svgNS, 'polygon');
+					roof.setAttribute('points', '0,5 6,0 12,5');
+					bld.appendChild(roof);
+					// Body
+					const body = document.createElementNS(svgNS, 'rect');
+					body.setAttribute('x', '1');
+					body.setAttribute('y', '5');
+					body.setAttribute('width', '10');
+					body.setAttribute('height', '8');
+					bld.appendChild(body);
+					// Door (cut-out via color matching pin background)
+					const door = document.createElementNS(svgNS, 'rect');
+					door.setAttribute('x', '4.5');
+					door.setAttribute('y', '8.5');
+					door.setAttribute('width', '3');
+					door.setAttribute('height', '4.5');
+					door.setAttribute('fill', color);
+					bld.appendChild(door);
+					svg.appendChild(bld);
 				} else {
 					const dot = document.createElementNS(svgNS, 'circle');
 					dot.setAttribute('cx', '14');

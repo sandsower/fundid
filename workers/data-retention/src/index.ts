@@ -4,6 +4,7 @@ interface Env {
 	SUPABASE_URL: string;
 	SUPABASE_SERVICE_KEY: string;
 	ITEM_IMAGES: R2Bucket;
+	INSTITUTIONAL_EXPIRE_DRY_RUN?: string;
 }
 
 export default {
@@ -30,6 +31,19 @@ export default {
 			} else {
 				console.log(`Deleted ${keys.length} images from R2`);
 			}
+		}
+
+		// Institutional auto-expire at 30 days. Defaults to dry-run; flip
+		// INSTITUTIONAL_EXPIRE_DRY_RUN to "false" after the first week of logs look clean.
+		const dryRun = env.INSTITUTIONAL_EXPIRE_DRY_RUN !== 'false';
+		const { data: instData, error: instError } = await supabase.rpc(
+			'expire_old_institutional_items',
+			{ p_dry_run: dryRun, p_threshold_days: 30 }
+		);
+		if (instError) {
+			console.error('Institutional auto-expire failed:', instError.message);
+		} else {
+			console.log('Institutional auto-expire:', JSON.stringify(instData));
 		}
 	},
 

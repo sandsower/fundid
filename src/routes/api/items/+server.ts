@@ -1,9 +1,10 @@
 import { json, error } from '@sveltejs/kit';
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { PUBLIC_SUPABASE_URL } from '$env/static/public';
 import { env } from '$env/dynamic/private';
 import type { RequestHandler } from './$types';
 import type { ItemType, ItemCategory } from '$types/item';
+import { hashInstitutionToken } from '$utils/institution-token';
 
 const RATE_LIMIT = 5;
 const RATE_WINDOW = 3600; // 1 hour
@@ -52,7 +53,6 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 
 	const ip = request.headers.get('cf-connecting-ip') || 'unknown';
 
-	// Turnstile verification
 	let body: Record<string, unknown>;
 	try {
 		body = await request.json();
@@ -65,6 +65,29 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 		return json({ error: 'turnstile_failed' }, { status: 403 });
 	}
 
+	// Honeypot — silent rejection
+	if (body.website) {
+		return json({ error: 'submission_failed' }, { status: 400 });
+	}
+
+	const supabase = createClient(PUBLIC_SUPABASE_URL, serviceRoleKey);
+
+	// Institutional submissions carry `inst` (slug) + `t` (token)
+	const instSlug = typeof body.inst === 'string' ? body.inst.trim() : '';
+	const instToken = typeof body.t === 'string' ? body.t.trim() : '';
+	if (instSlug && instToken) {
+		return await handleInstitutionalSubmission(supabase, body, instSlug, instToken);
+	}
+
+	return await handlePeerSubmission(supabase, body, platform, ip);
+};
+
+async function handlePeerSubmission(
+	supabase: SupabaseClient,
+	body: Record<string, unknown>,
+	platform: App.Platform | undefined,
+	ip: string
+) {
 	// Rate limit: single read, check, validate, then increment with cached count
 	const kv = platform?.env?.RATE_LIMIT;
 	const rlKey = kv ? `items:${ip}` : '';
@@ -73,12 +96,6 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 		return json({ error: 'rate_limited' }, { status: 429 });
 	}
 
-	// Honeypot check — silent rejection
-	if (body.website) {
-		return json({ error: 'submission_failed' }, { status: 400 });
-	}
-
-	// Validate required fields
 	const type = body.type as string;
 	const category = body.category as string;
 	const title = body.title as string | undefined;
@@ -106,23 +123,18 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 		return json({ error: 'invalid_location' }, { status: 400 });
 	}
 
-	// URL detection in text fields
 	if (URL_PATTERN.test(title) || URL_PATTERN.test(description || '') || URL_PATTERN.test(location_name)) {
 		return json({ error: 'url_detected' }, { status: 400 });
 	}
 
-	// Increment rate limit after validation passes (uses cached count, single write)
 	try {
 		if (kv) await kv.put(rlKey, String(rlCount + 1), { expirationTtl: RATE_WINDOW });
 	} catch (e) {
 		console.error('Rate limit increment failed:', (e as Error).message);
 	}
 
-	// Generate claim code server-side
 	const claimCode = generateClaimCode();
 	const claimCodeHash = await hashClaimCode(claimCode);
-
-	const supabase = createClient(PUBLIC_SUPABASE_URL, serviceRoleKey);
 
 	const { data, error: insertError } = await supabase
 		.from('items')
@@ -149,7 +161,6 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 		return json({ error: 'submission_failed' }, { status: 500 });
 	}
 
-	// Send claim code email — surface failure so client can warn user
 	let claimCodeSent = true;
 	const { error: rpcError } = await supabase.rpc('send_claim_code_email', {
 		p_item_id: data.id,
@@ -163,4 +174,83 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 	}
 
 	return json({ id: data.id, claim_code_sent: claimCodeSent });
-};
+}
+
+async function handleInstitutionalSubmission(
+	supabase: SupabaseClient,
+	body: Record<string, unknown>,
+	slug: string,
+	token: string
+) {
+	const { data: inst, error: instError } = await supabase
+		.from('institutions')
+		.select('id, name, address, latitude, longitude, token_hash')
+		.eq('slug', slug)
+		.maybeSingle();
+
+	if (instError || !inst) {
+		return json({ error: 'invalid_institution' }, { status: 403 });
+	}
+
+	const tokenHash = await hashInstitutionToken(token);
+	if (tokenHash !== inst.token_hash) {
+		return json({ error: 'invalid_institution' }, { status: 403 });
+	}
+
+	const category = body.category as string;
+	const title = body.title as string | undefined;
+	const description = body.description as string | undefined;
+	const image_url = body.image_url as string | undefined;
+
+	if (!title?.trim()) {
+		return json({ error: 'missing_fields' }, { status: 400 });
+	}
+
+	if (!VALID_CATEGORIES.includes(category as ItemCategory)) {
+		return json({ error: 'invalid_category' }, { status: 400 });
+	}
+
+	if (URL_PATTERN.test(title) || URL_PATTERN.test(description || '')) {
+		return json({ error: 'url_detected' }, { status: 400 });
+	}
+
+	const { data: rateLimitResult, error: rateLimitError } = await supabase.rpc(
+		'increment_institution_submission_count',
+		{ p_institution_id: inst.id }
+	);
+	if (rateLimitError) {
+		console.error('Institution rate limit check failed:', rateLimitError.message);
+		return json({ error: 'submission_failed' }, { status: 500 });
+	}
+	if (rateLimitResult === -1) {
+		return json({ error: 'rate_limited' }, { status: 429 });
+	}
+
+	const { data, error: insertError } = await supabase
+		.from('items')
+		.insert({
+			type: 'found',
+			category,
+			title: title.trim(),
+			description: (description || '').trim(),
+			image_url: image_url || null,
+			latitude: inst.latitude,
+			longitude: inst.longitude,
+			location_name: inst.name,
+			date_occurred: new Date().toISOString().split('T')[0],
+			contact_method: 'anonymous',
+			contact_value: null,
+			claim_code_hash: null,
+			institution_id: inst.id,
+			status: 'active'
+		})
+		.select('id')
+		.single();
+
+	if (insertError) {
+		console.error('Institutional item insert failed:', insertError.message);
+		return json({ error: 'submission_failed' }, { status: 500 });
+	}
+
+	return json({ id: data.id, institutional: true });
+}
