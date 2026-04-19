@@ -77,8 +77,10 @@ export const POST: RequestHandler = async ({ request, platform, cookies }) => {
 		return json({ error: 'turnstile_failed' }, { status: 403 });
 	}
 
-	// Honeypot — silent rejection
+	// Honeypot — silent rejection. Still cleans a pre-uploaded trusted image
+	// so a bot that fills the honeypot plus image can't leak R2 objects.
 	if (body.website) {
+		await cleanupOrphanedUpload(platform, body.image_url as string | undefined);
 		return json({ error: 'submission_failed' }, { status: 400 });
 	}
 
@@ -235,11 +237,13 @@ async function handleInstitutionalSubmission(
 		.maybeSingle();
 
 	if (instError || !inst) {
+		await cleanupOrphanedUpload(platform, body.image_url as string | undefined);
 		return json({ error: 'invalid_institution' }, { status: 403 });
 	}
 
 	const tokenHash = await hashInstitutionToken(token);
 	if (tokenHash !== inst.token_hash) {
+		await cleanupOrphanedUpload(platform, body.image_url as string | undefined);
 		return json({ error: 'invalid_institution' }, { status: 403 });
 	}
 
