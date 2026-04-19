@@ -146,6 +146,7 @@
     "successDescription": "Hluturinn birtist á Fundið með pinna við borðið ykkar. Hann dettur sjálfkrafa út eftir 30 daga.",
     "addAnother": "Skrá annan hlut",
     "pickedUpAt": "Afhentur hjá óskilamunum {name}",
+    "pickupGeneric": "Afhentur hjá samstarfsaðila",
     "claimInstructions": "Sótt við borðið með skilríki eða skýrri lýsingu.",
     "openingHours": "Opnunartímar",
     "address": "Heimilisfang",

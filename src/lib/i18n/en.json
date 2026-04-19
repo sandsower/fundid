@@ -146,6 +146,7 @@
     "successDescription": "The item now shows on Fundið with a pin at your desk. It auto-expires after 30 days.",
     "addAnother": "Log another item",
     "pickedUpAt": "Picked up from {name} lost & found",
+    "pickupGeneric": "Picked up by an institutional partner",
     "claimInstructions": "Claim at the desk with photo ID or a clear description.",
     "openingHours": "Opening hours",
     "address": "Address",

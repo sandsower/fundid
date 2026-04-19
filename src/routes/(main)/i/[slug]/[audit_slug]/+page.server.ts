@@ -30,12 +30,26 @@ export const load: PageServerLoad = async ({ params, platform }) => {
 
 	if (!inst || inst.audit_slug !== params.audit_slug) throw error(404, 'Not found');
 
-	const { data: items } = await supabase
-		.from('items')
-		.select('id, title, description, image_url, category, status, created_at')
-		.eq('institution_id', inst.id)
-		.order('created_at', { ascending: false })
-		.limit(50);
+	// Active items must always be fully visible — they are what the audit
+	// kill-switch acts on. 20/day × 30-day auto-expire = ~600 active rows at
+	// steady state for a standard partner; never cap the active list below
+	// that ceiling. Inactive (removed/expired) history is truncated for
+	// render cost; operators don't act on it.
+	const [{ data: activeItems }, { data: inactiveItems }] = await Promise.all([
+		supabase
+			.from('items')
+			.select('id, title, description, image_url, category, status, created_at')
+			.eq('institution_id', inst.id)
+			.eq('status', 'active')
+			.order('created_at', { ascending: false }),
+		supabase
+			.from('items')
+			.select('id, title, description, image_url, category, status, created_at')
+			.eq('institution_id', inst.id)
+			.neq('status', 'active')
+			.order('created_at', { ascending: false })
+			.limit(50)
+	]);
 
 	return {
 		institution: {
@@ -46,6 +60,6 @@ export const load: PageServerLoad = async ({ params, platform }) => {
 			rate_limit_per_day: inst.rate_limit_per_day
 		},
 		auditSlug: params.audit_slug,
-		items: (items ?? []) as AuditItem[]
+		items: [...(activeItems ?? []), ...(inactiveItems ?? [])] as AuditItem[]
 	};
 };

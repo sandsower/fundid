@@ -26,6 +26,10 @@
 	let showContact = $state(false);
 	let showResolve = $state(false);
 	let CatIcon = $derived(item ? (categoryIcons[(item as Item).category] || categoryIcons.other) : categoryIcons.other);
+	// Gate peer-to-peer contact/resolve flows on the item row, not on the
+	// institution lookup — the institution fetch can fail and must not cause
+	// institutional items to render contact buttons that go nowhere.
+	let isInstitutional = $derived(!!(item as Item | null)?.institution_id);
 	const tolgeeInstance = getTolgee(['language']);
 	let currentLocale = $derived($tolgeeInstance.getLanguage() === 'en' ? 'en' : 'is');
 	let weekHours = $derived.by(() => {
@@ -164,10 +168,18 @@
 							{/if}
 						</div>
 					</div>
+				{:else if isInstitutional}
+					<div class="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5 mb-6">
+						<div class="flex items-center gap-2 mb-3">
+							<Building2 size={18} class="text-[var(--color-amber)]" />
+							<p class="text-sm font-semibold text-[var(--color-ink)]">{$t('institutional.pickupGeneric')}</p>
+						</div>
+						<p class="text-sm text-[var(--color-ink-light)]">{$t('institutional.claimInstructions')}</p>
+					</div>
 				{/if}
 
 				<div class="flex flex-col gap-1.5 text-sm text-[var(--color-muted)] mb-6">
-					{#if !institution}
+					{#if !isInstitutional}
 						<p class="flex items-center gap-2">
 							<MapPin size={14} class="text-[var(--color-amber)] shrink-0" /> {item.location_name}
 						</p>
@@ -181,14 +193,14 @@
 					</p>
 				</div>
 
-				{#if !institution && item.latitude && item.longitude}
+				{#if !isInstitutional && item.latitude && item.longitude}
 					<div class="h-[220px] rounded-xl overflow-hidden border border-[var(--color-border)] mb-6">
 						<Map items={[item]} />
 					</div>
 				{/if}
 
 				<div class="flex gap-2 flex-wrap">
-					{#if item.status === 'active' && !institution}
+					{#if item.status === 'active' && !isInstitutional}
 						<button
 							onclick={() => (showContact = true)}
 							class="px-5 py-2.5 rounded-full font-medium text-sm text-white transition-colors bg-[var(--color-amber)] hover:bg-[var(--color-amber-dark)] inline-flex items-center gap-1.5"
