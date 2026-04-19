@@ -241,20 +241,27 @@ async function handleInstitutionalSubmission(
 	const description = body.description as string | undefined;
 	const image_url = body.image_url as string | undefined;
 
+	// Reject untrusted image URLs BEFORE running content validations. Once the
+	// URL passes the trust check, every subsequent rejection path must clean
+	// the pre-uploaded R2 object so a valid-token abuser can't leak storage
+	// by submitting malformed fields.
+	if (!isTrustedImageUrl(image_url)) {
+		return json({ error: 'invalid_image_url' }, { status: 400 });
+	}
+
 	if (!title?.trim()) {
+		await cleanupOrphanedUpload(platform, image_url);
 		return json({ error: 'missing_fields' }, { status: 400 });
 	}
 
 	if (!INSTITUTIONAL_CATEGORIES.includes(category as ItemCategory)) {
+		await cleanupOrphanedUpload(platform, image_url);
 		return json({ error: 'invalid_category' }, { status: 400 });
 	}
 
 	if (URL_PATTERN.test(title) || URL_PATTERN.test(description || '')) {
+		await cleanupOrphanedUpload(platform, image_url);
 		return json({ error: 'url_detected' }, { status: 400 });
-	}
-
-	if (!isTrustedImageUrl(image_url)) {
-		return json({ error: 'invalid_image_url' }, { status: 400 });
 	}
 
 	const { data: rpcData, error: rpcError } = await supabase.rpc('insert_institutional_item', {

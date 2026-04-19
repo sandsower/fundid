@@ -45,12 +45,14 @@ grant select on public.institutions_public to anon, authenticated;
 ------------------------------------------------------------------------
 -- 2. Items: add nullable institution FK
 ------------------------------------------------------------------------
--- SET NULL on delete: physical deletion of an institution must not fail or
--- cascade-delete historical items. Orphaned items fall back to their stored
--- lat/lng/location_name and render as generic public items. For operational
--- offboarding prefer a soft-disable flow; this FK behavior is a safety net.
+-- RESTRICT on delete: institution_id is the discriminator for audit
+-- kill-switch, auto-expire, and item-detail rendering. Silently nulling it
+-- would strand active rows on the public map without pickup instructions or
+-- operator controls. Offboarding must go through an explicit flow (expire
+-- or reassign items first), which is enforced by the FK failing on delete
+-- while anything still references the institution.
 alter table public.items
-  add column institution_id uuid references public.institutions(id) on delete set null;
+  add column institution_id uuid references public.institutions(id) on delete restrict;
 
 create index idx_items_institution_id
   on public.items (institution_id)
