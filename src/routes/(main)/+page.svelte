@@ -103,7 +103,7 @@
 			.select('id, type, category, title, description, image_url, latitude, longitude, location_name, date_occurred, status, contact_method, contact_value, claim_code_hash, created_at, updated_at')
 			.eq('status', 'active')
 			.order('created_at', { ascending: false })
-			.limit(50);
+			.limit(1000);
 
 		if (data && !error) items.set(data as Item[]);
 		loading.set(false);
