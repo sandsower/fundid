@@ -86,6 +86,25 @@
 		submitting = true;
 		error = '';
 		try {
+			// Preflight before upload so rate-limited or invalid submissions don't
+			// leave an orphaned R2 object. Best-effort — a concurrent submission
+			// can still consume the last quota slot between preflight and commit.
+			if (imageFile) {
+				const pre = await fetch('/api/institution/preflight', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					credentials: 'same-origin',
+					body: JSON.stringify({ inst: data.institution.slug, category })
+				});
+				if (!pre.ok) {
+					let pj;
+					try { pj = await pre.json(); } catch { pj = {}; }
+					if (pj.error === 'rate_limited') error = $t('error.rateLimited');
+					else error = $t('error.submissionFailed');
+					return;
+				}
+			}
+
 			let imageUrl: string | null = null;
 			if (imageFile) {
 				const compressed = await compressImage(imageFile);
