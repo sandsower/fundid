@@ -48,6 +48,12 @@ export const actions: Actions = {
 		if (isNaN(latitude) || isNaN(longitude)) {
 			return fail(400, { error: 'Invalid latitude/longitude' });
 		}
+		// Mirror the DB upper-bound check so the error is friendly instead of
+		// a raw Postgres constraint message. Bounds keep the audit page render
+		// tractable at 30-day retention.
+		if (rateLimit < 1 || rateLimit > 100) {
+			return fail(400, { error: 'rate_limit_per_day must be between 1 and 100' });
+		}
 
 		let hoursJson = null;
 		if (hoursRaw) {

@@ -17,7 +17,11 @@ create table public.institutions (
   contact_email text not null,
   token_hash text not null,
   audit_slug text not null unique,
-  rate_limit_per_day int not null default 20 check (rate_limit_per_day > 0),
+  -- Upper bound keeps the audit page's unbounded active-list render
+  -- tractable (limit × 30d retention = worst-case page size). Raise
+  -- deliberately if a real partner ever needs more than ~3000 active rows.
+  rate_limit_per_day int not null default 20
+    check (rate_limit_per_day > 0 and rate_limit_per_day <= 100),
   created_at timestamptz not null default now()
 );
 

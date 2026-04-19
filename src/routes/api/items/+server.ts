@@ -92,7 +92,14 @@ export const POST: RequestHandler = async ({ request, platform, cookies }) => {
 	const bodyToken = typeof body.t === 'string' ? body.t.trim() : '';
 	const cookieToken = instSlug ? cookies.get(`inst_session_${instSlug}`) ?? '' : '';
 	const instToken = bodyToken || cookieToken;
-	if (instSlug && instToken) {
+	if (instSlug) {
+		// Cookie may have expired between image upload and submit. Reject as
+		// an institutional failure and clean any pre-uploaded R2 object —
+		// never fall through to the peer path, which doesn't compensate.
+		if (!instToken) {
+			await cleanupOrphanedUpload(platform, body.image_url as string | undefined);
+			return json({ error: 'invalid_institution' }, { status: 403 });
+		}
 		return await handleInstitutionalSubmission(supabase, body, instSlug, instToken, platform);
 	}
 
