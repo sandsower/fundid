@@ -5,6 +5,7 @@
 	const { t } = getTranslate();
 	import { onMount } from 'svelte';
 	import { supabase } from '$lib/supabase';
+	import { capture } from '$lib/posthog';
 	import { Send, CheckCircle, XCircle, Loader, ArrowLeft, Lock } from 'lucide-svelte';
 	import { formatDateTime } from '$utils/date';
 
@@ -29,6 +30,11 @@
 		} else if (data?.success) {
 			msgData = data;
 			history = data.history || [];
+			capture('reply_opened', {
+				item_id: data.item_id,
+				direction: data.direction,
+				history_length: history.length
+			});
 		}
 		loading = false;
 	});
@@ -49,6 +55,11 @@
 
 			if (data?.success) {
 				sent = true;
+				capture('reply_sent', {
+					item_id: msgData?.item_id,
+					direction: msgData?.direction === 'inbound' ? 'outbound' : 'inbound',
+					history_length: history.length
+				});
 			} else if (data?.error === 'rate_limited') {
 				error = $t('contact.rateLimited');
 			} else if (data?.error === 'item_resolved') {

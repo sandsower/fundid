@@ -34,7 +34,20 @@ async function runInstitutionalExpiry(
 	supabase: ReturnType<typeof createClient>,
 	env: Env
 ): Promise<void> {
-	const dryRun = env.INSTITUTIONAL_EXPIRE_DRY_RUN !== 'false';
+	// Require explicit configuration. A missing or malformed value used to
+	// silently default to dry-run, which meant a fresh prod deploy could leave
+	// the 30-day expiry contract disabled indefinitely. Skip loudly instead so
+	// the absence is visible in worker logs and forces a deploy fix.
+	const raw = env.INSTITUTIONAL_EXPIRE_DRY_RUN;
+	if (raw !== 'true' && raw !== 'false') {
+		console.error(
+			'INSTITUTIONAL_EXPIRE_DRY_RUN must be set to "true" or "false"; got',
+			JSON.stringify(raw),
+			'— skipping institutional auto-expire run.'
+		);
+		return;
+	}
+	const dryRun = raw === 'true';
 	const { data, error } = await supabase.rpc('expire_old_institutional_items', {
 		p_dry_run: dryRun,
 		p_threshold_days: 30

@@ -5,6 +5,7 @@
 	const { t } = getTranslate();
 	import { onMount } from 'svelte';
 	import { supabase } from '$lib/supabase';
+	import { capture } from '$lib/posthog';
 	import { hashClaimCode } from '$utils/claim';
 	import { CheckCircle, XCircle, Loader } from 'lucide-svelte';
 
@@ -30,9 +31,15 @@
 
 			if (error) throw error;
 			status = data ? 'success' : 'error';
-			if (!data) errorMessage = $t('claim.invalid');
+			if (data) {
+				capture('resolve_completed', { item_id: itemId, method: 'claim_link' });
+			} else {
+				capture('resolve_failed', { item_id: itemId, reason: 'invalid_code', method: 'claim_link' });
+				errorMessage = $t('claim.invalid');
+			}
 		} catch (e: any) {
 			status = 'error';
+			capture('resolve_failed', { item_id: itemId, reason: 'error', method: 'claim_link' });
 			errorMessage = e.message || 'Something went wrong';
 		}
 	});
