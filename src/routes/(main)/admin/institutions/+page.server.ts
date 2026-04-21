@@ -6,6 +6,7 @@ import {
 	generateAuditSlug,
 	hashInstitutionToken
 } from '$utils/institution-token';
+import { parseWeekHours } from '$utils/hours';
 import type { PageServerLoad, Actions } from './$types';
 
 function getServiceClient(platform: App.Platform | undefined) {
@@ -57,10 +58,17 @@ export const actions: Actions = {
 
 		let hoursJson = null;
 		if (hoursRaw) {
+			let parsed: unknown;
 			try {
-				hoursJson = JSON.parse(hoursRaw);
+				parsed = JSON.parse(hoursRaw);
 			} catch {
 				return fail(400, { error: 'hours_json must be valid JSON or empty' });
+			}
+			hoursJson = parseWeekHours(parsed);
+			if (hoursJson === null) {
+				return fail(400, {
+					error: 'hours_json must map weekday keys (mon..sun) to arrays of [HH:MM, HH:MM] tuples'
+				});
 			}
 		}
 

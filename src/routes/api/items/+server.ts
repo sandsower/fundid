@@ -107,20 +107,22 @@ export const POST: RequestHandler = async ({ request, platform, cookies }) => {
 		return await handleInstitutionalSubmission(supabase, body, instSlug, instToken, platform, serviceRoleKey);
 	}
 
-	return await handlePeerSubmission(supabase, body, platform, ip);
+	return await handlePeerSubmission(supabase, body, platform, ip, serviceRoleKey);
 };
 
 async function handlePeerSubmission(
 	supabase: SupabaseClient,
 	body: Record<string, unknown>,
 	platform: App.Platform | undefined,
-	ip: string
+	ip: string,
+	serviceRoleKey: string
 ) {
 	// Rate limit: single read, check, validate, then increment with cached count
 	const kv = platform?.env?.RATE_LIMIT;
 	const rlKey = kv ? `items:${ip}` : '';
 	const rlCount = kv ? parseInt((await kv.get(rlKey)) || '0') : 0;
 	if (kv && rlCount >= RATE_LIMIT) {
+		await cleanupOrphanedUpload(platform, body, serviceRoleKey);
 		return json({ error: 'rate_limited' }, { status: 429 });
 	}
 
@@ -136,22 +138,27 @@ async function handlePeerSubmission(
 	const contact_value = body.contact_value as string | undefined;
 
 	if (!title?.trim() || !location_name?.trim() || !contact_value?.trim()) {
+		await cleanupOrphanedUpload(platform, body, serviceRoleKey);
 		return json({ error: 'missing_fields' }, { status: 400 });
 	}
 
 	if (!VALID_TYPES.includes(type as ItemType)) {
+		await cleanupOrphanedUpload(platform, body, serviceRoleKey);
 		return json({ error: 'invalid_type' }, { status: 400 });
 	}
 
 	if (!VALID_CATEGORIES.includes(category as ItemCategory)) {
+		await cleanupOrphanedUpload(platform, body, serviceRoleKey);
 		return json({ error: 'invalid_category' }, { status: 400 });
 	}
 
 	if (typeof latitude !== 'number' || typeof longitude !== 'number') {
+		await cleanupOrphanedUpload(platform, body, serviceRoleKey);
 		return json({ error: 'invalid_location' }, { status: 400 });
 	}
 
 	if (URL_PATTERN.test(title) || URL_PATTERN.test(description || '') || URL_PATTERN.test(location_name)) {
+		await cleanupOrphanedUpload(platform, body, serviceRoleKey);
 		return json({ error: 'url_detected' }, { status: 400 });
 	}
 
@@ -186,6 +193,7 @@ async function handlePeerSubmission(
 
 	if (insertError) {
 		console.error('Item insert failed:', insertError.message);
+		await cleanupOrphanedUpload(platform, body, serviceRoleKey);
 		return json({ error: 'submission_failed' }, { status: 500 });
 	}
 
