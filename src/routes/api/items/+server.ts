@@ -31,13 +31,17 @@ function isTrustedImageUrl(url: string | undefined | null): boolean {
 }
 
 // Prove the caller uploaded this R2 key via /api/upload by verifying the HMAC
-// they were given at upload time. Without this gate, anyone holding a valid
-// submission token could attach any already-public Fundid image URL to their
-// own new item (cross-item photo spoofing).
+// they were given at upload time AND that the object still exists in R2.
+// The HMAC gate blocks cross-item photo spoofing (attaching someone else's
+// image to your own item). The existence check blocks the race between the
+// retention worker's 24h orphan sweep and a stale form submission: without
+// it, a user who uploads and submits > 24h later would create an item whose
+// image_url points at a deleted object.
 async function verifyImageOwnership(
 	image_url: string | undefined,
 	upload_token: unknown,
-	secret: string
+	secret: string,
+	bucket: App.Platform['env']['ITEM_IMAGES'] | undefined
 ): Promise<boolean> {
 	if (!image_url) return true; // no image to own
 	if (typeof upload_token !== 'string' || !upload_token) return false;
@@ -45,7 +49,15 @@ async function verifyImageOwnership(
 	if (!base || !image_url.startsWith(`${base}/`)) return false;
 	const key = image_url.slice(base.length + 1);
 	if (!key) return false;
-	return await verifyUploadToken(key, upload_token, secret);
+	if (!(await verifyUploadToken(key, upload_token, secret))) return false;
+	if (!bucket) return true; // dev/test without R2: fall back to HMAC-only
+	try {
+		const head = await bucket.head(key);
+		return head !== null;
+	} catch (e) {
+		console.error('R2 head failed for', key, (e as Error).message);
+		return false;
+	}
 }
 
 function generateClaimCode(): string {
@@ -180,7 +192,7 @@ async function handlePeerSubmission(
 		return json({ error: 'url_detected' }, { status: 400 });
 	}
 
-	if (!(await verifyImageOwnership(image_url, body.upload_token, serviceRoleKey))) {
+	if (!(await verifyImageOwnership(image_url, body.upload_token, serviceRoleKey, platform?.env?.ITEM_IMAGES))) {
 		await cleanupOrphanedUpload(supabase, platform, body, serviceRoleKey);
 		return json({ error: 'invalid_upload' }, { status: 400 });
 	}
@@ -334,7 +346,7 @@ async function handleInstitutionalSubmission(
 		return json({ error: 'url_detected' }, { status: 400 });
 	}
 
-	if (!(await verifyImageOwnership(image_url, body.upload_token, serviceRoleKey))) {
+	if (!(await verifyImageOwnership(image_url, body.upload_token, serviceRoleKey, platform?.env?.ITEM_IMAGES))) {
 		await cleanupOrphanedUpload(supabase, platform, body, serviceRoleKey);
 		return json({ error: 'invalid_upload' }, { status: 400 });
 	}
