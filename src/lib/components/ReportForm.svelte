@@ -154,6 +154,7 @@
 		error = '';
 		try {
 			let imageUrl: string | null = null;
+			let uploadToken: string | null = null;
 			if (imageFile) {
 				const compressed = await compressImage(imageFile);
 				const form = new FormData();
@@ -163,6 +164,7 @@
 				try { body = await res.json(); } catch { body = {}; }
 				if (!res.ok) throw new Error(body.message || $t('error.submissionFailed'));
 				imageUrl = body.url;
+				uploadToken = body.upload_token;
 			}
 
 			const res = await fetch('/api/items', {
@@ -174,6 +176,7 @@
 					title: title.trim(),
 					description: description.trim(),
 					image_url: imageUrl,
+					upload_token: uploadToken,
 					latitude,
 					longitude,
 					location_name: locationName.trim(),

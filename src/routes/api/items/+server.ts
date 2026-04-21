@@ -5,6 +5,7 @@ import { env } from '$env/dynamic/private';
 import type { RequestHandler } from './$types';
 import type { ItemType, ItemCategory } from '$types/item';
 import { hashInstitutionToken } from '$utils/institution-token';
+import { verifyUploadToken } from '$utils/upload-signing';
 
 const RATE_LIMIT = 5;
 const RATE_WINDOW = 3600; // 1 hour
@@ -74,13 +75,14 @@ export const POST: RequestHandler = async ({ request, platform, cookies }) => {
 
 	const turnstileToken = body['cf-turnstile-response'] as string;
 	if (!turnstileToken || !(await verifyTurnstile(turnstileToken, turnstileSecret, ip))) {
+		await cleanupOrphanedUpload(platform, body, serviceRoleKey);
 		return json({ error: 'turnstile_failed' }, { status: 403 });
 	}
 
 	// Honeypot — silent rejection. Still cleans a pre-uploaded trusted image
 	// so a bot that fills the honeypot plus image can't leak R2 objects.
 	if (body.website) {
-		await cleanupOrphanedUpload(platform, body.image_url as string | undefined);
+		await cleanupOrphanedUpload(platform, body, serviceRoleKey);
 		return json({ error: 'submission_failed' }, { status: 400 });
 	}
 
@@ -99,10 +101,10 @@ export const POST: RequestHandler = async ({ request, platform, cookies }) => {
 		// an institutional failure and clean any pre-uploaded R2 object —
 		// never fall through to the peer path, which doesn't compensate.
 		if (!instToken) {
-			await cleanupOrphanedUpload(platform, body.image_url as string | undefined);
+			await cleanupOrphanedUpload(platform, body, serviceRoleKey);
 			return json({ error: 'invalid_institution' }, { status: 403 });
 		}
-		return await handleInstitutionalSubmission(supabase, body, instSlug, instToken, platform);
+		return await handleInstitutionalSubmission(supabase, body, instSlug, instToken, platform, serviceRoleKey);
 	}
 
 	return await handlePeerSubmission(supabase, body, platform, ip);
@@ -202,20 +204,26 @@ async function handlePeerSubmission(
 	return json({ id: data.id, claim_code_sent: claimCodeSent });
 }
 
-// Delete an uploaded R2 object when an institutional submission is rejected
-// after upload. Mirrors /api/upload's key shape; silently no-ops if the URL
-// isn't one of ours or if the bucket is unavailable (dev without wrangler).
+// Delete an uploaded R2 object when a submission is rejected after upload.
+// Requires the `upload_token` minted by /api/upload for this specific key;
+// without the token we never call bucket.delete, so a caller can't trick us
+// into deleting an R2 object they didn't upload by submitting its URL on a
+// deliberately-failing request. See [[client-url-driven-r2-cleanup-is-delete-any-vector]].
 async function cleanupOrphanedUpload(
 	platform: App.Platform | undefined,
-	image_url: string | null | undefined
+	body: Record<string, unknown>,
+	secret: string
 ): Promise<void> {
-	if (!image_url) return;
+	const image_url = body.image_url as string | null | undefined;
+	const upload_token = body.upload_token as string | null | undefined;
+	if (!image_url || !upload_token) return;
 	const bucket = platform?.env?.ITEM_IMAGES;
 	if (!bucket) return;
 	const base = PUBLIC_IMAGE_BASE_URL?.replace(/\/+$/, '');
 	if (!base || !image_url.startsWith(`${base}/`)) return;
 	const key = image_url.slice(base.length + 1);
 	if (!key) return;
+	if (!(await verifyUploadToken(key, upload_token, secret))) return;
 	try {
 		await bucket.delete(key);
 	} catch (e) {
@@ -228,7 +236,8 @@ async function handleInstitutionalSubmission(
 	body: Record<string, unknown>,
 	slug: string,
 	token: string,
-	platform: App.Platform | undefined
+	platform: App.Platform | undefined,
+	serviceRoleKey: string
 ) {
 	const { data: inst, error: instError } = await supabase
 		.from('institutions')
@@ -237,13 +246,13 @@ async function handleInstitutionalSubmission(
 		.maybeSingle();
 
 	if (instError || !inst) {
-		await cleanupOrphanedUpload(platform, body.image_url as string | undefined);
+		await cleanupOrphanedUpload(platform, body, serviceRoleKey);
 		return json({ error: 'invalid_institution' }, { status: 403 });
 	}
 
 	const tokenHash = await hashInstitutionToken(token);
 	if (tokenHash !== inst.token_hash) {
-		await cleanupOrphanedUpload(platform, body.image_url as string | undefined);
+		await cleanupOrphanedUpload(platform, body, serviceRoleKey);
 		return json({ error: 'invalid_institution' }, { status: 403 });
 	}
 
@@ -261,17 +270,17 @@ async function handleInstitutionalSubmission(
 	}
 
 	if (!title?.trim()) {
-		await cleanupOrphanedUpload(platform, image_url);
+		await cleanupOrphanedUpload(platform, body, serviceRoleKey);
 		return json({ error: 'missing_fields' }, { status: 400 });
 	}
 
 	if (!INSTITUTIONAL_CATEGORIES.includes(category as ItemCategory)) {
-		await cleanupOrphanedUpload(platform, image_url);
+		await cleanupOrphanedUpload(platform, body, serviceRoleKey);
 		return json({ error: 'invalid_category' }, { status: 400 });
 	}
 
 	if (URL_PATTERN.test(title) || URL_PATTERN.test(description || '')) {
-		await cleanupOrphanedUpload(platform, image_url);
+		await cleanupOrphanedUpload(platform, body, serviceRoleKey);
 		return json({ error: 'url_detected' }, { status: 400 });
 	}
 
@@ -285,21 +294,21 @@ async function handleInstitutionalSubmission(
 
 	if (rpcError) {
 		console.error('insert_institutional_item failed:', rpcError.message);
-		await cleanupOrphanedUpload(platform, image_url);
+		await cleanupOrphanedUpload(platform, body, serviceRoleKey);
 		return json({ error: 'submission_failed' }, { status: 500 });
 	}
 
 	const row = Array.isArray(rpcData) ? rpcData[0] : rpcData;
 	if (!row) {
-		await cleanupOrphanedUpload(platform, image_url);
+		await cleanupOrphanedUpload(platform, body, serviceRoleKey);
 		return json({ error: 'submission_failed' }, { status: 500 });
 	}
 	if (row.rate_limited) {
-		await cleanupOrphanedUpload(platform, image_url);
+		await cleanupOrphanedUpload(platform, body, serviceRoleKey);
 		return json({ error: 'rate_limited' }, { status: 429 });
 	}
 	if (!row.item_id) {
-		await cleanupOrphanedUpload(platform, image_url);
+		await cleanupOrphanedUpload(platform, body, serviceRoleKey);
 		return json({ error: 'invalid_institution' }, { status: 403 });
 	}
 
