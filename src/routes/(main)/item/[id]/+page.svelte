@@ -13,15 +13,39 @@
 	import ContactModal from '$components/ContactModal.svelte';
 	import { MapPin, Calendar, Clock, Share2, Printer, ArrowLeft, CheckCircle, MessageCircle } from 'lucide-svelte';
 	import { capture } from '$lib/posthog';
-	import type { Item } from '$types/item';
+	import type { Item, Institution } from '$types/item';
 	import { get } from 'svelte/store';
 	import { formatDate } from '$utils/date';
+	import { formatWeekHours } from '$utils/hours';
+	import { getTolgee } from '@tolgee/svelte';
+	import { Phone, Building2 } from 'lucide-svelte';
 
 	let item: Item | null = $state(null);
+	let institution: Institution | null = $state(null);
 	let loading = $state(true);
 	let showContact = $state(false);
 	let showResolve = $state(false);
 	let CatIcon = $derived(item ? (categoryIcons[(item as Item).category] || categoryIcons.other) : categoryIcons.other);
+	// Gate peer-to-peer contact/resolve flows on the item row, not on the
+	// institution lookup — the institution fetch can fail and must not cause
+	// institutional items to render contact buttons that go nowhere.
+	let isInstitutional = $derived(!!(item as Item | null)?.institution_id);
+	const tolgeeInstance = getTolgee(['language']);
+	let currentLocale = $derived($tolgeeInstance.getLanguage() === 'en' ? 'en' : 'is');
+	let weekHours = $derived.by(() => {
+		const inst = institution;
+		return inst ? formatWeekHours(inst.hours_json, currentLocale as 'is' | 'en') : [];
+	});
+
+	async function loadInstitutionFor(loaded: Item) {
+		if (!loaded.institution_id) return;
+		const { data: instData } = await supabase
+			.from('institutions_public')
+			.select('id, slug, name, address, latitude, longitude, phone, hours_json')
+			.eq('id', loaded.institution_id)
+			.maybeSingle();
+		if (instData) institution = instData as Institution;
+	}
 
 	onMount(async () => {
 		const id = $page.params.id;
@@ -30,12 +54,16 @@
 		const cached = get(itemsStore).find((i) => i.id === id);
 		if (cached) {
 			item = cached;
+			await loadInstitutionFor(cached);
 			loading = false;
 			return;
 		}
 
-		const { data, error } = await supabase.from('items').select('id, type, category, title, description, image_url, latitude, longitude, location_name, date_occurred, status, contact_method, contact_value, claim_code_hash, created_at, updated_at').eq('id', id).single();
-		if (data && !error) item = data as Item;
+		const { data, error } = await supabase.from('items').select('id, type, category, title, description, image_url, latitude, longitude, location_name, date_occurred, status, contact_method, contact_value, claim_code_hash, institution_id, created_at, updated_at').eq('id', id).single();
+		if (data && !error) {
+			item = data as Item;
+			await loadInstitutionFor(item);
+		}
 		loading = false;
 	});
 
@@ -110,10 +138,56 @@
 					<p class="text-[var(--color-ink-light)] leading-relaxed mb-5">{item.description}</p>
 				{/if}
 
+				{#if institution}
+					<div class="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5 mb-6">
+						<div class="flex items-center gap-2 mb-3">
+							<Building2 size={18} class="text-[var(--color-amber)]" />
+							<p class="text-sm font-semibold text-[var(--color-ink)]">
+								{$t('institutional.pickedUpAt', { name: institution.name })}
+							</p>
+						</div>
+						<p class="text-sm text-[var(--color-ink-light)] mb-4">{$t('institutional.claimInstructions')}</p>
+
+						<div class="space-y-2 text-sm">
+							<p class="flex items-start gap-2 text-[var(--color-ink-light)]">
+								<MapPin size={14} class="text-[var(--color-muted)] shrink-0 mt-0.5" />
+								<span>{institution.address}</span>
+							</p>
+							{#if institution.phone}
+								<p class="flex items-start gap-2 text-[var(--color-ink-light)]">
+									<Phone size={14} class="text-[var(--color-muted)] shrink-0 mt-0.5" />
+									<a href="tel:{institution.phone.replace(/\s/g, '')}" class="hover:underline">{institution.phone}</a>
+								</p>
+							{/if}
+							{#if weekHours.length > 0}
+								<div class="flex items-start gap-2 text-[var(--color-ink-light)]">
+									<Clock size={14} class="text-[var(--color-muted)] shrink-0 mt-0.5" />
+									<div class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-xs">
+										{#each weekHours as day}
+											<span class="text-[var(--color-muted)]">{day.label}</span>
+											<span>{day.hours}</span>
+										{/each}
+									</div>
+								</div>
+							{/if}
+						</div>
+					</div>
+				{:else if isInstitutional}
+					<div class="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5 mb-6">
+						<div class="flex items-center gap-2 mb-3">
+							<Building2 size={18} class="text-[var(--color-amber)]" />
+							<p class="text-sm font-semibold text-[var(--color-ink)]">{$t('institutional.pickupGeneric')}</p>
+						</div>
+						<p class="text-sm text-[var(--color-ink-light)]">{$t('institutional.claimInstructions')}</p>
+					</div>
+				{/if}
+
 				<div class="flex flex-col gap-1.5 text-sm text-[var(--color-muted)] mb-6">
-					<p class="flex items-center gap-2">
-						<MapPin size={14} class="text-[var(--color-amber)] shrink-0" /> {item.location_name}
-					</p>
+					{#if !isInstitutional}
+						<p class="flex items-center gap-2">
+							<MapPin size={14} class="text-[var(--color-amber)] shrink-0" /> {item.location_name}
+						</p>
+					{/if}
 					<p class="flex items-center gap-2">
 						<Calendar size={14} class="text-[var(--color-amber)] shrink-0" /> {formatDate(item.date_occurred)}
 					</p>
@@ -123,14 +197,14 @@
 					</p>
 				</div>
 
-				{#if item.latitude && item.longitude}
+				{#if !isInstitutional && item.latitude && item.longitude}
 					<div class="h-[220px] rounded-xl overflow-hidden border border-[var(--color-border)] mb-6">
 						<Map items={[item]} />
 					</div>
 				{/if}
 
 				<div class="flex gap-2 flex-wrap">
-					{#if item.status === 'active'}
+					{#if item.status === 'active' && !isInstitutional}
 						<button
 							onclick={() => (showContact = true)}
 							class="px-5 py-2.5 rounded-full font-medium text-sm text-white transition-colors bg-[var(--color-amber)] hover:bg-[var(--color-amber-dark)] inline-flex items-center gap-1.5"

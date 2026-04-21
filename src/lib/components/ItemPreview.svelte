@@ -5,7 +5,7 @@
 	const { t } = getTranslate();
 	import { categoryIcons } from '$utils/categories';
 	import { formatDate } from '$utils/date';
-	import { MapPin, Calendar, X, ArrowRight, MessageCircle } from 'lucide-svelte';
+	import { MapPin, Calendar, X, ArrowRight, MessageCircle, Building2 } from 'lucide-svelte';
 	import { capture } from '$lib/posthog';
 	import ContactModal from '$components/ContactModal.svelte';
 
@@ -13,6 +13,7 @@
 
 	let showContact = $state(false);
 	const CatIcon = $derived(categoryIcons[item.category] || categoryIcons.other);
+	const isInstitutional = $derived(!!item.institution_id);
 
 	function handleKeydown(e: KeyboardEvent) {
 		if (e.key === 'Escape') {
@@ -69,14 +70,19 @@
 
 			<div class="flex flex-col gap-1 text-sm text-[var(--color-muted)] mb-4">
 				<p class="flex items-center gap-1.5">
-					<MapPin size={13} class="text-[var(--color-amber)] shrink-0" /> {item.location_name}
+					{#if isInstitutional}
+						<Building2 size={13} class="text-[var(--color-amber)] shrink-0" />
+						{$t('institutional.pickedUpAt', { name: item.location_name })}
+					{:else}
+						<MapPin size={13} class="text-[var(--color-amber)] shrink-0" /> {item.location_name}
+					{/if}
 				</p>
 				<p class="flex items-center gap-1.5">
 					<Calendar size={13} class="text-[var(--color-amber)] shrink-0" /> {formatDate(item.date_occurred)}
 				</p>
 			</div>
 
-			{#if item.status === 'active'}
+			{#if item.status === 'active' && !isInstitutional}
 				<div class="flex gap-2">
 					<button
 						onclick={() => { showContact = true; capture('item_preview_contact_clicked', { item_id: item.id, item_type: item.type }); }}

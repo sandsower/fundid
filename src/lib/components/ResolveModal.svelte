@@ -41,7 +41,7 @@
 
 			if (rpcError) throw rpcError;
 			if (data) {
-				capture('resolve_completed', { item_id: itemId });
+				capture('resolve_completed', { item_id: itemId, method: 'modal' });
 				onResolved();
 			} else {
 				error = $t('claim.invalid');

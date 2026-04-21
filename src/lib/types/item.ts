@@ -16,6 +16,21 @@ export type ItemCategory =
 
 export type ItemStatus = 'active' | 'resolved' | 'expired';
 
+export type DayOfWeek = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun';
+export type HoursRange = [string, string]; // ["HH:MM", "HH:MM"]
+export type WeekHours = Partial<Record<DayOfWeek, HoursRange[]>>;
+
+export interface Institution {
+	id: string;
+	slug: string;
+	name: string;
+	address: string;
+	latitude: number;
+	longitude: number;
+	phone: string | null;
+	hours_json: WeekHours | null;
+}
+
 export interface Item {
 	id: string;
 	type: ItemType;
@@ -31,6 +46,7 @@ export interface Item {
 	contact_method: 'email' | 'anonymous';
 	contact_value: string | null;
 	claim_code_hash: string | null;
+	institution_id: string | null;
 	created_at: string;
 	updated_at: string;
 }

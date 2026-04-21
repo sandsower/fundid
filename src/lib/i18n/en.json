@@ -138,6 +138,20 @@
     "viewAll": "View all",
     "viewDetails": "View full details"
   },
+  "institutional": {
+    "reportTitle": "Log a lost-and-found item",
+    "reportContext": "Logging at",
+    "submit": "Submit",
+    "successTitle": "Submission received",
+    "successDescription": "The item now shows on Fundið with a pin at your desk. It auto-expires after 30 days.",
+    "addAnother": "Log another item",
+    "pickedUpAt": "Picked up from {name} lost & found",
+    "pickupGeneric": "Picked up by an institutional partner",
+    "claimInstructions": "Claim at the desk with photo ID or a clear description.",
+    "openingHours": "Opening hours",
+    "address": "Address",
+    "phone": "Phone"
+  },
   "item": {
     "category": "Category",
     "contactFinder": "Contact finder",

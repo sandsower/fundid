@@ -5,6 +5,12 @@ compatibility_date = "2024-12-01"
 [triggers]
 crons = ["0 3 * * *"]
 
+[vars]
+# Must match the app's PUBLIC_IMAGE_BASE_URL (set in both ci.yml and deploy-prod.yml).
+# Orphan sweep compares `items.image_url` against this base to derive R2 keys; if
+# the two ever diverge, the sweep sees every image as unreferenced and deletes them.
+PUBLIC_IMAGE_BASE_URL = "https://img.fundid.is"
+
 [[r2_buckets]]
 binding = "ITEM_IMAGES"
 bucket_name = "fundid-item-images"

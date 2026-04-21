@@ -1,5 +1,7 @@
 import { json, error } from '@sveltejs/kit';
 import { PUBLIC_IMAGE_BASE_URL } from '$env/static/public';
+import { env } from '$env/dynamic/private';
+import { signUploadKey } from '$utils/upload-signing';
 import type { RequestHandler } from './$types';
 
 const MAX_SIZE = 2 * 1024 * 1024; // 2MB
@@ -10,6 +12,8 @@ const RATE_WINDOW = 3600; // 1 hour in seconds
 export const POST: RequestHandler = async ({ request, platform }) => {
 	const bucket = platform?.env?.ITEM_IMAGES;
 	if (!bucket) throw error(503, 'Storage not available');
+	const serviceRoleKey = platform?.env?.SUPABASE_SERVICE_ROLE_KEY ?? env.SUPABASE_SERVICE_ROLE_KEY;
+	if (!serviceRoleKey) throw error(503, 'Storage not available');
 
 	// Rate limit by IP
 	const kv = platform?.env?.RATE_LIMIT;
@@ -33,5 +37,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 		httpMetadata: { contentType: file.type }
 	});
 
-	return json({ url: `${PUBLIC_IMAGE_BASE_URL}/${key}` });
+	const upload_token = await signUploadKey(key, serviceRoleKey);
+
+	return json({ url: `${PUBLIC_IMAGE_BASE_URL}/${key}`, upload_token });
 };

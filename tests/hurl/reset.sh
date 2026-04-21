@@ -21,7 +21,9 @@ truncate
   public.resolve_attempts,
   public.pet_details,
   public.item_photos,
-  public.sightings
+  public.sightings,
+  public.institutions,
+  public.institution_submissions_daily
 restart identity cascade;
 SQL
 

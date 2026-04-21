@@ -2,6 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
+	import { capture } from '$lib/posthog';
 	import { Check, Trash2, LogOut, Search } from 'lucide-svelte';
 
 	let { data, form } = $props();
@@ -151,7 +152,16 @@
 									<td class="px-4 py-3">
 										<div class="flex gap-2">
 											{#if item.status === 'active'}
-												<form method="POST" action="?/resolve" use:enhance>
+												<form
+													method="POST"
+													action="?/resolve"
+													use:enhance={() => async ({ result, update }) => {
+														if (result.type === 'success') {
+															capture('resolve_completed', { item_id: item.id, method: 'admin' });
+														}
+														await update();
+													}}
+												>
 													<input type="hidden" name="itemId" value={item.id} />
 													<button
 														type="submit"
