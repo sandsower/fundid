@@ -30,6 +30,24 @@ function isTrustedImageUrl(url: string | undefined | null): boolean {
 	return url.startsWith(`${base}/`);
 }
 
+// Prove the caller uploaded this R2 key via /api/upload by verifying the HMAC
+// they were given at upload time. Without this gate, anyone holding a valid
+// submission token could attach any already-public Fundid image URL to their
+// own new item (cross-item photo spoofing).
+async function verifyImageOwnership(
+	image_url: string | undefined,
+	upload_token: unknown,
+	secret: string
+): Promise<boolean> {
+	if (!image_url) return true; // no image to own
+	if (typeof upload_token !== 'string' || !upload_token) return false;
+	const base = PUBLIC_IMAGE_BASE_URL?.replace(/\/+$/, '');
+	if (!base || !image_url.startsWith(`${base}/`)) return false;
+	const key = image_url.slice(base.length + 1);
+	if (!key) return false;
+	return await verifyUploadToken(key, upload_token, secret);
+}
+
 function generateClaimCode(): string {
 	const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // 32 chars — divides 256 evenly, no modulo bias
 	const segment = () => {
@@ -160,6 +178,11 @@ async function handlePeerSubmission(
 	if (URL_PATTERN.test(title) || URL_PATTERN.test(description || '') || URL_PATTERN.test(location_name)) {
 		await cleanupOrphanedUpload(supabase, platform, body, serviceRoleKey);
 		return json({ error: 'url_detected' }, { status: 400 });
+	}
+
+	if (!(await verifyImageOwnership(image_url, body.upload_token, serviceRoleKey))) {
+		await cleanupOrphanedUpload(supabase, platform, body, serviceRoleKey);
+		return json({ error: 'invalid_upload' }, { status: 400 });
 	}
 
 	try {
@@ -309,6 +332,11 @@ async function handleInstitutionalSubmission(
 	if (URL_PATTERN.test(title) || URL_PATTERN.test(description || '')) {
 		await cleanupOrphanedUpload(supabase, platform, body, serviceRoleKey);
 		return json({ error: 'url_detected' }, { status: 400 });
+	}
+
+	if (!(await verifyImageOwnership(image_url, body.upload_token, serviceRoleKey))) {
+		await cleanupOrphanedUpload(supabase, platform, body, serviceRoleKey);
+		return json({ error: 'invalid_upload' }, { status: 400 });
 	}
 
 	const { data: rpcData, error: rpcError } = await supabase.rpc('insert_institutional_item', {
