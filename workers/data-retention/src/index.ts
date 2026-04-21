@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 interface Env {
 	SUPABASE_URL: string;
 	SUPABASE_SERVICE_KEY: string;
-	IMAGE_BASE_URL: string;
+	PUBLIC_IMAGE_BASE_URL: string;
 	ITEM_IMAGES: R2Bucket;
 	INSTITUTIONAL_EXPIRE_DRY_RUN?: string;
 }
@@ -52,19 +52,30 @@ async function runOrphanUploadSweep(
 	const base = baseUrl.replace(/\/+$/, '');
 	const cutoffMs = Date.now() - 24 * 60 * 60 * 1000;
 
-	const { data: rows, error } = await supabase
-		.from('items')
-		.select('image_url')
-		.not('image_url', 'is', null);
-	if (error) {
-		console.error('Orphan sweep: failed to load image_urls:', error.message);
-		return;
-	}
+	// PostgREST caps responses (~1000 rows by default). Page through items.image_url
+	// so the referenced set is complete — a short read here would cause the sweep to
+	// treat older referenced images as orphans and delete them.
 	const referenced = new Set<string>();
-	for (const row of (rows as { image_url: string | null }[]) ?? []) {
-		const url = row.image_url;
-		if (!url || !url.startsWith(`${base}/`)) continue;
-		referenced.add(url.slice(base.length + 1));
+	const PAGE = 1000;
+	let offset = 0;
+	while (true) {
+		const { data: rows, error } = await supabase
+			.from('items')
+			.select('image_url')
+			.not('image_url', 'is', null)
+			.range(offset, offset + PAGE - 1);
+		if (error) {
+			console.error('Orphan sweep: failed to load image_urls:', error.message);
+			return;
+		}
+		const batch = (rows as { image_url: string | null }[]) ?? [];
+		for (const row of batch) {
+			const url = row.image_url;
+			if (!url || !url.startsWith(`${base}/`)) continue;
+			referenced.add(url.slice(base.length + 1));
+		}
+		if (batch.length < PAGE) break;
+		offset += PAGE;
 	}
 
 	let cursor: string | undefined;
@@ -127,7 +138,7 @@ export default {
 		await Promise.allSettled([
 			runPeerCleanup(supabase, env.ITEM_IMAGES),
 			runInstitutionalExpiry(supabase, env),
-			runOrphanUploadSweep(supabase, env.ITEM_IMAGES, env.IMAGE_BASE_URL)
+			runOrphanUploadSweep(supabase, env.ITEM_IMAGES, env.PUBLIC_IMAGE_BASE_URL)
 		]);
 	},
 

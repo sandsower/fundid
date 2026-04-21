@@ -38,7 +38,8 @@ export const actions: Actions = {
 		const phone = ((form.get('phone') as string) || '').trim() || null;
 		const hoursRaw = ((form.get('hours_json') as string) || '').trim();
 		const contactEmail = (form.get('contact_email') as string)?.trim();
-		const rateLimit = parseInt(form.get('rate_limit_per_day') as string) || 20;
+		const rateLimitRaw = (form.get('rate_limit_per_day') as string | null)?.trim();
+		const rateLimit = rateLimitRaw ? Number(rateLimitRaw) : 20;
 
 		if (!slug || !name || !address || !contactEmail) {
 			return fail(400, { error: 'Missing required fields' });
@@ -52,8 +53,8 @@ export const actions: Actions = {
 		// Mirror the DB upper-bound check so the error is friendly instead of
 		// a raw Postgres constraint message. Bounds keep the audit page render
 		// tractable at 30-day retention.
-		if (rateLimit < 1 || rateLimit > 100) {
-			return fail(400, { error: 'rate_limit_per_day must be between 1 and 100' });
+		if (!Number.isFinite(rateLimit) || !Number.isInteger(rateLimit) || rateLimit < 1 || rateLimit > 100) {
+			return fail(400, { error: 'rate_limit_per_day must be an integer between 1 and 100' });
 		}
 
 		let hoursJson = null;

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { getTranslate } from '@tolgee/svelte';
-	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { Camera, X, CheckCircle, Building2 } from 'lucide-svelte';
 	import { categoryIcons, allCategories } from '$utils/categories';

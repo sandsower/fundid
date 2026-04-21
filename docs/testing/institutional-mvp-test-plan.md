@@ -136,8 +136,7 @@ Before tagging `v1.8.0`:
 - [ ] `pnpm check` returns 0 errors
 - [ ] Full Hurl suite green after `reset.sh`
 - [ ] M1–M8 manual paths pass in Chrome + Safari (iOS if possible, for the submission flow)
-- [ ] `INSTITUTIONAL_EXPIRE_DRY_RUN=true` confirmed in `workers/data-retention/src/index.ts` default
-- [ ] `deploy-prod.yml` writes the `INSTITUTIONAL_EXPIRE_DRY_RUN` secret (literal `"true"`)
+- [ ] `vars.INSTITUTIONAL_EXPIRE_DRY_RUN` is explicitly set to `"true"` or `"false"` in GitHub Actions variables. The worker fails closed (skips expiry) on any other value — there is no code-level default; the Actions variable is the source of truth. Initial deploy should set it to `"true"`; flip to `"false"` after 1–2 observed cron runs.
 - [ ] No uncommitted files outside the institutional MVP surface
 - [ ] Memento design note still accurate: `memento/notes/fundid-institutional-lost-found-mvp-design.md`
 
