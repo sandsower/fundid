@@ -107,14 +107,12 @@ export const POST: RequestHandler = async ({ request, platform, cookies }) => {
 
 	const turnstileToken = body['cf-turnstile-response'] as string;
 	if (!turnstileToken || !(await verifyTurnstile(turnstileToken, turnstileSecret, ip))) {
-		await cleanupOrphanedUpload(supabase, platform, body, serviceRoleKey);
 		return json({ error: 'turnstile_failed' }, { status: 403 });
 	}
 
-	// Honeypot — silent rejection. Still cleans a pre-uploaded trusted image
-	// so a bot that fills the honeypot plus image can't leak R2 objects.
+	// Honeypot — silent rejection. The 24h orphan sweep reclaims any R2 key
+	// that never gets referenced by an items row.
 	if (body.website) {
-		await cleanupOrphanedUpload(supabase, platform, body, serviceRoleKey);
 		return json({ error: 'submission_failed' }, { status: 400 });
 	}
 
@@ -127,11 +125,7 @@ export const POST: RequestHandler = async ({ request, platform, cookies }) => {
 	const cookieToken = instSlug ? cookies.get(`inst_session_${instSlug}`) ?? '' : '';
 	const instToken = bodyToken || cookieToken;
 	if (instSlug) {
-		// Cookie may have expired between image upload and submit. Reject as
-		// an institutional failure and clean any pre-uploaded R2 object —
-		// never fall through to the peer path, which doesn't compensate.
 		if (!instToken) {
-			await cleanupOrphanedUpload(supabase, platform, body, serviceRoleKey);
 			return json({ error: 'invalid_institution' }, { status: 403 });
 		}
 		return await handleInstitutionalSubmission(supabase, body, instSlug, instToken, platform, serviceRoleKey);
@@ -152,7 +146,6 @@ async function handlePeerSubmission(
 	const rlKey = kv ? `items:${ip}` : '';
 	const rlCount = kv ? parseInt((await kv.get(rlKey)) || '0') : 0;
 	if (kv && rlCount >= RATE_LIMIT) {
-		await cleanupOrphanedUpload(supabase, platform, body, serviceRoleKey);
 		return json({ error: 'rate_limited' }, { status: 429 });
 	}
 
@@ -168,32 +161,26 @@ async function handlePeerSubmission(
 	const contact_value = body.contact_value as string | undefined;
 
 	if (!title?.trim() || !location_name?.trim() || !contact_value?.trim()) {
-		await cleanupOrphanedUpload(supabase, platform, body, serviceRoleKey);
 		return json({ error: 'missing_fields' }, { status: 400 });
 	}
 
 	if (!VALID_TYPES.includes(type as ItemType)) {
-		await cleanupOrphanedUpload(supabase, platform, body, serviceRoleKey);
 		return json({ error: 'invalid_type' }, { status: 400 });
 	}
 
 	if (!VALID_CATEGORIES.includes(category as ItemCategory)) {
-		await cleanupOrphanedUpload(supabase, platform, body, serviceRoleKey);
 		return json({ error: 'invalid_category' }, { status: 400 });
 	}
 
 	if (typeof latitude !== 'number' || typeof longitude !== 'number') {
-		await cleanupOrphanedUpload(supabase, platform, body, serviceRoleKey);
 		return json({ error: 'invalid_location' }, { status: 400 });
 	}
 
 	if (URL_PATTERN.test(title) || URL_PATTERN.test(description || '') || URL_PATTERN.test(location_name)) {
-		await cleanupOrphanedUpload(supabase, platform, body, serviceRoleKey);
 		return json({ error: 'url_detected' }, { status: 400 });
 	}
 
 	if (!(await verifyImageOwnership(image_url, body.upload_token, serviceRoleKey, platform?.env?.ITEM_IMAGES))) {
-		await cleanupOrphanedUpload(supabase, platform, body, serviceRoleKey);
 		return json({ error: 'invalid_upload' }, { status: 400 });
 	}
 
@@ -228,7 +215,6 @@ async function handlePeerSubmission(
 
 	if (insertError) {
 		console.error('Item insert failed:', insertError.message);
-		await cleanupOrphanedUpload(supabase, platform, body, serviceRoleKey);
 		return json({ error: 'submission_failed' }, { status: 500 });
 	}
 
@@ -247,52 +233,6 @@ async function handlePeerSubmission(
 	return json({ id: data.id, claim_code_sent: claimCodeSent });
 }
 
-// Delete an uploaded R2 object when a submission is rejected after upload.
-// Requires the `upload_token` minted by /api/upload for this specific key,
-// AND refuses to delete any URL that is already referenced by an `items` row.
-// Key-scoped tokens are deterministic HMACs over the R2 key, so the same
-// token is valid forever — without the live-reference check, a caller who
-// successfully submitted an item could later replay `image_url + upload_token`
-// on a deliberately-failing request to delete their own live asset. The
-// reference check turns cleanup into a no-op once the image is committed.
-async function cleanupOrphanedUpload(
-	supabase: SupabaseClient,
-	platform: App.Platform | undefined,
-	body: Record<string, unknown>,
-	secret: string
-): Promise<void> {
-	const image_url = body.image_url as string | null | undefined;
-	const upload_token = body.upload_token as string | null | undefined;
-	if (!image_url || !upload_token) return;
-	const bucket = platform?.env?.ITEM_IMAGES;
-	if (!bucket) return;
-	const base = PUBLIC_IMAGE_BASE_URL?.replace(/\/+$/, '');
-	if (!base || !image_url.startsWith(`${base}/`)) return;
-	const key = image_url.slice(base.length + 1);
-	if (!key) return;
-	if (!(await verifyUploadToken(key, upload_token, secret))) return;
-
-	// Refuse delete if the URL is already live on an item. Fail closed on
-	// query error: leaking a few bytes of R2 beats deleting a live image.
-	const { data: existing, error: lookupError } = await supabase
-		.from('items')
-		.select('id')
-		.eq('image_url', image_url)
-		.limit(1)
-		.maybeSingle();
-	if (lookupError) {
-		console.error('R2 cleanup reference lookup failed:', lookupError.message);
-		return;
-	}
-	if (existing) return;
-
-	try {
-		await bucket.delete(key);
-	} catch (e) {
-		console.error('R2 orphan cleanup failed for', key, (e as Error).message);
-	}
-}
-
 async function handleInstitutionalSubmission(
 	supabase: SupabaseClient,
 	body: Record<string, unknown>,
@@ -308,13 +248,11 @@ async function handleInstitutionalSubmission(
 		.maybeSingle();
 
 	if (instError || !inst) {
-		await cleanupOrphanedUpload(supabase, platform, body, serviceRoleKey);
 		return json({ error: 'invalid_institution' }, { status: 403 });
 	}
 
 	const tokenHash = await hashInstitutionToken(token);
 	if (tokenHash !== inst.token_hash) {
-		await cleanupOrphanedUpload(supabase, platform, body, serviceRoleKey);
 		return json({ error: 'invalid_institution' }, { status: 403 });
 	}
 
@@ -323,31 +261,25 @@ async function handleInstitutionalSubmission(
 	const description = body.description as string | undefined;
 	const image_url = body.image_url as string | undefined;
 
-	// Reject untrusted image URLs BEFORE running content validations. Once the
-	// URL passes the trust check, every subsequent rejection path must clean
-	// the pre-uploaded R2 object so a valid-token abuser can't leak storage
-	// by submitting malformed fields.
+	// Reject image URLs that don't point at our R2 bucket — the audit page
+	// would leak audit_slug via Referer if it rendered an external image.
 	if (!isTrustedImageUrl(image_url)) {
 		return json({ error: 'invalid_image_url' }, { status: 400 });
 	}
 
 	if (!title?.trim()) {
-		await cleanupOrphanedUpload(supabase, platform, body, serviceRoleKey);
 		return json({ error: 'missing_fields' }, { status: 400 });
 	}
 
 	if (!INSTITUTIONAL_CATEGORIES.includes(category as ItemCategory)) {
-		await cleanupOrphanedUpload(supabase, platform, body, serviceRoleKey);
 		return json({ error: 'invalid_category' }, { status: 400 });
 	}
 
 	if (URL_PATTERN.test(title) || URL_PATTERN.test(description || '')) {
-		await cleanupOrphanedUpload(supabase, platform, body, serviceRoleKey);
 		return json({ error: 'url_detected' }, { status: 400 });
 	}
 
 	if (!(await verifyImageOwnership(image_url, body.upload_token, serviceRoleKey, platform?.env?.ITEM_IMAGES))) {
-		await cleanupOrphanedUpload(supabase, platform, body, serviceRoleKey);
 		return json({ error: 'invalid_upload' }, { status: 400 });
 	}
 
@@ -361,21 +293,17 @@ async function handleInstitutionalSubmission(
 
 	if (rpcError) {
 		console.error('insert_institutional_item failed:', rpcError.message);
-		await cleanupOrphanedUpload(supabase, platform, body, serviceRoleKey);
 		return json({ error: 'submission_failed' }, { status: 500 });
 	}
 
 	const row = Array.isArray(rpcData) ? rpcData[0] : rpcData;
 	if (!row) {
-		await cleanupOrphanedUpload(supabase, platform, body, serviceRoleKey);
 		return json({ error: 'submission_failed' }, { status: 500 });
 	}
 	if (row.rate_limited) {
-		await cleanupOrphanedUpload(supabase, platform, body, serviceRoleKey);
 		return json({ error: 'rate_limited' }, { status: 429 });
 	}
 	if (!row.item_id) {
-		await cleanupOrphanedUpload(supabase, platform, body, serviceRoleKey);
 		return json({ error: 'invalid_institution' }, { status: 403 });
 	}
 
