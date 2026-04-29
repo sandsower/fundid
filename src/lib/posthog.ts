@@ -24,3 +24,7 @@ export function capture(event: string, properties?: Record<string, unknown>) {
 	if (!initialized) return;
 	posthog.capture(event, properties);
 }
+
+export function captureImageError(surface: string, properties?: Record<string, unknown>) {
+	capture('image_load_failed', { surface, ...properties });
+}

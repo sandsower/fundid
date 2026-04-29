@@ -4,6 +4,7 @@
 	import { petSiteEnabled } from '$utils/features';
 	import { get } from 'svelte/store';
 	import type { Item } from '$types/item';
+	import { captureImageError } from '$lib/posthog';
 
 	export interface MapBounds {
 		north: number;
@@ -66,6 +67,8 @@
 
 		map.on('moveend', emitBounds);
 		map.on('load', emitBounds);
+
+		window.addEventListener('fundid:image-load-failed', popupImageErrorHandler);
 		map.addControl(
 			new maplibregl.GeolocateControl({ positionOptions: { enableHighAccuracy: true }, trackUserLocation: false }),
 			'top-right'
@@ -166,8 +169,11 @@
 				el.onmouseenter = () => (svg.style.transform = 'scale(1.2)');
 				el.onmouseleave = () => (svg.style.transform = 'scale(1)');
 
+				const onErrorAttr = item.image_url
+					? ` onerror="this.style.display='none';window.dispatchEvent(new CustomEvent('fundid:image-load-failed',{detail:{item_id:'${item.id}'}}))"`
+					: '';
 				const imgHtml = item.image_url
-						? `<img src="${item.image_url}" alt="" style="width: 100%; height: 120px; object-fit: cover; border-radius: 10px 10px 0 0; display: block;" />`
+						? `<img src="${item.image_url}" alt="" style="width: 100%; height: 120px; object-fit: cover; border-radius: 10px 10px 0 0; display: block;"${onErrorAttr} />`
 						: '';
 				const detailUrl = isPet ? `/dyr/pet/${item.id}` : `/item/${item.id}`;
 				const detailLabel = isPet ? 'View on Fundið Dýr →' : 'View details →';
@@ -223,7 +229,13 @@
 		}
 	});
 
+	function popupImageErrorHandler(e: Event) {
+		const detail = (e as CustomEvent<{ item_id?: string }>).detail;
+		captureImageError('map_popup', { item_id: detail?.item_id });
+	}
+
 	onDestroy(() => {
+		window.removeEventListener('fundid:image-load-failed', popupImageErrorHandler);
 		map?.remove();
 	});
 </script>

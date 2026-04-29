@@ -6,7 +6,7 @@
 	import { categoryIcons } from '$utils/categories';
 	import { formatDate } from '$utils/date';
 	import { MapPin, Calendar, X, ArrowRight, MessageCircle } from 'lucide-svelte';
-	import { capture } from '$lib/posthog';
+	import { capture, captureImageError } from '$lib/posthog';
 	import ContactModal from '$components/ContactModal.svelte';
 
 	let { item, onClose }: { item: Item; onClose: () => void } = $props();
@@ -38,7 +38,12 @@
 
 		<!-- Full image -->
 		{#if item.image_url}
-			<img src={item.image_url} alt={item.title} class="w-full max-h-[50vh] object-contain bg-[var(--color-surface)]" />
+			<img
+				src={item.image_url}
+				alt={item.title}
+				class="w-full max-h-[50vh] object-contain bg-[var(--color-surface)]"
+				onerror={() => captureImageError('item_preview', { item_id: item.id, image_url: item.image_url })}
+			/>
 		{:else}
 			<div class="w-full h-48 bg-[var(--color-surface)] flex items-center justify-center">
 				<CatIcon size={56} strokeWidth={1} class="text-[var(--color-muted)]" />
