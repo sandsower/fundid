@@ -42,7 +42,7 @@
 				src={item.image_url}
 				alt={item.title}
 				class="w-full max-h-[50vh] object-contain bg-[var(--color-surface)]"
-				onerror={() => captureImageError('item_preview', { item_id: item.id, image_url: item.image_url })}
+				onerror={() => captureImageError('item_preview', { item_id: item.id })}
 			/>
 		{:else}
 			<div class="w-full h-48 bg-[var(--color-surface)] flex items-center justify-center">

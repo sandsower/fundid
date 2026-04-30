@@ -84,7 +84,7 @@
 					alt={item.title}
 					class="w-full max-h-[60vh] object-contain bg-[var(--color-surface)]"
 					onclick={() => capture('photo_viewed', { item_id: item?.id })}
-					onerror={() => captureImageError('item_detail', { item_id: item?.id, image_url: item?.image_url })}
+					onerror={() => captureImageError('item_detail', { item_id: item?.id })}
 				/>
 			{:else}
 				<div class="w-full h-48 bg-[var(--color-surface)] flex items-center justify-center">

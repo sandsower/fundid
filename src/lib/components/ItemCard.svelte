@@ -44,7 +44,7 @@
 				alt={item.title}
 				loading="lazy"
 				class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
-				onerror={() => captureImageError('item_card', { item_id: item.id, image_url: item.image_url })}
+				onerror={() => captureImageError('item_card', { item_id: item.id })}
 			/>
 		</div>
 	{:else}

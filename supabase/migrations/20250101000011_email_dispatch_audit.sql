@@ -10,10 +10,14 @@
 -- audit rows past that window are useful only for "did a dispatch happen for
 -- item X / address Y" complaints, which 30 days covers comfortably.
 
+-- item_id has ON DELETE CASCADE so any item deletion path (delete_item RPC for
+-- claim-code erasure, admin delete, cleanup_expired_items, future paths) drops
+-- the audit rows automatically. Without the FK, recipient emails could outlive
+-- the listing they relate to, breaking GDPR erasure expectations.
 create table if not exists private.email_dispatches (
   id bigserial primary key,
   payload_type text not null,
-  item_id uuid,
+  item_id uuid references public.items(id) on delete cascade,
   recipient text,
   request_id bigint,
   config_complete boolean not null,
@@ -78,12 +82,10 @@ begin
 end;
 $$ language plpgsql security definer;
 
--- Extend daily retention cron to prune the audit table. The original
--- function only touched items + cascading rows; without this, recipient
--- emails would survive deletion of the listing they relate to.
--- Two prune passes:
---   1. dispatches tied to items being deleted now (cascade)
---   2. any dispatch older than 30 days, regardless of item (TTL)
+-- Extend daily retention cron with a 30-day TTL prune for orphan audit rows
+-- (dispatches that have no item_id, e.g. support_request, or whose item was
+-- already deleted before this cron ran). Item-tied dispatches cascade-delete
+-- via the FK above, so this only handles the TTL case.
 create or replace function cleanup_expired_items()
 returns json as $$
 declare
@@ -102,12 +104,12 @@ begin
     or
     (status = 'active' and created_at < now() - interval '6 months');
 
-  if v_expired_ids is null or array_length(v_expired_ids, 1) is null then
-    -- Even with no items expiring, prune stale dispatch audit rows.
-    delete from private.email_dispatches
-    where dispatched_at < now() - interval '30 days';
-    get diagnostics v_dispatches_deleted = row_count;
+  -- TTL prune runs every day regardless of items expiring.
+  delete from private.email_dispatches
+  where dispatched_at < now() - interval '30 days';
+  get diagnostics v_dispatches_deleted = row_count;
 
+  if v_expired_ids is null or array_length(v_expired_ids, 1) is null then
     return json_build_object(
       'items_deleted', 0,
       'messages_deleted', 0,
@@ -131,12 +133,7 @@ begin
   where item_id = any(v_expired_ids);
   get diagnostics v_attempts_deleted = row_count;
 
-  -- Cascade to email audit (item dropping out + 30-day TTL)
-  delete from private.email_dispatches
-  where item_id = any(v_expired_ids)
-    or dispatched_at < now() - interval '30 days';
-  get diagnostics v_dispatches_deleted = row_count;
-
+  -- Item delete cascades to private.email_dispatches via FK.
   delete from public.items
   where id = any(v_expired_ids);
   get diagnostics v_items_deleted = row_count;
