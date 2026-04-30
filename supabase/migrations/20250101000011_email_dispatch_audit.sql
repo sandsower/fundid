@@ -3,6 +3,12 @@
 -- The previous _dispatch_email used `perform net.http_post(...)` which
 -- discards pg_net's request_id, leaving no way to correlate a complaint
 -- ("never got my claim code email") with the underlying dispatch attempt.
+--
+-- Retention: this table holds recipient emails as PII, so cleanup_expired_items
+-- (daily cron) prunes rows older than 30 days plus any tied to a deleted item.
+-- pg_net's net._http_response entries expire on its own short clock (~6h), so
+-- audit rows past that window are useful only for "did a dispatch happen for
+-- item X / address Y" complaints, which 30 days covers comfortably.
 
 create table if not exists private.email_dispatches (
   id bigserial primary key,
@@ -29,6 +35,20 @@ declare
   v_anon_key text;
   v_request_id bigint;
   v_config_complete boolean;
+  -- Coalesce across the four payload shapes in use:
+  --   claim_code: 'to', 'itemId'
+  --   contact_notification: 'posterEmail', 'itemId'
+  --   reply_notification: 'recipient_email', 'item_id'
+  --   support_request: 'requesterEmail', no item id
+  -- Without this, audit rows for non-claim_code dispatches would land with
+  -- null recipient/item_id and the "did user X get their email?" query breaks.
+  v_item_id uuid := nullif(coalesce(payload->>'itemId', payload->>'item_id'), '')::uuid;
+  v_recipient text := coalesce(
+    payload->>'to',
+    payload->>'posterEmail',
+    payload->>'recipient_email',
+    payload->>'requesterEmail'
+  );
 begin
   select value into v_url from private.app_config where key = 'edge_function_url';
   select value into v_secret from private.app_config where key = 'edge_function_secret';
@@ -38,13 +58,7 @@ begin
 
   if not v_config_complete then
     insert into private.email_dispatches (payload_type, item_id, recipient, request_id, config_complete)
-    values (
-      payload->>'type',
-      nullif(payload->>'itemId', '')::uuid,
-      payload->>'to',
-      null,
-      false
-    );
+    values (payload->>'type', v_item_id, v_recipient, null, false);
     raise warning 'Edge function config not complete — email not sent';
     return;
   end if;
@@ -60,12 +74,79 @@ begin
   ) into v_request_id;
 
   insert into private.email_dispatches (payload_type, item_id, recipient, request_id, config_complete)
-  values (
-    payload->>'type',
-    nullif(payload->>'itemId', '')::uuid,
-    payload->>'to',
-    v_request_id,
-    true
+  values (payload->>'type', v_item_id, v_recipient, v_request_id, true);
+end;
+$$ language plpgsql security definer;
+
+-- Extend daily retention cron to prune the audit table. The original
+-- function only touched items + cascading rows; without this, recipient
+-- emails would survive deletion of the listing they relate to.
+-- Two prune passes:
+--   1. dispatches tied to items being deleted now (cascade)
+--   2. any dispatch older than 30 days, regardless of item (TTL)
+create or replace function cleanup_expired_items()
+returns json as $$
+declare
+  v_expired_ids uuid[];
+  v_image_urls text[];
+  v_items_deleted int;
+  v_messages_deleted int;
+  v_attempts_deleted int;
+  v_dispatches_deleted int;
+begin
+  select array_agg(id)
+  into v_expired_ids
+  from public.items
+  where
+    (status = 'resolved' and updated_at < now() - interval '90 days')
+    or
+    (status = 'active' and created_at < now() - interval '6 months');
+
+  if v_expired_ids is null or array_length(v_expired_ids, 1) is null then
+    -- Even with no items expiring, prune stale dispatch audit rows.
+    delete from private.email_dispatches
+    where dispatched_at < now() - interval '30 days';
+    get diagnostics v_dispatches_deleted = row_count;
+
+    return json_build_object(
+      'items_deleted', 0,
+      'messages_deleted', 0,
+      'attempts_deleted', 0,
+      'dispatches_deleted', v_dispatches_deleted,
+      'image_paths', json_build_array()
+    );
+  end if;
+
+  select array_agg(image_url)
+  into v_image_urls
+  from public.items
+  where id = any(v_expired_ids)
+    and image_url is not null;
+
+  delete from public.contact_messages
+  where item_id = any(v_expired_ids);
+  get diagnostics v_messages_deleted = row_count;
+
+  delete from public.resolve_attempts
+  where item_id = any(v_expired_ids);
+  get diagnostics v_attempts_deleted = row_count;
+
+  -- Cascade to email audit (item dropping out + 30-day TTL)
+  delete from private.email_dispatches
+  where item_id = any(v_expired_ids)
+    or dispatched_at < now() - interval '30 days';
+  get diagnostics v_dispatches_deleted = row_count;
+
+  delete from public.items
+  where id = any(v_expired_ids);
+  get diagnostics v_items_deleted = row_count;
+
+  return json_build_object(
+    'items_deleted', v_items_deleted,
+    'messages_deleted', v_messages_deleted,
+    'attempts_deleted', v_attempts_deleted,
+    'dispatches_deleted', v_dispatches_deleted,
+    'image_paths', coalesce(to_json(v_image_urls), '[]'::json)
   );
 end;
 $$ language plpgsql security definer;
