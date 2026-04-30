@@ -82,6 +82,16 @@ begin
 end;
 $$ language plpgsql security definer;
 
+-- Lock the helper out of PostgREST. Default Postgres grants EXECUTE on public
+-- functions to PUBLIC, which in Supabase includes anon and authenticated. With
+-- the grant in place an anonymous caller could `rpc('_dispatch_email', ...)`
+-- with arbitrary JSON, triggering Resend through the Edge Function and writing
+-- attacker-controlled recipient rows into the audit table. Only the trusted
+-- SECURITY DEFINER wrappers (send_claim_code_email, send_contact_message,
+-- reply_to_message, send_support_request) should reach this function.
+revoke execute on function _dispatch_email(json) from public;
+revoke execute on function _dispatch_email(json) from anon, authenticated;
+
 -- Extend daily retention cron with a 30-day TTL prune for orphan audit rows
 -- (dispatches that have no item_id, e.g. support_request, or whose item was
 -- already deleted before this cron ran). Item-tied dispatches cascade-delete
@@ -151,7 +161,16 @@ $$ language plpgsql security definer;
 -- View joining the audit table with pg_net's response table. SQL-editor
 -- only (private schema, not exposed via PostgREST). `outcome` collapses
 -- the join into one of: config_missing | queue_failed | pending |
--- timed_out | error | sent | http_error.
+-- unknown_response_expired | timed_out | error | sent | http_error.
+--
+-- pg_net purges net._http_response on a short clock (~6h on Supabase
+-- managed). Audit rows live 30 days. Without an age check, a sent or
+-- failed dispatch becomes indistinguishable from in-flight after pg_net
+-- prunes its row, which would mislead complaint triage. So: if the
+-- audit row is older than the pg_net retention window and we still
+-- have no response row, mark it `unknown_response_expired` rather
+-- than `pending`. 6h matches the default; tune the interval if the
+-- pg_net config changes.
 create or replace view private.email_dispatch_status as
 select
   d.id,
@@ -168,6 +187,7 @@ select
   case
     when not d.config_complete then 'config_missing'
     when d.request_id is null then 'queue_failed'
+    when r.id is null and d.dispatched_at < now() - interval '6 hours' then 'unknown_response_expired'
     when r.id is null then 'pending'
     when r.timed_out then 'timed_out'
     when r.error_msg is not null then 'error'
