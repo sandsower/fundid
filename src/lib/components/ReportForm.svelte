@@ -161,7 +161,10 @@
 				const res = await fetch('/api/upload', { method: 'POST', body: form });
 				let body;
 				try { body = await res.json(); } catch { body = {}; }
-				if (!res.ok) throw new Error(body.message || $t('error.submissionFailed'));
+				if (!res.ok) {
+					capture('image_upload_failed', { status: res.status, reason: body.error || body.message || 'unknown' });
+					throw new Error(body.message || $t('error.submissionFailed'));
+				}
 				imageUrl = body.url;
 			}
 
@@ -188,6 +191,8 @@
 			try { data = await res.json(); } catch { data = {}; }
 
 			if (!res.ok) {
+				const reason = data.error || 'unknown';
+				capture('report_form_failed', { type, category, status: res.status, reason });
 				if (data.error === 'turnstile_failed') error = $t('error.turnstileFailed');
 				else if (data.error === 'rate_limited') error = $t('error.rateLimited');
 				else if (data.error === 'url_detected') error = $t('error.urlNotAllowed');
@@ -208,6 +213,7 @@
 			capture('report_form_submitted', { type, category, has_photo: !!imageFile, has_location: !!locationName.trim() });
 
 			if (!data.claim_code_sent) {
+				capture('claim_code_email_failed', { item_id: data.id });
 				console.warn('Claim code email may not have been sent for item', data.id);
 			}
 

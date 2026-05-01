@@ -5,7 +5,7 @@
 	const { t } = getTranslate();
 	import type { Item } from '$types/item';
 	import { categoryIcons } from '$utils/categories';
-	import { capture } from '$lib/posthog';
+	import { capture, captureImageError } from '$lib/posthog';
 	import { MapPin } from 'lucide-svelte';
 
 	let { item, onSelect }: { item: Item; onSelect?: (item: Item) => void } = $props();
@@ -44,6 +44,7 @@
 				alt={item.title}
 				loading="lazy"
 				class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
+				onerror={() => captureImageError('item_card', { item_id: item.id })}
 			/>
 		</div>
 	{:else}
